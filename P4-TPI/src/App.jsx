@@ -3,6 +3,7 @@ import Login from "../View/Login";
 import { LanguageProvider } from "../CustomHooks/TraslateHook"; 
 import BookingPage from "../View/BookingPage";
 import Admin from "../View/Admin";
+import NotFound from "../View/NotFound";
 
 function App() {
   return (
@@ -12,7 +13,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<h1>404 Not Found</h1>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </LanguageProvider>
