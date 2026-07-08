@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
+import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
+import { decodeToken, fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconChevronLeft = () => (
@@ -52,71 +54,10 @@ const IconPlus = () => (
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
-// Days that have appointments (day of month)
-const HAS_APPOINTMENTS = new Set([3, 10, 15, 22, 30]);
 
-const APPOINTMENTS = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    initials: "SJ",
-    color: "#dbeafe",
-    service: "Consultation",
-    time: "09:00 AM",
-    duration: "1h 30m",
-    room: "Room 101",
-    doctor: "Dr. Emily White",
-    doctorInitials: "EW",
-    amount: 150,
-    status: "Confirmed",
-    pending: false,
-    description: "Initial consultation to discuss treatment options and create a personalized care plan. Patient has reported recurring symptoms that need evaluation.",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    initials: "MC",
-    color: "#fce7f3",
-    service: "Follow-up",
-    time: "11:00 AM",
-    duration: "45m",
-    room: "Room 203",
-    doctor: "John Martinez",
-    doctorInitials: "JM",
-    amount: 75,
-    status: "Confirmed",
-    pending: false,
-    description: "Follow-up visit to review recent lab results and adjust medication dosage if necessary.",
-  },
-  {
-    id: 3,
-    name: "Emily Davis",
-    initials: "ED",
-    color: "#fef3c7",
-    service: "Initial Meeting",
-    time: "02:30 PM",
-    duration: "1h",
-    room: "Room 105",
-    doctor: "Dr. Emily White",
-    doctorInitials: "EW",
-    amount: 120,
-    status: "Pending",
-    pending: true,
-    description: "First meeting with new patient. Review medical history and establish a baseline for ongoing treatment.",
-  },
-];
-
-const UPCOMING = [
-  { label: "Today",     count: 3, color: "#3b82f6" },
-  { label: "Tomorrow",  count: 1, color: "#22c55e" },
-  { label: "Friday",    count: 2, color: "#a855f7" },
-  { label: "Saturday",  count: 0, color: "#9a9a9a" },
-];
 
 // ── Calendar ──────────────────────────────────────────────────────────────────
-const Calendar = ({ selected, onSelect }) => {
-  const [viewDate, setViewDate] = useState(new Date(2026, 4, 1)); // May 2026
-
+const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange }) => {
   const year  = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
@@ -125,42 +66,37 @@ const Calendar = ({ selected, onSelect }) => {
   const prevDays  = new Date(year, month, 0).getDate();
 
   const cells = [];
-  // prev month tail
   for (let i = firstDay - 1; i >= 0; i--)
     cells.push({ day: prevDays - i, cur: false });
-  // current month
   for (let d = 1; d <= daysCount; d++)
     cells.push({ day: d, cur: true });
-  // next month head
   let next = 1;
   while (cells.length % 7 !== 0) cells.push({ day: next++, cur: false });
 
-  const prevMonth = () => setViewDate(new Date(year, month - 1, 1));
-  const nextMonth = () => setViewDate(new Date(year, month + 1, 1));
+  const apptDays = new Set(
+    (appointments || []).filter(a => { const d = new Date(a.day); return d.getMonth() === month && d.getFullYear() === year; }).map(a => new Date(a.day).getDate())
+  );
 
   return (
     <div>
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors">
+        <button onClick={() => onViewDateChange(new Date(year, month - 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors">
           <IconChevronLeft />
         </button>
         <span className="text-sm font-semibold text-[#1a1a2e]">{MONTHS[month]} {year}</span>
-        <button onClick={nextMonth} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors">
+        <button onClick={() => onViewDateChange(new Date(year, month + 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors">
           <IconChevronRight />
         </button>
       </div>
-      {/* Day labels */}
       <div className="grid grid-cols-7 mb-1">
         {DAYS.map(d => (
           <div key={d} className="text-center text-[11px] font-semibold text-[#9a9a9a] py-1">{d}</div>
         ))}
       </div>
-      {/* Cells */}
       <div className="grid grid-cols-7 gap-y-0.5">
         {cells.map((c, i) => {
           const isSelected = c.cur && c.day === selected;
-          const hasAppt    = c.cur && HAS_APPOINTMENTS.has(c.day);
+          const hasAppt    = c.cur && apptDays.has(c.day);
           return (
             <button
               key={i}
@@ -177,17 +113,6 @@ const Calendar = ({ selected, onSelect }) => {
             </button>
           );
         })}
-      </div>
-      {/* Legend */}
-      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-[#f0ede8]">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full border border-[#3b82f6] bg-white inline-block" />
-          <span className="text-xs text-[#9a9a9a]">Has appointments</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#1a1a2e] inline-block" />
-          <span className="text-xs text-[#9a9a9a]">Selected</span>
-        </div>
       </div>
     </div>
   );
@@ -214,74 +139,74 @@ const Avatar = ({ initials, color, size = "md" }) => {
   );
 };
 
+const getInitials = (name) => {
+  if (!name) return "--";
+  return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+};
+
+const toTime12 = (iso) => {
+  if (!iso) return "--";
+  const [h, m] = iso.split(":");
+  const hour = parseInt(h, 10);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  return `${hour > 12 ? hour - 12 : hour === 0 ? 12 : hour}:${m} ${ampm}`;
+};
+
 // ── Appointment card ──────────────────────────────────────────────────────────
 const AppointmentCard = ({ appt }) => {
   const [expanded, setExpanded] = useState(false);
+  const isPending = appt.status === "Pending";
+  const timeRange = `${toTime12(appt.startTime)} - ${toTime12(appt.endTime)}`;
 
   return (
     <div
       className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer
-        ${appt.pending ? "border-l-4 border-l-[#f59e0b] border-[#e2ddd8]" : "border-[#e2ddd8]"}
+        ${isPending ? "border-l-4 border-l-[#f59e0b] border-[#e2ddd8]" : "border-[#e2ddd8]"}
       `}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
     >
-      {/* Main row */}
       <div className="flex items-center gap-4 px-5 py-4">
-        <Avatar initials={appt.initials} color={appt.color} />
+        <Avatar initials={getInitials(appt.clientName)} color="#dbeafe" />
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-[#1a1a2e] text-sm">{appt.name}</p>
-          <p className="text-xs text-[#9a9a9a]">{appt.service}</p>
+          <p className="font-semibold text-[#1a1a2e] text-sm">{appt.clientName || "—"}</p>
+          <p className="text-xs text-[#9a9a9a]">{appt.serviceName || "—"}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1 text-[#22c55e]">
             <IconDollar />
-            <span className="text-sm font-semibold text-[#1a1a2e]">${appt.amount}.00</span>
+            <span className="text-sm font-semibold text-[#1a1a2e]">${Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
-          <StatusBadge status={appt.status} pending={appt.pending} />
+          <StatusBadge status={appt.status || "Confirmed"} pending={isPending} />
         </div>
       </div>
 
-      {/* Detail row */}
       <div className="flex items-center justify-between px-5 pb-4 gap-4">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5 text-[#6b7280]">
             <IconClock />
-            <span className="text-xs">{appt.time}</span>
-            <span className="text-xs text-[#b0aba5]">({appt.duration})</span>
+            <span className="text-xs">{timeRange}</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[#6b7280]">
-            <IconMapPin />
-            <span className="text-xs">{appt.room}</span>
-          </div>
+          {appt.payment && (
+            <div className="flex items-center gap-1.5 text-[#6b7280]">
+              <IconDollar />
+              <span className="text-xs">{appt.payment}</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 text-[#6b7280]">
           <IconUser />
-          <span className="text-xs">Assigned to:</span>
-          <Avatar initials={appt.doctorInitials} color="#e2ddd8" size="sm" />
-          <span className="text-xs font-semibold text-[#1a1a2e]">{appt.doctor}</span>
+          <span className="text-xs">{appt.staffName || "--"}</span>
         </div>
       </div>
 
-      {/* Expandable description */}
-<div
-  className={`
-    overflow-hidden
-    transition-all
-    duration-500
-    ease-in-out
-    ${expanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}
-  `}
->
-  <div className="px-5 pb-4 border-t border-[#f0ede8] pt-3">
-    <div className="flex items-start gap-2 text-[#6b7280]">
-      <span className="mt-0.5 shrink-0">
-        <IconChevronDown />
-      </span>
-      <p className="text-xs leading-relaxed">{appt.description}</p>
-    </div>
-  </div>
-</div>
+      {appt.observation && (
+        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="px-5 pb-4 border-t border-[#f0ede8] pt-3">
+            <p className="text-xs text-[#6b7280] leading-relaxed">{appt.observation}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -289,17 +214,65 @@ const AppointmentCard = ({ appt }) => {
 // ── Main component ────────────────────────────────────────────────────────────
 const Appointments = () => {
   const { t } = useTranslation();
-  const [selectedDay, setSelectedDay] = useState(30);
+  const today = new Date();
+  const [selectedDay, setSelectedDay] = useState(today.getDate());
+  const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState(null);
+  const [userBranchId, setUserBranchId] = useState(null);
+  const [branches, setBranches] = useState([]);
+  const [selectedBranchId, setSelectedBranchId] = useState(null);
 
-  const selectedDate = `Wednesday, April 10, 2024`; // static for now; wire to real date logic if needed
+  useEffect(() => {
+    const user = decodeToken();
+    if (user) {
+      setRole(user.role);
+      setUserBranchId(user.branchId);
+    }
+  }, []);
+
+  useEffect(() => {
+    const lastDay = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+    if (selectedDay > lastDay) setSelectedDay(lastDay);
+  }, [viewDate]);
+
+  useEffect(() => {
+    if (role !== "Admin") return;
+    fetchBranchData().then(setBranches);
+  }, [role]);
+
+  useEffect(() => {
+    async function loadAppointments() {
+      setLoading(true);
+      try {
+        const day = new Date(viewDate.getFullYear(), viewDate.getMonth(), selectedDay);
+        let data;
+        if (role === "Recepcionista" || role === "Receptionist") {
+          data = await fetchMyBranchAppointmentsByDate(day);
+        } else {
+          data = await fetchAppointmentsByDate(day, selectedBranchId);
+        }
+        setAppointments(Array.isArray(data) ? data : []);
+      } catch {
+        setAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (role && selectedDay) loadAppointments();
+  }, [selectedDay, selectedBranchId, role, viewDate]);
+
+  const formatDate = (day) => {
+    const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+    return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  };
 
   return (
     <div className="flex flex-col gap-6">
 
-      {/* Top: calendar + day appointments */}
       <div className="flex gap-5 items-start">
 
-        {/* Calendar card */}
         <div className="w-[300px] shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-base font-bold text-[#1a1a2e]">{t("Calendar") || "Calendar"}</h2>
@@ -308,37 +281,46 @@ const Appointments = () => {
               {t("New Appointment") || "New Appointment"}
             </button>
           </div>
-          <Calendar selected={selectedDay} onSelect={setSelectedDay} />
-        </div>
-
-        {/* Day appointments */}
-        <div className="flex-1 flex flex-col gap-3">
-          <div className="mb-1">
-            <h2 className="text-lg font-bold text-[#1a1a2e]">{selectedDate}</h2>
-            <p className="text-sm text-[#9a9a9a]">{APPOINTMENTS.length} appointments scheduled</p>
-          </div>
-          {APPOINTMENTS.map(appt => (
-            <AppointmentCard key={appt.id} appt={appt} />
-          ))}
-        </div>
-      </div>
-
-      {/* Upcoming this week */}
-      <div>
-        <h2 className="text-base font-bold text-[#1a1a2e] mb-3">{t("Upcoming This Week") || "Upcoming This Week"}</h2>
-        <div className="grid grid-cols-4 gap-4">
-          {UPCOMING.map(({ label, count, color }) => (
-            <div key={label} className="bg-white rounded-2xl border border-[#e2ddd8] px-5 py-4 flex flex-col gap-1">
-              <p className="text-xs text-[#9a9a9a] font-medium">{label}</p>
-              <div className="flex items-end gap-2">
-                <div className="w-1 h-8 rounded-full shrink-0" style={{ background: color }} />
-                <span className="text-3xl font-bold text-[#1a1a2e] leading-none">{count}</span>
-              </div>
-              <p className="text-xs text-[#9a9a9a]">
-                {count === 1 ? "appointment" : "appointments"}
-              </p>
+          {role === "Admin" && branches.length > 0 && (
+            <div className="mb-4">
+              <label className="text-xs font-semibold text-[#6b7280] block mb-1.5">{t("Branch") || "Branch"}</label>
+              <select
+                value={selectedBranchId || ""}
+                onChange={e => setSelectedBranchId(e.target.value || null)}
+                className="w-full text-sm bg-[#f9f8f6] border border-[#e2ddd8] rounded-xl px-3 py-2 text-[#1a1a2e] outline-none focus:border-[#1a1a2e] transition-colors"
+              >
+                <option value="">{t("All branches") || "All branches"}</option>
+                {branches.map(b => (
+                  <option key={b.id || b.branchId} value={b.id || b.branchId}>
+                    {b.name || b.branchName}
+                  </option>
+                ))}
+              </select>
             </div>
-          ))}
+          )}
+          <Calendar selected={selectedDay} onSelect={setSelectedDay} appointments={appointments} viewDate={viewDate} onViewDateChange={setViewDate} />
+        </div>
+
+        <div className="flex-1 flex flex-col gap-3">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+            </div>
+          ) : (
+            <>
+              <div className="mb-1">
+                <h2 className="text-lg font-bold text-[#1a1a2e]">{formatDate(selectedDay)}</h2>
+                <p className="text-sm text-[#9a9a9a]">{appointments.length} appointments scheduled</p>
+              </div>
+              {appointments.length === 0 ? (
+                <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center">
+                  <p className="text-sm text-[#9a9a9a]">{t("No appointments for this day") || "No appointments for this day"}</p>
+                </div>
+              ) : (
+                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} />)
+              )}
+            </>
+          )}
         </div>
       </div>
 
