@@ -16,7 +16,7 @@ const Settings = () => {
   return (
     <div className="flex flex-col gap-6 w-full h-full pb-10 items-center">
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-[#f0ede8] rounded-xl p-1 self-start">
+      <div className="flex items-center gap-1 bg-[#f0ede8] rounded-xl p-1 mx-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
