@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BASE_URL, authHeaders } from "../../../../services/api";
+import { BASE_URL, getAuthHeaders } from "../../../../services/api";
 import { IconGlobe, IconCamera } from './SettingsIcons';
 
 const IconUpload = () => (
@@ -20,7 +20,7 @@ const BusinessTab = () => {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${BASE_URL}/Business/MyBusiness`, { headers: authHeaders });
+        const res = await fetch(`${BASE_URL}/Business/MyBusiness`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error("Failed to load business data");
         const data = await res.json();
         const initial = {
@@ -78,7 +78,7 @@ const BusinessTab = () => {
     try {
       const res = await fetch(`${BASE_URL}/Business/MyBusiness/Update`, {
         method: "PUT",
-        headers: authHeaders,
+        headers: getAuthHeaders(),
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error("Failed to save changes");

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
-import { decodeToken, fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
+import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
+import { useAuth } from "../../../../CustomHooks/AuthContext";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconChevronLeft = () => (
@@ -224,13 +225,14 @@ const Appointments = () => {
   const [branches, setBranches] = useState([]);
   const [selectedBranchId, setSelectedBranchId] = useState(null);
 
+  const { user } = useAuth();
+
   useEffect(() => {
-    const user = decodeToken();
     if (user) {
       setRole(user.role);
       setUserBranchId(user.branchId);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     const lastDay = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();

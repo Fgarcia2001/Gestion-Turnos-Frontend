@@ -1,16 +1,19 @@
 export const BASE_URL = "https://localhost:7032/api";
 export const AUTH_URL = `${BASE_URL}/Auth`;
 
-const token = import.meta.env.VITE_JWT_TOKEN;
+const TOKEN_KEY = "auth_token";
 
-export const authHeaders = {
-  "Content-Type": "application/json",
-  ...(token && { Authorization: `Bearer ${token}` }),
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
 };
 
 export const fetchJson = async (url) => {
   try {
-    const res = await fetch(url, { method: "GET", headers: authHeaders });
+    const res = await fetch(url, { method: "GET", headers: getAuthHeaders() });
     if (!res.ok) {
       console.error(`Error ${res.status} en ${url}`);
       return [];
@@ -26,7 +29,7 @@ export const fetchJson = async (url) => {
 export const signIn = async (credentials) => {
   const res = await fetch(`${AUTH_URL}/SignIn`, {
     method: "POST",
-    headers: authHeaders,
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials),
   });
   if (!res.ok) {
@@ -49,22 +52,6 @@ export const signUp = async (payload) => {
   return res.json();
 };
 
-export const decodeToken = () => {
-  try {
-    const payloadBase64 = token.split(".")[1];
-    const json = JSON.parse(atob(payloadBase64));
-    return {
-      sub: json.sub,
-      name: json.name,
-      role: json["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
-      businessId: json.BusinessId,
-      branchId: json.BranchId,
-    };
-  } catch {
-    return null;
-  }
-};
-
 const toDateParam = (date) => {
   const d = new Date(date);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -83,3 +70,4 @@ export const fetchStaffData   = () => fetchJson(`${BASE_URL}/Staff/Business/Staf
 export const fetchClientData  = () => fetchJson(`${BASE_URL}/Client`);
 export const fetchBranchData  = () => fetchJson(`${BASE_URL}/Branch`);
 export const fetchServiceData = () => fetchJson(`${BASE_URL}/Service`);
+
