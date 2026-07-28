@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../CustomHooks/AuthContext";
 
 const IconHome = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -68,8 +70,15 @@ const NavButton = ({ id, label, Icon, active, onClick }) => (
 
 const Navbar = ({ onSelectSection }) => {
   const [active, setActive] = useState("home");
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleClick = (id) => {
+    if (id === "logout") {
+      logout();
+      navigate("/");
+      return;
+    }
     setActive(id);
     if (onSelectSection) onSelectSection(id);
   };

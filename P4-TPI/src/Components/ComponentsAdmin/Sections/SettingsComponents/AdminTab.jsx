@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BASE_URL, authHeaders } from "../../../../services/api";
+import { BASE_URL, getAuthHeaders } from "../../../../services/api";
 import { IconCamera, IconMail, IconPhone as IconPhoneIcon } from './SettingsIcons';
 
 const IconUpload = () => (
@@ -20,7 +20,7 @@ const AdminTab = () => {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${BASE_URL}/Staff/Business/Admin`, { headers: authHeaders });
+        const res = await fetch(`${BASE_URL}/Staff/Business/Admin`, { headers: getAuthHeaders() });
         if (!res.ok) throw new Error("Failed to load admin data");
         const data = await res.json();
         const initial = {
@@ -78,7 +78,7 @@ const AdminTab = () => {
     try {
       const res = await fetch(`${BASE_URL}/Staff/Business/Admin`, {
         method: "PUT",
-        headers: authHeaders,
+        headers: getAuthHeaders(),
         body: JSON.stringify(formData),
       });
       if (!res.ok) throw new Error("Failed to save changes");

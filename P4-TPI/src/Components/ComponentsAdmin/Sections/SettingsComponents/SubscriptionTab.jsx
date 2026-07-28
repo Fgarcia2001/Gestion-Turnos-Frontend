@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BASE_URL, authHeaders } from "../../../../services/api";
+import { BASE_URL, getAuthHeaders } from "../../../../services/api";
 import { IconSparkles, IconCheck } from './SettingsIcons';
 
 const SubscriptionTab = () => {
@@ -9,7 +9,7 @@ const SubscriptionTab = () => {
   useEffect(() => {
     async function fetchSubscription() {
       try {
-        const res = await fetch(`${BASE_URL}/BusinessSubscription/my`, { headers: authHeaders });
+        const res = await fetch(`${BASE_URL}/BusinessSubscription/my`, { headers: getAuthHeaders() });
         const data = await res.json();
         setPlan(data);
       } catch {

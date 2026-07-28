@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+import { useAuth } from "../../../CustomHooks/AuthContext";
 import { dataLogin, DataLogup } from "./Datalogin/Login";
 import { useNavigate } from "react-router-dom";
 
@@ -145,6 +146,7 @@ const signUp = async (payload, t) => {
 // ── Main component ────────────────────────────────────────────────────────────
 const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) => {
   const { t } = useTranslation();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading]       = useState(false);
   const [register, setRegister]         = useState(false);
@@ -201,7 +203,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) =>
           email: loginFields.email,
           password: loginFields.password,
         }, t);
-        console.log("Sign-in success:", data);
+        login(data.token);
         navigate("/admin");
       }
     } catch (err) {
