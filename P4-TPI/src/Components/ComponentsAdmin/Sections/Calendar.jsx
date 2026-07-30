@@ -6,17 +6,9 @@ import CalendarGrid from './CalendarComponents/CalendarGrid';
 // ── Constants ─────────────────────────────────────────────────────────────────
 const TIME_RANGE = { start: 9, end: 19 };
 
-const MOCK_STAFF = [
-  { id: '1', name: 'cri sa',        initials: 'CS' },
-  { id: '2', name: 'fra ga',        initials: 'FG' },
-  { id: '3', name: 'martin ccirio', initials: 'MC' },
-];
+const MOCK_STAFF = [];
 
-const MOCK_APPOINTMENTS = [
-  { id: 'a1', staffId: '1', startTime: '10:00', endTime: '11:30', title: 'Haircut',      color: '#3b82f6' },
-  { id: 'a2', staffId: '2', startTime: '14:00', endTime: '15:00', title: 'Beard Trim',   color: '#10b981' },
-  { id: 'a3', staffId: '3', startTime: '16:30', endTime: '18:00', title: 'Hair Coloring', color: '#8b5cf6' },
-];
+const MOCK_APPOINTMENTS = [];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const addDays = (date, days) =>

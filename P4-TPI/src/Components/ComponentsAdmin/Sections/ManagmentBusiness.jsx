@@ -1,50 +1,53 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
-import { 
-  IconUsers, IconCalendar, IconTrendUp, IconBuilding, IconActivity, IconPlus 
+import {
+  IconUsers, IconCalendar, IconTrendUp, IconBuilding, IconActivity, IconPlus
 } from "./ManagmentBusinessComponents/Icons";
 import { StatCard } from "./ManagmentBusinessComponents/Shared";
-import { 
-  fetchStaffData, fetchClientData, fetchBranchData, fetchServiceData, TABS 
+import {
+  fetchStaffData, fetchClientData, fetchBranchData, fetchServiceData, TABS
 } from "./ManagmentBusinessComponents/Data";
+import { createStaff, updateStaff, deleteStaff } from "../../../services/staffService";
+import { createBranch, updateBranch, deleteBranch } from "../../../services/branchService";
+import { createService, updateService, deleteService } from "../../../services/servicesService";
 import { EditModal, CreateModal, SchedulesModal, DeleteModal } from "./ManagmentBusinessComponents/Modals";
 import { TableRow } from "./ManagmentBusinessComponents/TableComponents";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const STATS_CONFIG = {
   staff: (data, t) => [
-    { icon: IconUsers,    iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"),        value: data.staff.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: 92 },
-    { icon: IconTrendUp,  iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"),  value: "11.5" },
+    { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
+    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: "—" },
+    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: "—" },
   ],
   client: (data, t) => [
-    { icon: IconUsers,    iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Clients"),      value: data.clients.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: 92 },
-    { icon: IconTrendUp,  iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"),  value: "11.5" },
+    { icon: IconUsers, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Clients"), value: data.clients.length },
+    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: "—" },
+    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: "—" },
   ],
   service: (data, t) => [
-    { icon: IconActivity, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Services"),     value: data.services.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: 450 },
-    { icon: IconUsers,    iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"),     value: "120" },
+    { icon: IconActivity, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Services"), value: data.services.length },
+    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: "—" },
+    { icon: IconUsers, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: "—" },
   ],
   branch: (data, t) => [
-    { icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Total Branches"),     value: data.branches.length },
-    { icon: IconUsers,    iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"),        value: data.staff.length },
-    { icon: IconTrendUp,  iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"),  value: "11.5" },
+    { icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Total Branches"), value: data.branches.length },
+    { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
+    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: "—" },
   ],
 };
 
 const TAB_HEADERS = {
-  staff:   ["Name", "Email", "Phone", "Role", "Branch"],
-  client:  ["Name", "Email", "Phone", "Birthday"],
-  branch:  ["Name", "Address", "Phone", "City"],
+  staff: ["Name", "Email", "Phone", "Role", "Branch"],
+  client: ["Name", "Email", "Phone", "Birthday"],
+  branch: ["Name", "Address", "Phone", "City"],
   service: ["Name", "Category", "Description", "Duration", "Price"],
 };
 
 const ADD_LABELS = {
-  staff:   "Add Staff",
-  client:  "Add Client",
-  branch:  "Add Branch",
+  staff: "Add Staff",
+  client: "Add Client",
+  branch: "Add Branch",
   service: "Add Service",
 };
 
@@ -62,11 +65,10 @@ const TabSelector = ({ tabs, activeTab, onTabChange, t }) => (
       <button
         key={id}
         onClick={() => onTabChange(id)}
-        className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-          activeTab === id
-            ? "bg-[#1a1a2e] text-white shadow-sm"
-            : "text-[#9a9a9a] hover:text-[#1a1a2e]"
-        }`}
+        className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === id
+          ? "bg-[#1a1a2e] text-white shadow-sm"
+          : "text-[#9a9a9a] hover:text-[#1a1a2e]"
+          }`}
       >
         {t(labelKey)}
       </button>
@@ -115,15 +117,15 @@ const ManagmentBusiness = () => {
   const { t } = useTranslation();
 
   // ── State ──────────────────────────────────────────────────────────────────
-  const [tab, setTab]                     = useState("staff");
-  const [isLoading, setIsLoading]         = useState(true);
-  const [createTarget, setCreateTarget]   = useState(false);
-  const [editTarget, setEditTarget]       = useState(null);
-  const [deleteTarget, setDeleteTarget]   = useState(null);
+  const [tab, setTab] = useState("staff");
+  const [isLoading, setIsLoading] = useState(true);
+  const [createTarget, setCreateTarget] = useState(false);
+  const [editTarget, setEditTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [schedulesTarget, setSchedulesTarget] = useState(null);
   const [data, setData] = useState({
-    staff:    [],
-    clients:  [],
+    staff: [],
+    clients: [],
     branches: [],
     services: [],
   });
@@ -152,27 +154,134 @@ const ManagmentBusiness = () => {
 
   // ── Derived data ───────────────────────────────────────────────────────────
   const tableData = {
-    staff:   data.staff,
-    client:  data.clients,
-    branch:  data.branches,
+    staff: data.staff,
+    client: data.clients,
+    branch: data.branches,
     service: data.services,
   }[tab] ?? [];
 
-  const stats   = STATS_CONFIG[tab]?.(data, t) ?? [];
+  const stats = STATS_CONFIG[tab]?.(data, t) ?? [];
   const addLabel = t(ADD_LABELS[tab]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
-  const handleCreate = (newRecord) => {
+  const handleCreate = async (newRecord) => {
+    if (tab === "staff") {
+      const created = await createStaff({
+        name: newRecord.staffName,
+        email: newRecord.staffEmail,
+        password: newRecord.password,
+        linkPhoto: newRecord.staffLinkPhoto,
+        phone: newRecord.staffPhone,
+        rol: Number(newRecord.rol),
+        branchId: newRecord.branchId,
+      });
+      setData((prev) => ({ ...prev, staff: [...prev.staff, created] }));
+      return;
+    }
+    if (tab === "branch") {
+      const created = await createBranch({
+        Name: newRecord.name,
+        Address: newRecord.address,
+        phone: newRecord.phone,
+        City: newRecord.city,
+      });
+      setData((prev) => ({ ...prev, branches: [...prev.branches, created] }));
+      return;
+    }
+    if (tab === "service") {
+      const created = await createService({
+        name: newRecord.name,
+        categoria: newRecord.categoria,
+        description: newRecord.description,
+        duration: Number(newRecord.duration),
+        price: Number(newRecord.price),
+      });
+      setData((prev) => ({ ...prev, services: [...prev.services, created] }));
+      return;
+    }
     console.log("Created:", newRecord);
     // TODO: wire to API + update local state
   };
 
-  const handleEdit = (updated) => {
+  const handleEdit = async (updated) => {
+    if (tab === "staff") {
+      const id = updated.id ?? updated.staffId;
+      const saved = await updateStaff(id, {
+        name: updated.staffName,
+        email: updated.staffEmail,
+        password: updated.password,
+        linkPhoto: updated.staffLinkPhoto,
+        phone: updated.staffPhone,
+        rol: Number(updated.rol),
+        branchId: updated.branchId,
+      });
+      setData((prev) => ({
+        ...prev,
+        staff: prev.staff.map((s) => ((s.id ?? s.staffId) === id ? saved : s)),
+      }));
+      return;
+    }
+    if (tab === "branch") {
+      const id = updated.id ?? updated.branchId;
+      const saved = await updateBranch(id, {
+        Name: updated.name,
+        Address: updated.address,
+        phone: updated.phone,
+        City: updated.city,
+      });
+      setData((prev) => ({
+        ...prev,
+        branches: prev.branches.map((b) => ((b.id ?? b.branchId) === id ? saved : b)),
+      }));
+      return;
+    }
+    if (tab === "service") {
+      const id = updated.id ?? updated.serviceId;
+      const saved = await updateService(id, {
+        name: updated.name,
+        categoria: updated.categoria,
+        description: updated.description,
+        duration: Number(updated.duration),
+        price: Number(updated.price),
+      });
+      setData((prev) => ({
+        ...prev,
+        services: prev.services.map((s) => ((s.id ?? s.serviceId) === id ? (saved ?? { ...s, ...updated }) : s)),
+      }));
+      return;
+    }
     console.log("Saved:", updated);
     // TODO: wire to API + update local state
   };
 
-  const handleDelete = (row) => {
+  const handleDelete = async (row) => {
+    if (tab === "service") {
+      const id = row.id ?? row.serviceId;
+      await deleteService(id);
+      setData((prev) => ({
+        ...prev,
+        services: prev.services.filter((s) => (s.id ?? s.serviceId) !== id),
+      }));
+      return;
+    }
+    if (tab === "staff") {
+      const id = row.id ?? row.staffId;
+      await deleteStaff(id);
+      setData((prev) => ({
+        ...prev,
+        staff: prev.staff.filter((s) => (s.id ?? s.staffId) !== id),
+      }));
+      return;
+    }
+    if (tab === "branch") {
+      const id = row.id ?? row.branchId;
+      await deleteBranch(id);
+      setData((prev) => ({
+        ...prev,
+        branches: prev.branches.filter((b) => (b.id ?? b.branchId) !== id),
+      }));
+      return;
+    }
     console.log("Deleted:", row);
     // TODO: wire to API + update local state
   };
@@ -231,8 +340,8 @@ const ManagmentBusiness = () => {
                         row={row}
                         tab={tab}
                         t={t}
-                        onEdit={()      => setEditTarget(row)}
-                        onDelete={()    => setDeleteTarget(row)}
+                        onEdit={() => setEditTarget(row)}
+                        onDelete={() => setDeleteTarget(row)}
                         onSchedules={() => setSchedulesTarget(row)}
                       />
                     ))
@@ -248,6 +357,7 @@ const ManagmentBusiness = () => {
       {createTarget && (
         <CreateModal
           tab={tab}
+          branches={data.branches}
           onClose={() => setCreateTarget(false)}
           onSave={handleCreate}
         />
@@ -257,6 +367,7 @@ const ManagmentBusiness = () => {
         <EditModal
           row={editTarget}
           tab={tab}
+          branches={data.branches}
           onClose={() => setEditTarget(null)}
           onSave={handleEdit}
         />
