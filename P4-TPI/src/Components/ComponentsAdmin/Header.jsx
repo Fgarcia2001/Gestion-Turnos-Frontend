@@ -6,13 +6,16 @@ const IconBell = () => (
   </svg>
 );
 
-const Header = ({ username = "Alif Reza" }) => {
-  const initials = username.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+const Header = ({ username }) => {
+  const displayName = username || "";
+  const initials = displayName
+    ? displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+    : "--";
   return (
     <header className="flex items-center justify-between w-full px-8 py-5 bg-[#f0ede8]">
       <div>
         <h1 className="text-2xl font-bold text-[#1a1a2e] leading-tight">
-          Hello, <span className="font-bold">{username}</span>
+          Hello, <span className="font-bold">{displayName || "there"}</span>
         </h1>
         <p className="text-sm text-[#9a9a9a] mt-0.5">View and control your appointments here!</p>
       </div>

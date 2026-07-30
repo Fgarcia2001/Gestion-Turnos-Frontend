@@ -2,17 +2,45 @@ import { useState } from 'react';
 import { ModalOverlay, inputClass, labelClass, Avatar } from './Shared';
 import { IconPhoto, IconX, IconWarning, IconClock } from './Icons';
 
+// ── Role label ↔ id mapping ────────────────────────────────────────────────────
+// The staff list endpoint returns rol as a text label (e.g. "Recepcionista"),
+// but the create/update payload expects the numeric id used by the <select> options.
+const ROLE_NAME_TO_ID = { Recepcionista: 1, Profesional: 2 };
+
 // ── Edit Modal ────────────────────────────────────────────────────────────────
-export const EditModal = ({ row, tab, onClose, onSave }) => {
-  const [form, setForm] = useState({ ...row });
+export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
+  const [form, setForm] = useState(() => {
+    if (tab === "staff") {
+      const matchedBranch = branches.find(
+        (b) => (b.name ?? b.branchName) === row.branchName
+      );
+      const rol = typeof row.rol === "number" ? row.rol : (ROLE_NAME_TO_ID[row.rol] ?? "");
+      return {
+        ...row,
+        rol,
+        branchId: row.branchId ?? matchedBranch?.id ?? matchedBranch?.branchId ?? "",
+      };
+    }
+    return { ...row };
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(form);
-    onClose();
+    setError("");
+    setSubmitting(true);
+    try {
+      await onSave(form);
+      onClose();
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const tabLabel = tab === "staff" ? "Staff" : tab === "client" ? "Client" : tab === "branch" ? "Branch" : "Service";
@@ -20,9 +48,9 @@ export const EditModal = ({ row, tab, onClose, onSave }) => {
   return (
     <ModalOverlay onClose={onClose}>
       <div
-  className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
-  style={{ maxHeight: "90vh", overflowY: "auto" }}
->
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
+        style={{ maxHeight: "90vh", overflowY: "auto" }}
+      >
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5 w-full">
@@ -46,6 +74,12 @@ export const EditModal = ({ row, tab, onClose, onSave }) => {
           </div>
         </div>
 
+        {error && (
+          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
           {/* ── STAFF fields ── */}
@@ -58,6 +92,10 @@ export const EditModal = ({ row, tab, onClose, onSave }) => {
               <div>
                 <label className={labelClass}>Staff Email</label>
                 <input name="staffEmail" type="email" value={form.staffEmail || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
+              </div>
+              <div>
+                <label className={labelClass}>Password</label>
+                <input name="password" type="password" value={form.password || ""} onChange={handleChange} className={inputClass} required minLength={6} placeholder="••••••••" autoComplete="new-password" />
               </div>
               <div>
                 <label className={labelClass}>Staff Phone</label>
@@ -80,16 +118,20 @@ export const EditModal = ({ row, tab, onClose, onSave }) => {
               <div>
                 <label className={labelClass}>Role</label>
                 <select name="rol" value={form.rol || ""} onChange={handleChange} className={inputClass}>
-                  <option value="Doctor">Doctor</option>
-                  <option value="Therapist">Therapist</option>
-                  <option value="Nurse">Nurse</option>
-                  <option value="Receptionist">Receptionist</option>
-                  <option value="Admin">Admin</option>
+                  <option value={1}>Recepcionista</option>
+                  <option value={2}>Profesional</option>
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Branch Name</label>
-                <input name="branchName" value={form.branchName || ""} onChange={handleChange} className={inputClass} placeholder="Branch Name" />
+                <label className={labelClass}>Branch</label>
+                <select name="branchId" value={form.branchId || ""} onChange={handleChange} className={inputClass} required>
+                  <option value="" disabled>Select a branch</option>
+                  {branches.map((b) => (
+                    <option key={b.id ?? b.branchId} value={b.id ?? b.branchId}>
+                      {b.name ?? b.branchName}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
@@ -172,9 +214,9 @@ export const EditModal = ({ row, tab, onClose, onSave }) => {
               className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors">
               Cancel
             </button>
-            <button type="submit"
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors">
-              Save changes
+            <button type="submit" disabled={submitting}
+              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50">
+              {submitting ? "Saving..." : "Save changes"}
             </button>
           </div>
         </form>
@@ -184,16 +226,26 @@ export const EditModal = ({ row, tab, onClose, onSave }) => {
 };
 
 // ── Create Modal ──────────────────────────────────────────────────────────────
-export const CreateModal = ({ tab, onClose, onSave }) => {
-  const [form, setForm] = useState({});
+export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
+  const [form, setForm] = useState(() => (tab === "staff" ? { rol: 1 } : {}));
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(form);
-    onClose();
+    setError("");
+    setSubmitting(true);
+    try {
+      await onSave(form);
+      onClose();
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const tabLabel = tab === "staff" ? "Staff" : tab === "client" ? "Client" : tab === "branch" ? "Branch" : "Service";
@@ -217,6 +269,12 @@ export const CreateModal = ({ tab, onClose, onSave }) => {
           </button>
         </div>
 
+        {error && (
+          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
           {/* ── STAFF fields ── */}
@@ -231,6 +289,10 @@ export const CreateModal = ({ tab, onClose, onSave }) => {
                 <input name="staffEmail" type="email" value={form.staffEmail || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
               </div>
               <div>
+                <label className={labelClass}>Password</label>
+                <input name="password" type="password" value={form.password || ""} onChange={handleChange} className={inputClass} required minLength={6} placeholder="••••••••" autoComplete="new-password" />
+              </div>
+              <div>
                 <label className={labelClass}>Staff Phone</label>
                 <input name="staffPhone" value={form.staffPhone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
               </div>
@@ -243,17 +305,21 @@ export const CreateModal = ({ tab, onClose, onSave }) => {
               </div>
               <div>
                 <label className={labelClass}>Role</label>
-                <select name="rol" value={form.rol || "Doctor"} onChange={handleChange} className={inputClass}>
-                  <option value="Doctor">Doctor</option>
-                  <option value="Therapist">Therapist</option>
-                  <option value="Nurse">Nurse</option>
-                  <option value="Receptionist">Receptionist</option>
-                  <option value="Admin">Admin</option>
+                <select name="rol" value={form.rol} onChange={handleChange} className={inputClass}>
+                  <option value={1}>Recepcionista</option>
+                  <option value={2}>Profesional</option>
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Branch Name</label>
-                <input name="branchName" value={form.branchName || ""} onChange={handleChange} className={inputClass} placeholder="Branch Name" />
+                <label className={labelClass}>Branch</label>
+                <select name="branchId" value={form.branchId || ""} onChange={handleChange} className={inputClass} required>
+                  <option value="" disabled>Select a branch</option>
+                  {branches.map((b) => (
+                    <option key={b.id ?? b.branchId} value={b.id ?? b.branchId}>
+                      {b.name ?? b.branchName}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
@@ -336,9 +402,9 @@ export const CreateModal = ({ tab, onClose, onSave }) => {
               className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors">
               Cancel
             </button>
-            <button type="submit"
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors">
-              Create
+            <button type="submit" disabled={submitting}
+              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50">
+              {submitting ? "Creating..." : "Create"}
             </button>
           </div>
         </form>
