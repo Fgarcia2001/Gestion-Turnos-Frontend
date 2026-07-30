@@ -1,33 +1,57 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { IconDots, IconEdit, IconClock, IconTrash } from './Icons';
 import { Avatar, Badge } from './Shared';
 
 // ── Dropdown context menu ─────────────────────────────────────────────────────
 export const RowMenu = ({ tab, onEdit, onDelete, onSchedules }) => {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const buttonRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (!open || !buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setPosition({ top: rect.bottom + 4, left: rect.right - 160 });
+  }, [open]);
 
   useEffect(() => {
+    if (!open) return;
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (
+        buttonRef.current && !buttonRef.current.contains(e.target) &&
+        menuRef.current && !menuRef.current.contains(e.target)
+      ) {
+        setOpen(false);
+      }
     };
+    const reposition = () => setOpen(false);
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    window.addEventListener("scroll", reposition, true);
+    window.addEventListener("resize", reposition);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("scroll", reposition, true);
+      window.removeEventListener("resize", reposition);
+    };
+  }, [open]);
 
   return (
-    <div className="relative inline-block" ref={ref}>
+    <div className="relative inline-block">
       <button
+        ref={buttonRef}
         onClick={() => setOpen((v) => !v)}
         className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1 rounded-lg hover:bg-[#f0ede8]"
       >
         <IconDots />
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
-          className="absolute right-0 z-50 mt-1 bg-white border border-[#e2ddd8] rounded-xl shadow-lg overflow-hidden"
-          style={{ animation: "fadeSlideIn 0.15s ease", minWidth: "10rem" }}
+          ref={menuRef}
+          className="fixed z-50 bg-white border border-[#e2ddd8] rounded-xl shadow-lg overflow-hidden"
+          style={{ animation: "fadeSlideIn 0.15s ease", minWidth: "10rem", top: position.top, left: position.left }}
         >
           <button
             onClick={() => { setOpen(false); onEdit(); }}
@@ -59,7 +83,8 @@ export const RowMenu = ({ tab, onEdit, onDelete, onSchedules }) => {
             <IconTrash />
             Delete
           </button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

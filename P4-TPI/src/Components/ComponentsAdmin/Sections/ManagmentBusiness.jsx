@@ -7,7 +7,9 @@ import { StatCard } from "./ManagmentBusinessComponents/Shared";
 import {
   fetchStaffData, fetchClientData, fetchBranchData, fetchServiceData, TABS
 } from "./ManagmentBusinessComponents/Data";
-import { createStaff, updateStaff } from "../../../services/api";
+import { createStaff, updateStaff, deleteStaff } from "../../../services/staffService";
+import { createBranch, updateBranch, deleteBranch } from "../../../services/branchService";
+import { createService, updateService, deleteService } from "../../../services/servicesService";
 import { EditModal, CreateModal, SchedulesModal, DeleteModal } from "./ManagmentBusinessComponents/Modals";
 import { TableRow } from "./ManagmentBusinessComponents/TableComponents";
 
@@ -176,6 +178,27 @@ const ManagmentBusiness = () => {
       setData((prev) => ({ ...prev, staff: [...prev.staff, created] }));
       return;
     }
+    if (tab === "branch") {
+      const created = await createBranch({
+        Name: newRecord.name,
+        Address: newRecord.address,
+        phone: newRecord.phone,
+        City: newRecord.city,
+      });
+      setData((prev) => ({ ...prev, branches: [...prev.branches, created] }));
+      return;
+    }
+    if (tab === "service") {
+      const created = await createService({
+        name: newRecord.name,
+        categoria: newRecord.categoria,
+        description: newRecord.description,
+        duration: Number(newRecord.duration),
+        price: Number(newRecord.price),
+      });
+      setData((prev) => ({ ...prev, services: [...prev.services, created] }));
+      return;
+    }
     console.log("Created:", newRecord);
     // TODO: wire to API + update local state
   };
@@ -198,11 +221,67 @@ const ManagmentBusiness = () => {
       }));
       return;
     }
+    if (tab === "branch") {
+      const id = updated.id ?? updated.branchId;
+      const saved = await updateBranch(id, {
+        Name: updated.name,
+        Address: updated.address,
+        phone: updated.phone,
+        City: updated.city,
+      });
+      setData((prev) => ({
+        ...prev,
+        branches: prev.branches.map((b) => ((b.id ?? b.branchId) === id ? saved : b)),
+      }));
+      return;
+    }
+    if (tab === "service") {
+      const id = updated.id ?? updated.serviceId;
+      const saved = await updateService(id, {
+        name: updated.name,
+        categoria: updated.categoria,
+        description: updated.description,
+        duration: Number(updated.duration),
+        price: Number(updated.price),
+      });
+      setData((prev) => ({
+        ...prev,
+        services: prev.services.map((s) => ((s.id ?? s.serviceId) === id ? (saved ?? { ...s, ...updated }) : s)),
+      }));
+      return;
+    }
     console.log("Saved:", updated);
     // TODO: wire to API + update local state
   };
 
-  const handleDelete = (row) => {
+  const handleDelete = async (row) => {
+    if (tab === "service") {
+      const id = row.id ?? row.serviceId;
+      await deleteService(id);
+      setData((prev) => ({
+        ...prev,
+        services: prev.services.filter((s) => (s.id ?? s.serviceId) !== id),
+      }));
+      return;
+    }
+    if (tab === "staff") {
+      const id = row.id ?? row.staffId;
+      await deleteStaff(id);
+      setData((prev) => ({
+        ...prev,
+        staff: prev.staff.filter((s) => (s.id ?? s.staffId) !== id),
+      }));
+      return;
+    }
+    if (tab === "branch") {
+      const id = row.id ?? row.branchId;
+      await deleteBranch(id);
+      setData((prev) => ({
+        ...prev,
+        branches: prev.branches.filter((b) => (b.id ?? b.branchId) !== id),
+      }));
+      return;
+    }
     console.log("Deleted:", row);
     // TODO: wire to API + update local state
   };
