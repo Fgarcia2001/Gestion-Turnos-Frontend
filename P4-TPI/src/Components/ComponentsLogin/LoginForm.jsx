@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
 import { useAuth } from "../../../CustomHooks/AuthContext";
 import { dataLogin, DataLogup } from "./Datalogin/Login";
 import { useNavigate } from "react-router-dom";
+import { fetchBusinessTypes } from "../../services/businessService";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconMail = () => (
@@ -157,6 +158,11 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) =>
 
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
+  const [businessTypes, setBusinessTypes] = useState([]);
+
+  useEffect(() => {
+    fetchBusinessTypes().then(setBusinessTypes);
+  }, []);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleLoginChange = (e) => {
@@ -178,7 +184,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) =>
     setServerError("");
 
     const validationErrors = register
-      ? validateSignup({ ...loginFields, ...signupFields }, t)
+      ? validateSignup({ ...signupFields, ...loginFields }, t)
       : validateLogin(loginFields, t);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -197,7 +203,8 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) =>
           password: loginFields.password,
         };
         const data = await signUp(payload, t);
-        console.log("Sign-up success:", data);
+        login(data.token);
+        navigate("/admin");
       } else {
         const data = await signIn({
           email: loginFields.email,
@@ -330,14 +337,19 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) =>
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("businessCategory")}</label>
                 <InputIcon icon={IconBriefcase}>
-                  <input
-                    type="text"
+                  <select
                     name="businessCategory"
-                    placeholder={t("businessCategoryPlaceholder")}
                     value={signupFields.businessCategory}
                     onChange={handleSignupChange}
-                    className={inputWithIconCls + (errors.businessCategory ? inputErrorCls : "")}
-                  />
+                    className={inputWithIconCls + " appearance-none cursor-pointer" + (errors.businessCategory ? inputErrorCls : "")}
+                  >
+                    <option value="">{t("businessCategoryPlaceholder")}</option>
+                    {businessTypes.map((type) => (
+                      <option key={type.id} value={type.id}>
+                        {type.name}
+                      </option>
+                    ))}
+                  </select>
                 </InputIcon>
                 <FieldError msg={errors.businessCategory} />
               </div>
