@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "../View/Home";
 import Login from "../View/Login";
-import { LanguageProvider } from "../CustomHooks/TraslateHook"; 
+import { LanguageProvider } from "../CustomHooks/TraslateHook";
 import { AuthProvider } from "../CustomHooks/AuthContext";
 import BookingPage from "../View/BookingPage";
 import Admin from "../View/Admin";
@@ -12,7 +13,9 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/booking" element={<BookingPage />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
