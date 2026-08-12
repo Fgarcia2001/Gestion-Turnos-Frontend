@@ -26,6 +26,21 @@ export const fetchJson = async (url) => {
   }
 };
 
+export const fetchJsonOrThrow = async (url) => {
+  let res;
+  try {
+    res = await fetch(url, { method: "GET", headers: getAuthHeaders() });
+  } catch {
+    throw new Error("networkError");
+  }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message || "apiError");
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+};
+
 export const signIn = async (credentials) => {
   const res = await fetch(`${AUTH_URL}/SignIn`, {
     method: "POST",
@@ -52,7 +67,7 @@ export const signUp = async (payload) => {
   return res.json();
 };
 
-const toDateParam = (date) => {
+export const toDateParam = (date) => {
   const d = new Date(date);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };

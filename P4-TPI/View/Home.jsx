@@ -70,7 +70,7 @@ const Home = () => {
             title="Book an Appointment"
             description="Looking to schedule a visit with a business? Find availability and book your appointment in seconds."
             buttonLabel="Book Now"
-            onAction={() => navigate("/appointments")}
+            onAction={() => navigate("/booking")}
           />
         </section>
       </div>

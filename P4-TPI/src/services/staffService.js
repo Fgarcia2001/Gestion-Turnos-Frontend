@@ -1,4 +1,7 @@
-import { BASE_URL, getAuthHeaders } from "./api";
+import { BASE_URL, getAuthHeaders, fetchJsonOrThrow } from "./api";
+
+export const fetchStaffByBranch = (branchId) =>
+  fetchJsonOrThrow(`${BASE_URL}/staff/branch/${branchId}`);
 
 export const createStaff = async (payload) => {
   const res = await fetch(`${BASE_URL}/Staff`, {

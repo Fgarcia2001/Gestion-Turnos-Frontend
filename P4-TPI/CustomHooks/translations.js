@@ -69,7 +69,72 @@ export const translations = {
 
     // API messages
     invalidCredentials: "Invalid credentials. Please try again.",
-    registrationFailed: "Registration failed. Please try again."
+    registrationFailed: "Registration failed. Please try again.",
+
+    // Booking flow - step titles
+    selectBusinessType: "Select Business Type",
+    selectBusiness: "Select Business",
+    selectBranch: "Select Branch",
+    selectService: "Select Service",
+    selectProfessional: "Select Professional",
+    enterYourInformation: "Enter Your Information",
+    reviewYourAppointment: "Review Your Appointment",
+    appointmentConfirmed: "Appointment Confirmed",
+
+    // Booking flow - empty states
+    noBusinessTypesFound: "No business types found.",
+    noBusinessesFound: "No businesses found for this type.",
+    noBranchesFound: "No branches found for this business.",
+    noServicesFound: "No services found for this business.",
+    noStaffFound: "No professionals found at this branch.",
+    noSlotsAvailable: "No available time slots for this day. Try another day.",
+
+    // Booking flow - error states
+    loadBusinessTypesError: "Couldn't load business types.",
+    loadBusinessesError: "Couldn't load businesses.",
+    loadBranchesError: "Couldn't load branches.",
+    loadServicesError: "Couldn't load services.",
+    loadStaffError: "Couldn't load professionals.",
+    loadSlotsError: "Couldn't load available time slots.",
+    networkError: "Network error. Check your connection and try again.",
+    bookingFailed: "Couldn't complete your booking. Please try again.",
+    retry: "Retry",
+
+    // Booking flow - client info form
+    clientNameLabel: "Full name",
+    clientEmailLabel: "Email",
+    clientPhoneLabel: "Phone",
+    clientBirthDayLabel: "Date of birth",
+    observationLabel: "Notes (optional)",
+    observationPlaceholder: "Any details the professional should know",
+    paymentLabel: "Payment method",
+    payment_cash: "Cash",
+    payment_card: "Card",
+    birthDayRequired: "Date of birth is required.",
+    paymentRequired: "Payment method is required.",
+
+    // Booking flow - review & confirmation
+    reviewSummaryTitle: "Review your appointment",
+    businessLabel: "Business",
+    branchLabel: "Branch",
+    serviceLabel: "Service",
+    professionalLabel: "Professional",
+    dateLabel: "Date",
+    timeLabel: "Time",
+    priceLabel: "Price",
+    durationLabel: "Duration",
+    confirmButton: "Confirm Appointment",
+    appointmentConfirmedTitle: "Your appointment is confirmed!",
+    bookAnother: "Book another appointment",
+    appointmentIdLabel: "Confirmation number",
+
+    // Booking flow - calendar months
+    january: "January", february: "February", march: "March", may: "May",
+    june: "June", july: "July", august: "August", september: "September",
+    october: "October", november: "November", december: "December",
+
+    // Misc
+    minutesAbbrev: "min"
   },
   es: {
     welcome: "Bienvenido de nuevo",
@@ -141,6 +206,71 @@ export const translations = {
 
     // API messages
     invalidCredentials: "Credenciales incorrectas. Inténtalo nuevamente.",
-    registrationFailed: "No se pudo completar el registro. Inténtalo nuevamente."
+    registrationFailed: "No se pudo completar el registro. Inténtalo nuevamente.",
+
+    // Flujo de reserva - títulos de pasos
+    selectBusinessType: "Selecciona el Tipo de Negocio",
+    selectBusiness: "Selecciona el Negocio",
+    selectBranch: "Selecciona la Sucursal",
+    selectService: "Selecciona el Servicio",
+    selectProfessional: "Selecciona el Profesional",
+    enterYourInformation: "Ingresa tu Información",
+    reviewYourAppointment: "Revisa tu Turno",
+    appointmentConfirmed: "Turno Confirmado",
+
+    // Flujo de reserva - estados vacíos
+    noBusinessTypesFound: "No se encontraron tipos de negocio.",
+    noBusinessesFound: "No se encontraron negocios para este tipo.",
+    noBranchesFound: "No se encontraron sucursales para este negocio.",
+    noServicesFound: "No se encontraron servicios para este negocio.",
+    noStaffFound: "No se encontraron profesionales en esta sucursal.",
+    noSlotsAvailable: "No hay horarios disponibles para este día. Prueba con otro día.",
+
+    // Flujo de reserva - estados de error
+    loadBusinessTypesError: "No se pudieron cargar los tipos de negocio.",
+    loadBusinessesError: "No se pudieron cargar los negocios.",
+    loadBranchesError: "No se pudieron cargar las sucursales.",
+    loadServicesError: "No se pudieron cargar los servicios.",
+    loadStaffError: "No se pudieron cargar los profesionales.",
+    loadSlotsError: "No se pudieron cargar los horarios disponibles.",
+    networkError: "Error de red. Verifica tu conexión e inténtalo nuevamente.",
+    bookingFailed: "No se pudo completar la reserva. Inténtalo nuevamente.",
+    retry: "Reintentar",
+
+    // Flujo de reserva - formulario de datos del cliente
+    clientNameLabel: "Nombre completo",
+    clientEmailLabel: "Correo electrónico",
+    clientPhoneLabel: "Teléfono",
+    clientBirthDayLabel: "Fecha de nacimiento",
+    observationLabel: "Notas (opcional)",
+    observationPlaceholder: "Cualquier detalle que el profesional deba saber",
+    paymentLabel: "Método de pago",
+    payment_cash: "Efectivo",
+    payment_card: "Tarjeta",
+    birthDayRequired: "La fecha de nacimiento es obligatoria.",
+    paymentRequired: "El método de pago es obligatorio.",
+
+    // Flujo de reserva - revisión y confirmación
+    reviewSummaryTitle: "Revisa tu turno",
+    businessLabel: "Negocio",
+    branchLabel: "Sucursal",
+    serviceLabel: "Servicio",
+    professionalLabel: "Profesional",
+    dateLabel: "Fecha",
+    timeLabel: "Hora",
+    priceLabel: "Precio",
+    durationLabel: "Duración",
+    confirmButton: "Confirmar Turno",
+    appointmentConfirmedTitle: "¡Tu turno está confirmado!",
+    bookAnother: "Reservar otro turno",
+    appointmentIdLabel: "Número de confirmación",
+
+    // Flujo de reserva - meses del calendario
+    january: "Enero", february: "Febrero", march: "Marzo", may: "Mayo",
+    june: "Junio", july: "Julio", august: "Agosto", september: "Septiembre",
+    october: "Octubre", november: "Noviembre", december: "Diciembre",
+
+    // Varios
+    minutesAbbrev: "min"
   }
 };
