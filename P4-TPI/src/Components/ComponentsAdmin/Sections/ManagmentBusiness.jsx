@@ -123,6 +123,7 @@ const ManagmentBusiness = () => {
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [schedulesTarget, setSchedulesTarget] = useState(null);
+  const [toast, setToast] = useState(null);
   const [data, setData] = useState({
     staff: [],
     clients: [],
@@ -131,26 +132,31 @@ const ManagmentBusiness = () => {
   });
 
   // ── Data fetching ──────────────────────────────────────────────────────────
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const [staff, clients, branches, services] = await Promise.all([
-          fetchStaffData(),
-          fetchClientData(),
-          fetchBranchData(),
-          fetchServiceData(),
-        ]);
-        setData({ staff, clients, branches, services });
-      } catch (e) {
-        console.error("Error loading data:", e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [staff, clients, branches, services] = await Promise.all([
+        fetchStaffData(),
+        fetchClientData(),
+        fetchBranchData(),
+        fetchServiceData(),
+      ]);
+      setData({ staff, clients, branches, services });
+    } catch (e) {
+      console.error("Error loading data:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadData();
   }, []);
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   // ── Derived data ───────────────────────────────────────────────────────────
   const tableData = {
@@ -176,27 +182,30 @@ const ManagmentBusiness = () => {
         branchId: newRecord.branchId,
       });
       setData((prev) => ({ ...prev, staff: [...prev.staff, created] }));
+      showToast(t("Staff created successfully") || "Staff created successfully");
       return;
     }
     if (tab === "branch") {
-      const created = await createBranch({
+      await createBranch({
         Name: newRecord.name,
         Address: newRecord.address,
         phone: newRecord.phone,
         City: newRecord.city,
       });
-      setData((prev) => ({ ...prev, branches: [...prev.branches, created] }));
+      await loadData();
+      showToast(t("Branch created successfully") || "Branch created successfully");
       return;
     }
     if (tab === "service") {
-      const created = await createService({
+      await createService({
         name: newRecord.name,
         categoria: newRecord.categoria,
         description: newRecord.description,
         duration: Number(newRecord.duration),
         price: Number(newRecord.price),
       });
-      setData((prev) => ({ ...prev, services: [...prev.services, created] }));
+      await loadData();
+      showToast(t("Service created successfully") || "Service created successfully");
       return;
     }
     console.log("Created:", newRecord);
@@ -219,6 +228,7 @@ const ManagmentBusiness = () => {
         ...prev,
         staff: prev.staff.map((s) => ((s.id ?? s.staffId) === id ? saved : s)),
       }));
+      showToast(t("Staff updated successfully") || "Staff updated successfully");
       return;
     }
     if (tab === "branch") {
@@ -233,6 +243,7 @@ const ManagmentBusiness = () => {
         ...prev,
         branches: prev.branches.map((b) => ((b.id ?? b.branchId) === id ? saved : b)),
       }));
+      showToast(t("Branch updated successfully") || "Branch updated successfully");
       return;
     }
     if (tab === "service") {
@@ -248,6 +259,7 @@ const ManagmentBusiness = () => {
         ...prev,
         services: prev.services.map((s) => ((s.id ?? s.serviceId) === id ? (saved ?? { ...s, ...updated }) : s)),
       }));
+      showToast(t("Service updated successfully") || "Service updated successfully");
       return;
     }
     console.log("Saved:", updated);
@@ -295,6 +307,15 @@ const ManagmentBusiness = () => {
   return (
     <>
       <style>{CSS_ANIMATIONS}</style>
+
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          {toast}
+        </div>
+      )}
 
       <div className="flex flex-col gap-6">
 

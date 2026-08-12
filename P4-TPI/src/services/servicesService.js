@@ -1,4 +1,7 @@
-import { BASE_URL, getAuthHeaders } from "./api";
+import { BASE_URL, getAuthHeaders, fetchJsonOrThrow } from "./api";
+
+export const fetchServicesByBusiness = (businessId) =>
+  fetchJsonOrThrow(`${BASE_URL}/services/business/${businessId}`);
 
 export const createService = async (payload) => {
   const res = await fetch(`${BASE_URL}/Service`, {
@@ -10,7 +13,8 @@ export const createService = async (payload) => {
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.message || "Failed to create service. Please try again.");
   }
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 };
 
 export const updateService = async (id, payload) => {

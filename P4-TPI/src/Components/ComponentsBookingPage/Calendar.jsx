@@ -1,127 +1,96 @@
-import React, { useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+import { IconChevronLeft, IconChevronRight } from "./Icons";
 
-export default function CalendarCustomDays() {
-  const today = new Date();
+const MONTH_KEYS = [
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december",
+];
+const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+
+const isSameDay = (a, b) =>
+  a && b &&
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+const startOfDay = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDate }) => {
   const { t } = useTranslation();
 
-  const [currentMonth, setCurrentMonth] = useState(
-    new Date(today.getFullYear(), today.getMonth(), 1)
-  );
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const min = minDate ? startOfDay(minDate) : null;
 
-  const [selectedDate, setSelectedDate] = useState(null);
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysCount = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
 
-  const daysInMonth = (date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  };
-
-  const startDayOfWeek = (date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
-
-  const isWeekend = (date) => {
-    const d = date.getDay();
-    return d === 0 || d === 6;
-  };
-
-  const handleDayClick = (date) => {
-    setSelectedDate(date);
-  };
-
-  const isSameDay = (a, b) => {
-    return (
-      a &&
-      b &&
-      a.getDate() === b.getDate() &&
-      a.getMonth() === b.getMonth() &&
-      a.getFullYear() === b.getFullYear()
-    );
-  };
-
-  const renderDays = () => {
-    const totalDays = daysInMonth(currentMonth);
-    const startOffset = startDayOfWeek(currentMonth);
-
-    const days = [];
-
-    for (let i = 0; i < startOffset; i++) {
-      days.push(<div key={`empty-${i}`} />);
-    }
-
-    for (let i = 1; i <= totalDays; i++) {
-      const date = new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth(),
-        i
-      );
-
-      const selected = isSameDay(date, selectedDate);
-
-      days.push(
-        <div
-          key={i}
-          onClick={() => handleDayClick(date)}
-          style={{
-            padding: 10,
-            cursor: "pointer",
-            borderRadius: 8,
-            background: selected ? "#2563eb" : "transparent",
-            color: selected ? "white" : "black",
-            textAlign: "center",
-          }}
-        >
-          <div>{i}</div>
-        </div>
-      );
-    }
-
-    return days;
-  };
-
-  const changeMonth = (offset) => {
-    setCurrentMonth(
-      new Date(
-        currentMonth.getFullYear(),
-        currentMonth.getMonth() + offset,
-        1
-      )
-    );
-  };
+  const cells = [];
+  for (let i = firstDay - 1; i >= 0; i--) cells.push({ day: prevDays - i, cur: false });
+  for (let d = 1; d <= daysCount; d++) cells.push({ day: d, cur: true });
+  let next = 1;
+  while (cells.length % 7 !== 0) cells.push({ day: next++, cur: false });
 
   return (
-    <div style={{ width: 300, margin: "0 auto", fontFamily: "sans-serif" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: 10,
-        }}
-      >
-        <button onClick={() => changeMonth(-1)}>←</button>
-        <strong>
-          {currentMonth.toLocaleString("default", {
-            month: "long",
-            year: "numeric",
-          })}
-        </strong>
-        <button onClick={() => changeMonth(1)}>→</button>
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
+        >
+          <IconChevronLeft />
+        </button>
+        <span className="text-sm font-semibold text-[#1A1A1A]">
+          {(t(MONTH_KEYS[month]) || MONTH_KEYS[month])} {year}
+        </span>
+        <button
+          onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
+        >
+          <IconChevronRight />
+        </button>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: 5,
-        }}
-      >
-        {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((d) => (
-          <div key={d} style={{ textAlign: "center", fontWeight: "bold" }}>
-            {d}
+      <div className="grid grid-cols-7 mb-1">
+        {DAY_KEYS.map((k) => (
+          <div key={k} className="text-center text-[11px] font-semibold text-gray-400 py-1">
+            {t(k) || k}
           </div>
         ))}
+      </div>
 
-        {renderDays()}
+      <div className="grid grid-cols-7 gap-y-1">
+        {cells.map((c, i) => {
+          const date = c.cur ? new Date(year, month, c.day) : null;
+          const isPast = c.cur && min && date < min;
+          const isSelected = c.cur && isSameDay(date, selected);
+          const disabled = !c.cur || isPast;
+
+          return (
+            <button
+              key={i}
+              type="button"
+              disabled={disabled}
+              onClick={() => !disabled && onSelect(date)}
+              className={`flex items-center justify-center h-9 w-full rounded-lg text-sm transition-colors
+                ${!c.cur ? "text-gray-300 cursor-default" : ""}
+                ${isPast ? "text-gray-300 cursor-not-allowed" : ""}
+                ${c.cur && !isPast && !isSelected ? "text-[#1A1A1A] cursor-pointer hover:bg-gray-100" : ""}
+                ${isSelected ? "bg-[#1A1A1A] text-white font-semibold" : ""}
+              `}
+            >
+              {c.day}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
-}
+};
+
+export default BookingCalendar;
