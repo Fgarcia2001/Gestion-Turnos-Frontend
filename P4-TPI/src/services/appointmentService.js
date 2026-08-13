@@ -22,3 +22,17 @@ export const createAppointment = async (payload) => {
   }
   return res.json();
 };
+
+export const updateAppointmentStatus = async (id, status) => {
+  const res = await fetch(`${BASE_URL}/Appointment/${id}/status`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message || "Failed to update appointment status. Please try again.");
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+};

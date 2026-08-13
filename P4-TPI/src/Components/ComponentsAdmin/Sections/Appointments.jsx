@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
 import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
+import { updateAppointmentStatus } from "../../../services/appointmentService";
 import { useAuth } from "../../../../CustomHooks/AuthContext";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -52,19 +53,19 @@ const IconPlus = () => (
 );
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const DAYS   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 
 
 // ── Calendar ──────────────────────────────────────────────────────────────────
 const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange }) => {
-  const year  = viewDate.getFullYear();
+  const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
-  const firstDay  = new Date(year, month, 1).getDay();
+  const firstDay = new Date(year, month, 1).getDay();
   const daysCount = new Date(year, month + 1, 0).getDate();
-  const prevDays  = new Date(year, month, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
 
   const cells = [];
   for (let i = firstDay - 1; i >= 0; i--)
@@ -97,7 +98,7 @@ const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange
       <div className="grid grid-cols-7 gap-y-0.5">
         {cells.map((c, i) => {
           const isSelected = c.cur && c.day === selected;
-          const hasAppt    = c.cur && apptDays.has(c.day);
+          const hasAppt = c.cur && apptDays.has(c.day);
           return (
             <button
               key={i}
@@ -120,12 +121,56 @@ const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange
 };
 
 // ── Status badge ──────────────────────────────────────────────────────────────
-const StatusBadge = ({ status, pending }) => {
-  const cfg = pending
-    ? "bg-[#fef3c7] text-[#b45309]"
-    : "bg-[#dcfce7] text-[#15803d]";
+const APPOINTMENT_STATUS = [
+  { value: 0, label: "Pending" },
+  { value: 1, label: "Confirmed" },
+  { value: 2, label: "Cancelled" },
+];
+
+const STATUS_STYLES = {
+  Pending: "bg-[#fef3c7] text-[#b45309]",
+  Confirmed: "bg-[#dcfce7] text-[#15803d]",
+  Cancelled: "bg-[#fee2e2] text-[#b91c1c]",
+};
+
+const StatusBadge = ({ status }) => {
+  const cfg = STATUS_STYLES[status] || STATUS_STYLES.Confirmed;
   return (
     <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${cfg}`}>{status}</span>
+  );
+};
+
+// ── Status change menu ───────────────────────────────────────────────────────
+const StatusMenu = ({ status, onChangeStatus, disabled }) => {
+  const [open, setOpen] = useState(false);
+  const current = APPOINTMENT_STATUS.find(s => s.label === status)?.value;
+
+  return (
+    <div
+      className="relative"
+      onClick={e => e.stopPropagation()}
+      onMouseEnter={() => !disabled && setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <StatusBadge status={status} />
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 mt-1 w-32 bg-white border border-[#e2ddd8] rounded-xl shadow-lg overflow-hidden z-20">
+            {APPOINTMENT_STATUS.map(s => (
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => { setOpen(false); if (s.value !== current) onChangeStatus(s.value); }}
+                className={`w-full text-left text-xs px-3 py-2 hover:bg-[#f0ede8] transition-colors ${s.value === current ? "font-semibold text-[#1a1a2e]" : "text-[#6b7280]"}`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 
@@ -154,10 +199,20 @@ const toTime12 = (iso) => {
 };
 
 // ── Appointment card ──────────────────────────────────────────────────────────
-const AppointmentCard = ({ appt }) => {
+const AppointmentCard = ({ appt, onStatusChange }) => {
   const [expanded, setExpanded] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const isPending = appt.status === "Pending";
   const timeRange = `${toTime12(appt.startTime)} - ${toTime12(appt.endTime)}`;
+
+  const handleStatusChange = async (value) => {
+    setUpdating(true);
+    try {
+      await onStatusChange(appt.id, value);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   return (
     <div
@@ -176,9 +231,9 @@ const AppointmentCard = ({ appt }) => {
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1 text-[#22c55e]">
             <IconDollar />
-            <span className="text-sm font-semibold text-[#1a1a2e]">${Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className="text-sm font-semibold text-[#1a1a2e]">{Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
-          <StatusBadge status={appt.status || "Confirmed"} pending={isPending} />
+          <StatusMenu status={appt.status || "Confirmed"} onChangeStatus={handleStatusChange} disabled={updating} />
         </div>
       </div>
 
@@ -265,6 +320,18 @@ const Appointments = () => {
     if (role && selectedDay) loadAppointments();
   }, [selectedDay, selectedBranchId, role, viewDate]);
 
+  const handleStatusChange = async (apptId, statusValue) => {
+    const prevAppointments = appointments;
+    const newLabel = APPOINTMENT_STATUS.find(s => s.value === statusValue)?.label;
+    setAppointments(list => list.map(a => (a.id === apptId ? { ...a, status: newLabel } : a)));
+    try {
+      await updateAppointmentStatus(apptId, statusValue);
+    } catch (e) {
+      console.error(e);
+      setAppointments(prevAppointments);
+    }
+  };
+
   const formatDate = (day) => {
     const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
     return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
@@ -319,7 +386,7 @@ const Appointments = () => {
                   <p className="text-sm text-[#9a9a9a]">{t("No appointments for this day") || "No appointments for this day"}</p>
                 </div>
               ) : (
-                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} />)
+                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} />)
               )}
             </>
           )}
