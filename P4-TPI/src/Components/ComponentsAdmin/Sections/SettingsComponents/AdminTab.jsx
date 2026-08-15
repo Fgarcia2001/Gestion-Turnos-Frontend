@@ -76,7 +76,7 @@ const AdminTab = () => {
     setSaving(true);
     setError("");
     try {
-      const res = await fetch(`${BASE_URL}/Staff/Business/Admin`, {
+      const res = await fetch(`${BASE_URL}/Staff/email`, {
         method: "PUT",
         headers: getAuthHeaders(),
         body: JSON.stringify(formData),
@@ -173,8 +173,8 @@ const AdminTab = () => {
             <input
               type="email"
               value={formData.staffEmail}
-              onChange={handleChange("staffEmail")}
-              className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+              readOnly
+              className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#9a9a9a] focus:outline-none bg-transparent cursor-not-allowed"
             />
           </div>
 
