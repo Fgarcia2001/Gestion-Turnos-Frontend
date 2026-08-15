@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
 import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
-import { updateAppointmentStatus } from "../../../services/appointmentService";
+import { updateAppointmentStatus, fetchMyAppointments } from "../../../services/appointmentService";
 import { useAuth } from "../../../../CustomHooks/AuthContext";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -76,7 +76,10 @@ const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange
   while (cells.length % 7 !== 0) cells.push({ day: next++, cur: false });
 
   const apptDays = new Set(
-    (appointments || []).filter(a => { const d = new Date(a.day); return d.getMonth() === month && d.getFullYear() === year; }).map(a => new Date(a.day).getDate())
+    (appointments || [])
+      .map((a) => (a.day || "").split("-").map(Number))
+      .filter(([y, m]) => y === year && m === month + 1)
+      .map(([, , d]) => d)
   );
 
   return (
@@ -199,7 +202,7 @@ const toTime12 = (iso) => {
 };
 
 // ── Appointment card ──────────────────────────────────────────────────────────
-const AppointmentCard = ({ appt, onStatusChange }) => {
+const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
   const [expanded, setExpanded] = useState(false);
   const [updating, setUpdating] = useState(false);
   const isPending = appt.status === "Pending";
@@ -233,7 +236,11 @@ const AppointmentCard = ({ appt, onStatusChange }) => {
             <IconDollar />
             <span className="text-sm font-semibold text-[#1a1a2e]">{Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
-          <StatusMenu status={appt.status || "Confirmed"} onChangeStatus={handleStatusChange} disabled={updating} />
+          {canChangeStatus ? (
+            <StatusMenu status={appt.status || "Confirmed"} onChangeStatus={handleStatusChange} disabled={updating} />
+          ) : (
+            <StatusBadge status={appt.status || "Confirmed"} />
+          )}
         </div>
       </div>
 
@@ -282,6 +289,8 @@ const Appointments = () => {
 
   const { user } = useAuth();
 
+  const isProfessional = role === "2" || role === "Profesional" || role === "Professional";
+
   useEffect(() => {
     if (user) {
       setRole(user.role);
@@ -305,7 +314,13 @@ const Appointments = () => {
       try {
         const day = new Date(viewDate.getFullYear(), viewDate.getMonth(), selectedDay);
         let data;
-        if (role === "Recepcionista" || role === "Receptionist") {
+        if (role === "2" || role === "Profesional" || role === "Professional") {
+          const all = await fetchMyAppointments();
+          data = all.filter((a) => {
+            const [y, m, d] = (a.day || "").split("-").map(Number);
+            return y === viewDate.getFullYear() && m === viewDate.getMonth() + 1 && d === selectedDay;
+          });
+        } else if (role === "Recepcionista" || role === "Receptionist") {
           data = await fetchMyBranchAppointmentsByDate(day);
         } else {
           data = await fetchAppointmentsByDate(day, selectedBranchId);
@@ -386,7 +401,7 @@ const Appointments = () => {
                   <p className="text-sm text-[#9a9a9a]">{t("No appointments for this day") || "No appointments for this day"}</p>
                 </div>
               ) : (
-                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} />)
+                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} canChangeStatus={!isProfessional} />)
               )}
             </>
           )}

@@ -1,4 +1,6 @@
-import { BASE_URL, getAuthHeaders, fetchJsonOrThrow, toDateParam } from "./api";
+import { BASE_URL, getAuthHeaders, fetchJson, fetchJsonOrThrow, toDateParam } from "./api";
+
+export const fetchMyAppointments = () => fetchJson(`${BASE_URL}/Appointment/my-appointments`);
 
 export const fetchAvailableSlots = ({ branchId, staffId, serviceId, date }) => {
   const params = new URLSearchParams({

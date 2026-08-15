@@ -10,9 +10,16 @@ import Calendar from "../src/Components/ComponentsAdmin/Sections/Calendar";
 
 const Admin = () => {
   const { user } = useAuth();
-  const [section, setSection] = useState("home");
+  const isProfessional = user?.role === "2" || user?.role === "Profesional" || user?.role === "Professional";
+  const [section, setSection] = useState(isProfessional ? "appointments" : "home");
+
+  const handleSelectSection = (id) => {
+    if (isProfessional) return;
+    setSection(id);
+  };
 
   const renderSection = () => {
+    if (isProfessional) return <Appointments />;
     switch (section) {
       case "home": return <Home />;
       case "managmentBusiness": return <ManagmentBusiness />;
@@ -28,7 +35,7 @@ const Admin = () => {
     <div className="flex w-full h-screen overflow-hidden bg-[#f0ede8]">
 
       {/* Sidebar — ocupa toda la altura, NO es fixed */}
-      <Navbar onSelectSection={setSection} />
+      <Navbar onSelectSection={handleSelectSection} role={user?.role} />
 
       {/* Right side: header + content */}
       <div className="flex flex-col flex-1 overflow-hidden">

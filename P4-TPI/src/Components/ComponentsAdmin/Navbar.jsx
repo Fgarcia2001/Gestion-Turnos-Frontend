@@ -68,7 +68,9 @@ const NavButton = ({ id, label, Icon, active, onClick }) => (
   </button>
 );
 
-const Navbar = ({ onSelectSection }) => {
+const isProfessional = (role) => role === "2" || role === "Profesional" || role === "Professional";
+
+const Navbar = ({ onSelectSection, role }) => {
   const [active, setActive] = useState("home");
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -89,9 +91,11 @@ const Navbar = ({ onSelectSection }) => {
         <IconLogo />
       </div>
       <div className="flex flex-col items-center gap-1 flex-1">
-        {navItems.map(({ id, label, Icon }) => (
-          <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
-        ))}
+        {navItems
+          .filter(({ id }) => !isProfessional(role) || id === "appointments")
+          .map(({ id, label, Icon }) => (
+            <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
+          ))}
       </div>
       <div className="flex flex-col items-center gap-1">
         {bottomItems.map(({ id, label, Icon }) => (
