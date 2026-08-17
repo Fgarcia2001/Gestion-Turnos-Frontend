@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../CustomHooks/AuthContext";
+import { NotificationProvider } from "../CustomHooks/NotificationContext";
 import Navbar from "../src/Components/ComponentsAdmin/Navbar";
 import Header from "../src/Components/ComponentsAdmin/Header";
 import Home from "../src/Components/ComponentsAdmin/Sections/Home";
@@ -38,17 +39,19 @@ const Admin = () => {
       <Navbar onSelectSection={handleSelectSection} role={user?.role} />
 
       {/* Right side: header + content */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <NotificationProvider>
+        <div className="flex flex-col flex-1 overflow-hidden">
 
-        {/* Header */}
-        <Header username={user?.name} />
+          {/* Header */}
+          <Header username={user?.name} onNavigateToAppointments={() => setSection("appointments")} />
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-8 pb-8">
-          {renderSection()}
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto px-8 pb-8">
+            {renderSection()}
+          </div>
+
         </div>
-
-      </div>
+      </NotificationProvider>
     </div>
   );
 };

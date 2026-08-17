@@ -4,6 +4,8 @@ import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
 import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
 import { updateAppointmentStatus, fetchMyAppointments } from "../../../services/appointmentService";
 import { useAuth } from "../../../../CustomHooks/AuthContext";
+import { ModalOverlay } from "./ManagmentBusinessComponents/Shared";
+import { IconX, IconWarning } from "./ManagmentBusinessComponents/Icons";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconChevronLeft = () => (
@@ -55,6 +57,11 @@ const IconPlus = () => (
 // ── Data ──────────────────────────────────────────────────────────────────────
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+const CSS_ANIMATIONS = `
+  @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
+`;
 
 
 
@@ -201,25 +208,117 @@ const toTime12 = (iso) => {
   return `${hour > 12 ? hour - 12 : hour === 0 ? 12 : hour}:${m} ${ampm}`;
 };
 
+// ── Cancel appointment modal ──────────────────────────────────────────────────
+const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
+  const { t } = useTranslation();
+  const [submitting, setSubmitting] = useState(false);
+
+  const close = () => {
+    if (!submitting) onClose();
+  };
+
+  const handleConfirm = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await onConfirm();
+    } catch {
+      // El rollback y el toast de error ya los maneja el handler principal
+    } finally {
+      setSubmitting(false);
+      onClose();
+    }
+  };
+
+  const [y, m, d] = (appt.day || "---").split("-");
+  const dateLabel = `${d}/${m}/${y}`;
+  const timeLabel = appt.startTime || "--";
+
+  return (
+    <ModalOverlay onClose={close}>
+      <div className="w-full max-w-sm bg-white rounded-2xl border border-[#e2ddd8] p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="w-11 h-11 rounded-full bg-[#fee2e2] flex items-center justify-center text-[#b91c1c] shrink-0">
+            <IconWarning />
+          </div>
+          <button onClick={close} disabled={submitting} aria-label="Close" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+            <IconX />
+          </button>
+        </div>
+
+        <h3 className="text-lg font-bold text-[#1a1a2e] mb-4">{t("Cancel appointment") || "Cancelar turno"}</h3>
+
+        <div className="bg-[#f9f8f6] rounded-xl p-4 space-y-2 mb-4">
+          <p className="text-sm">
+            <span className="font-semibold text-[#1a1a2e]">{t("Client") || "Cliente"}: </span>
+            <span className="text-[#6b7280]">{appt.clientName || "—"}</span>
+          </p>
+          <p className="text-sm">
+            <span className="font-semibold text-[#1a1a2e]">{t("Service") || "Servicio"}: </span>
+            <span className="text-[#6b7280]">{appt.serviceName || "—"}</span>
+          </p>
+          <p className="text-sm">
+            <span className="font-semibold text-[#1a1a2e]">{t("Date and time") || "Fecha y hora"}: </span>
+            <span className="text-[#6b7280]">{dateLabel} {t("at") || "a las"} {timeLabel}</span>
+          </p>
+        </div>
+
+        <div className="bg-[#fef3c7] border border-[#fde68a] rounded-xl px-4 py-3 mb-5">
+          <p className="text-xs text-[#92400e] leading-relaxed">
+            {t("Cancel email warning") || "Se enviará un email al cliente avisándole que su turno fue cancelado."}
+          </p>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <button
+            onClick={close}
+            disabled={submitting}
+            className="px-4 py-2 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {t("Back") || "Volver"}
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={submitting}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting && <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
+            {t("Yes, cancel appointment") || "Sí, cancelar turno"}
+          </button>
+        </div>
+      </div>
+    </ModalOverlay>
+  );
+};
+
 // ── Appointment card ──────────────────────────────────────────────────────────
 const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
   const [expanded, setExpanded] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const isPending = appt.status === "Pending";
   const timeRange = `${toTime12(appt.startTime)} - ${toTime12(appt.endTime)}`;
 
   const handleStatusChange = async (value) => {
+    if (value === 2) {
+      setConfirming(true);
+      return;
+    }
     setUpdating(true);
     try {
       await onStatusChange(appt.id, value);
+    } catch {
+      // El toast de error ya lo muestra el handler principal
     } finally {
       setUpdating(false);
     }
   };
 
+  const handleConfirmCancel = () => onStatusChange(appt.id, 2);
+
   return (
     <div
-      className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden cursor-pointer
+      className={`bg-white rounded-2xl border transition-all duration-200 cursor-pointer
         ${isPending ? "border-l-4 border-l-[#f59e0b] border-[#e2ddd8]" : "border-[#e2ddd8]"}
       `}
       onMouseEnter={() => setExpanded(true)}
@@ -270,6 +369,10 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
           </div>
         </div>
       )}
+
+      {confirming && (
+        <CancelAppointmentModal appt={appt} onClose={() => setConfirming(false)} onConfirm={handleConfirmCancel} />
+      )}
     </div>
   );
 };
@@ -286,6 +389,12 @@ const Appointments = () => {
   const [userBranchId, setUserBranchId] = useState(null);
   const [branches, setBranches] = useState([]);
   const [selectedBranchId, setSelectedBranchId] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message, isError = false) => {
+    setToast({ message, isError });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const { user } = useAuth();
 
@@ -341,9 +450,14 @@ const Appointments = () => {
     setAppointments(list => list.map(a => (a.id === apptId ? { ...a, status: newLabel } : a)));
     try {
       await updateAppointmentStatus(apptId, statusValue);
+      if (statusValue === 2) {
+        showToast(t("Appointment cancelled, email sent") || "Turno cancelado. Se envió un email al cliente.");
+      }
     } catch (e) {
       console.error(e);
       setAppointments(prevAppointments);
+      showToast(e?.message || "No se pudo actualizar el turno. Inténtelo nuevamente.", true);
+      throw e;
     }
   };
 
@@ -354,6 +468,22 @@ const Appointments = () => {
 
   return (
     <div className="flex flex-col gap-6">
+      <style>{CSS_ANIMATIONS}</style>
+
+      {toast && (
+        <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg ${toast.isError ? "bg-[#dc2626]" : "bg-[#1a1a2e]"}`}>
+          {toast.isError ? (
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17L4 12" />
+            </svg>
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
 
       <div className="flex gap-5 items-start">
 
