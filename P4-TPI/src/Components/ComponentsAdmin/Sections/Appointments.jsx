@@ -208,6 +208,13 @@ const toTime12 = (iso) => {
   return `${hour > 12 ? hour - 12 : hour === 0 ? 12 : hour}:${m} ${ampm}`;
 };
 
+const isFuture = (appt) => {
+  if (!appt?.day || !appt?.startTime) return true;
+  const [y, m, d] = appt.day.split("-").map(Number);
+  const [hh, mm] = appt.startTime.split(":").map(Number);
+  return new Date(y, m - 1, d, hh, mm) > new Date();
+};
+
 // ── Cancel appointment modal ──────────────────────────────────────────────────
 const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
   const { t } = useTranslation();
@@ -300,7 +307,7 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
   const timeRange = `${toTime12(appt.startTime)} - ${toTime12(appt.endTime)}`;
 
   const handleStatusChange = async (value) => {
-    if (value === 2) {
+    if (value === 2 && isFuture(appt)) {
       setConfirming(true);
       return;
     }
@@ -335,7 +342,7 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
             <IconDollar />
             <span className="text-sm font-semibold text-[#1a1a2e]">{Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
-          {canChangeStatus ? (
+          {canChangeStatus && appt.status !== "Cancelled" ? (
             <StatusMenu status={appt.status || "Confirmed"} onChangeStatus={handleStatusChange} disabled={updating} />
           ) : (
             <StatusBadge status={appt.status || "Confirmed"} />

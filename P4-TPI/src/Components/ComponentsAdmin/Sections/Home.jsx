@@ -1,196 +1,235 @@
+import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
+import { fetchDashboardSummary } from "../../../services/dashboardService";
 
-// ── SVG Icons ──────────────────────────────────────────────────────────────
-const IconTrendUp = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+// ── Icons ─────────────────────────────────────────────────────────────────────
+const IconTrendUp = ({ className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="M3 17L9 11L13 15L21 7" /><path d="M14 7H21V14" />
   </svg>
 );
-const IconChevronRight = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 6L15 12L9 18" />
-  </svg>
-);
-const IconStar = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5">
-    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-  </svg>
-);
 
-// ── Mini bar chart ──────────────────────────────────────────────────────────
-const BarChart = () => {
-  const bars = [
-    { label: "Nov", h: 0 },
-    { label: "Dec", h: 0 },
-    { label: "Jan", h: 0 },
-    { label: "Feb", h: 0 },
-    { label: "Mar", h: 0 },
-  ];
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const money = (value) =>
+  Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const shortMonth = (month) => {
+  const [y, m] = (month || "").split("-").map(Number);
+  if (!y || !m) return month || "";
+  return new Date(y, m - 1, 1).toLocaleDateString("en-US", { month: "short" });
+};
+
+// ── Bar chart ─────────────────────────────────────────────────────────────────
+const BarChart = ({ data }) => {
+  const values = (data || []).map((d) => Number(d.revenue) || 0);
+  const max = Math.max(...values, 1);
+
   return (
-    <div className="flex items-end gap-2 h-20 mt-4">
-      {bars.map(({ label, h }) => (
-        <div key={label} className="flex flex-col items-center gap-1 flex-1">
-          <div
-            className="w-full rounded-md bg-[#d8d4ce]"
-            style={{ height: `${h}%` }}
-          />
-          <span className="text-[10px] text-[#9a9a9a]">{label}</span>
-        </div>
-      ))}
+    <div className="flex items-end gap-2 h-24 mt-5">
+      {(data || []).map(({ month, revenue }) => {
+        const value = Number(revenue) || 0;
+        return (
+          <div key={month} className="flex flex-col items-center gap-1 flex-1">
+            <div
+              className="w-full rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
+              style={{ height: `${Math.max((value / max) * 100, 3)}%` }}
+            />
+            <span className="text-[10px] text-[#9a9a9a]">{shortMonth(month)}</span>
+          </div>
+        );
+      })}
     </div>
   );
 };
 
-// ── Donut chart (SVG) ────────────────────────────────────────────────────────
-const DonutChart = ({ percent = 0 }) => {
+// ── Donut chart ───────────────────────────────────────────────────────────────
+const DonutChart = ({ pending = 0, confirmed = 0, cancelled = 0 }) => {
+  const total = pending + confirmed + cancelled;
   const r = 38;
   const circ = 2 * Math.PI * r;
-  const completed = (percent / 100) * circ;
-  const inProgress = 0;
+  const seg = (value) => (total ? (value / total) * circ : 0);
+  const p = seg(pending);
+  const c = seg(confirmed);
+  const x = seg(cancelled);
+
   return (
     <div className="relative w-24 h-24 flex items-center justify-center">
       <svg width="96" height="96" viewBox="0 0 96 96" style={{ transform: "rotate(-90deg)" }}>
-        {/* bg */}
         <circle cx="48" cy="48" r={r} fill="none" stroke="#e2ddd8" strokeWidth="10" />
-        {/* completed - dark */}
-        <circle cx="48" cy="48" r={r} fill="none" stroke="#1a1a2e" strokeWidth="10"
-          strokeDasharray={`${completed} ${circ}`} strokeLinecap="round" />
-        {/* in progress - blue */}
-        <circle cx="48" cy="48" r={r} fill="none" stroke="#3b82f6" strokeWidth="10"
-          strokeDasharray={`${inProgress} ${circ}`} strokeDashoffset={-completed} strokeLinecap="round" />
-        {/* pending - amber */}
-        <circle cx="48" cy="48" r={r} fill="none" stroke="#f59e0b" strokeWidth="10"
-          strokeDasharray={`${circ - completed - inProgress} ${circ}`}
-          strokeDashoffset={-(completed + inProgress)} strokeLinecap="round" />
+        {p > 0 && (
+          <circle cx="48" cy="48" r={r} fill="none" stroke="#f59e0b" strokeWidth="10"
+            strokeDasharray={`${p} ${circ}`} strokeLinecap="round" />
+        )}
+        {c > 0 && (
+          <circle cx="48" cy="48" r={r} fill="none" stroke="#15803d" strokeWidth="10"
+            strokeDasharray={`${c} ${circ}`} strokeDashoffset={-p} strokeLinecap="round" />
+        )}
+        {x > 0 && (
+          <circle cx="48" cy="48" r={r} fill="none" stroke="#b91c1c" strokeWidth="10"
+            strokeDasharray={`${x} ${circ}`} strokeDashoffset={-(p + c)} strokeLinecap="round" />
+        )}
       </svg>
       <div className="absolute flex flex-col items-center leading-none">
-        <span className="text-lg font-bold text-[#1a1a2e]">{percent}%</span>
-        <span className="text-[10px] text-[#9a9a9a]">Done</span>
+        <span className="text-lg font-bold text-[#1a1a2e]">{total}</span>
       </div>
     </div>
   );
 };
 
-// ── Main Home ────────────────────────────────────────────────────────────────
+// ── Main Home ─────────────────────────────────────────────────────────────────
 const Home = () => {
   const { t } = useTranslation();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetchDashboardSummary();
+      setData(res && res.currentMonth ? res : null);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await fetchDashboardSummary();
+        if (!cancelled) setData(res && res.currentMonth ? res : null);
+      } catch {
+        if (!cancelled) setError(true);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center">
+        <p className="text-sm text-[#9a9a9a] mb-4">{t("Load dashboard error") || "Couldn't load the dashboard"}</p>
+        <button
+          onClick={load}
+          className="bg-[#1a1a2e] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors cursor-pointer"
+        >
+          {t("retry") || "Retry"}
+        </button>
+      </div>
+    );
+  }
+
+  const currentMonth = data?.currentMonth || {};
+  const series = Array.isArray(data?.monthlyRevenue) ? data.monthlyRevenue : [];
+  const branches = Array.isArray(data?.branches) ? data.branches : [];
+  const pending = Number(currentMonth.pending) || 0;
+  const confirmed = Number(currentMonth.confirmed) || 0;
+  const cancelled = Number(currentMonth.cancelled) || 0;
+
+  const statusItems = [
+    { color: "#f59e0b", label: t("Pending") || "Pending", count: pending },
+    { color: "#15803d", label: t("Accepted") || "Accepted", count: confirmed },
+    { color: "#b91c1c", label: t("Cancelled") || "Cancelled", count: cancelled },
+  ];
 
   return (
-    <div className="flex flex-col gap-6 ">
+    <div className="flex flex-col gap-6">
 
       {/* Top row: 3 cards */}
       <div className="grid grid-cols-3 gap-4 py-10">
 
-        {/* Appointment Statistics */}
+        {/* Monthly revenue */}
         <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm text-[#9a9a9a] font-medium">{t("Appointment Statistics")}</p>
+          <p className="text-sm text-[#9a9a9a] font-medium">{t("Monthly revenue") || "Monthly revenue"}</p>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-4xl font-bold text-[#1a1a2e]">0</span>
-            <span className="text-sm text-[#9a9a9a]">{t("Total this month")}</span>
+            <span className="text-4xl font-bold text-[#1a1a2e]">${money(currentMonth.revenue)}</span>
+            <span className="text-sm text-[#9a9a9a]">{t("Total this month") || "Total this month"}</span>
           </div>
-          <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d] text-xs font-semibold">
-            <IconTrendUp /> 0%
-          </span>
-          <BarChart />
-          <p className="text-xs text-[#9a9a9a] mt-3">{t("Always see your booking updates")}</p>
+          <BarChart data={series} />
         </div>
 
-        {/* Next Appointment */}
+        {/* Estimated earnings */}
         <div className="rounded-2xl p-5 flex flex-col justify-between" style={{ background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)" }}>
-          <div>
-            <p className="text-xs font-semibold tracking-widest text-blue-200 uppercase">{t("Next Appointment")}</p>
-            <div className="mt-3">
-              <p className="text-3xl font-bold text-white tracking-tight">—</p>
-              <p className="text-blue-200 text-sm mt-1">—</p>
-            </div>
+          <p className="text-xs font-semibold tracking-widest text-blue-200 uppercase">{t("Estimated earnings") || "Estimated earnings"}</p>
+          <div className="mt-3 flex items-end justify-between">
+            <span className="text-4xl font-bold text-white tracking-tight">${money(currentMonth.estimatedEarnings)}</span>
+            <span className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white">
+              <IconTrendUp />
+            </span>
           </div>
-          <div className="flex items-end justify-between mt-6">
-            <div>
-              <p className="text-white font-semibold text-base">{t("Name of client")}</p>
-              <p className="text-blue-200 text-sm">{t("Type of Service")}</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
-              —
-            </div>
-          </div>
+          <p className="text-blue-200 text-sm mt-4">{t("Accrued to today") || "Accrued to today"}</p>
         </div>
 
-        {/* Analytics */}
+        {/* Totals by status */}
         <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm text-[#9a9a9a] font-medium">{t("Analytics")}</p>
+          <p className="text-sm text-[#9a9a9a] font-medium">{t("Appointment Statistics") || "Appointment Statistics"}</p>
           <div className="flex items-center justify-between mt-4">
-            <div className="flex flex-col gap-2">
-              {[
-                { color: "#1a1a2e", label: t("Completed") },
-                { color: "#3b82f6", label: t("In progress") },
-                { color: "#f59e0b", label: t("Pending") },
-              ].map(({ color, label }) => (
+            <div className="flex flex-col gap-2.5">
+              {statusItems.map(({ color, label, count }) => (
                 <div key={label} className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
                   <span className="text-xs text-[#6b7280]">{label}</span>
+                  <span className="text-sm font-bold text-[#1a1a2e] ml-auto">{count}</span>
                 </div>
               ))}
             </div>
-            <DonutChart percent={0} />
+            <DonutChart pending={pending} confirmed={confirmed} cancelled={cancelled} />
           </div>
         </div>
       </div>
 
-      {/* Bottom row */}
-      <div className="grid grid-cols-5 gap-4">
-
-        {/* Recent Appointments - 3/5 */}
-        <div className="col-span-3 bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm font-semibold text-[#1a1a2e] mb-1">{t("Recent Appointments")}</p>
-          <p className="text-sm text-[#9a9a9a] py-3">{t("No appointments for this day") || "No recent appointments"}</p>
+      {/* Branches summary */}
+      <div className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#f0ede8]">
+          <p className="text-sm font-semibold text-[#1a1a2e]">{t("Branches") || "Branches"}</p>
         </div>
-
-        {/* Right column - 2/5 */}
-        <div className="col-span-2 flex flex-col gap-4">
-
-          {/* Completed vs Cancelled */}
-          <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8] flex-1">
-            <p className="text-sm font-semibold text-[#1a1a2e] mb-4">{t("Completed vs Cancelled")}</p>
-            <div className="flex items-center gap-6">
-              {/* Completed toggle */}
-              <div className="flex items-center gap-3">
-                <div className="relative w-8 h-14 bg-[#1a1a2e] rounded-full flex flex-col justify-end pb-1 items-center">
-                  <div className="w-5 h-5 rounded-full bg-white" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-[#1a1a2e]">0%</p>
-                  <p className="text-xs text-[#9a9a9a]">{t("Completed")}</p>
-                </div>
-              </div>
-              {/* Cancelled toggle */}
-              <div className="flex items-center gap-3">
-                <div className="relative w-8 h-14 bg-[#e2ddd8] rounded-full flex flex-col justify-start pt-1 items-center">
-                  <div className="w-5 h-5 rounded-full bg-white" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-[#1a1a2e]">0%</p>
-                  <p className="text-xs text-[#9a9a9a]">{t("Cancelled")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Premium banner */}
-          <div className="bg-white rounded-2xl p-4 border border-[#e2ddd8] flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#fef3c7] flex items-center justify-center text-[#f59e0b] shrink-0">
-              <IconStar />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#1a1a2e]">{t("More features?")}</p>
-              <p className="text-xs text-[#9a9a9a] leading-tight">{t("Update your account to premium")}</p>
-            </div>
-            <button className="shrink-0 bg-[#1a1a2e] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors whitespace-nowrap">
-              {t("Go to premium")}
-            </button>
-          </div>
-
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-[#9a9a9a] uppercase tracking-wide">
+                <th className="px-5 py-3 font-semibold">{t("Branch") || "Branch"}</th>
+                <th className="px-3 py-3 font-semibold text-center">{t("Pending") || "Pending"}</th>
+                <th className="px-3 py-3 font-semibold text-center">{t("Accepted") || "Accepted"}</th>
+                <th className="px-3 py-3 font-semibold text-center">{t("Cancelled") || "Cancelled"}</th>
+                <th className="px-5 py-3 font-semibold text-right">{t("Month revenue") || "Month revenue"}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {branches.map((b) => (
+                <tr key={b.branchId} className="border-t border-[#f0ede8] hover:bg-[#f9f8f6] transition-colors">
+                  <td className="px-5 py-3 font-semibold text-[#1a1a2e]">{b.name || "—"}</td>
+                  <td className="px-3 py-3 text-center text-[#b45309] font-semibold">{Number(b.pending) || 0}</td>
+                  <td className="px-3 py-3 text-center text-[#15803d] font-semibold">{Number(b.confirmed) || 0}</td>
+                  <td className="px-3 py-3 text-center text-[#b91c1c] font-semibold">{Number(b.cancelled) || 0}</td>
+                  <td className="px-5 py-3 text-right font-semibold text-[#1a1a2e]">${money(b.monthRevenue)}</td>
+                </tr>
+              ))}
+              {branches.length === 0 && (
+                <tr className="border-t border-[#f0ede8]">
+                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-[#9a9a9a]">{t("No branches found for this business.") || "No branches."}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
+
     </div>
   );
 };

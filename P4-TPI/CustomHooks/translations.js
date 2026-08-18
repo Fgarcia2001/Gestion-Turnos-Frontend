@@ -133,6 +133,17 @@ export const translations = {
     june: "June", july: "July", august: "August", september: "September",
     october: "October", november: "November", december: "December",
 
+    // Dashboard (Home)
+    "Monthly revenue": "Monthly revenue",
+    "Estimated earnings": "Estimated earnings",
+    "Accrued to today": "Accrued to today",
+    Pending: "Pending",
+    Accepted: "Accepted",
+    Cancelled: "Cancelled",
+    Branches: "Branches",
+    "Month revenue": "Month revenue",
+    "Load dashboard error": "Couldn't load the dashboard summary.",
+
     // Misc
     minutesAbbrev: "min"
   },
@@ -269,6 +280,17 @@ export const translations = {
     january: "Enero", february: "Febrero", march: "Marzo", may: "Mayo",
     june: "Junio", july: "Julio", august: "Agosto", september: "Septiembre",
     october: "Octubre", november: "Noviembre", december: "Diciembre",
+
+    // Dashboard (Home)
+    "Monthly revenue": "Ingresos por mes",
+    "Estimated earnings": "Ganancia estimada",
+    "Accrued to today": "Acumulado hasta hoy",
+    Pending: "Pendientes",
+    Accepted: "Aceptados",
+    Cancelled: "Cancelados",
+    Branches: "Sucursales",
+    "Month revenue": "Ganancia del mes",
+    "Load dashboard error": "No se pudo cargar el resumen del panel.",
 
     // Varios
     minutesAbbrev: "min"
