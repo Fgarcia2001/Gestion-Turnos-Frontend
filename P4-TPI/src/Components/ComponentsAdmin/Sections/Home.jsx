@@ -47,7 +47,7 @@ const BarChart = ({ data }) => {
           >
             <div className="flex items-end w-full h-16">
               <div
-                className="w-full rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
+                className="w-full max-w-8 mx-auto rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
                 style={{ height: `${barHeight}px` }}
               />
             </div>
@@ -169,13 +169,13 @@ const Home = () => {
     <div className="flex flex-col gap-6">
 
       {/* Top row: 3 cards */}
-      <div className="grid grid-cols-3 gap-4 py-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 py-6 sm:py-8 xl:py-10">
 
         {/* Monthly revenue */}
         <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
           <p className="text-sm text-[#9a9a9a] font-medium">{t("Monthly revenue") || "Monthly revenue"}</p>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-4xl font-bold text-[#1a1a2e]">${money(currentMonth.revenue)}</span>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mt-1">
+            <span className="text-3xl xl:text-4xl font-bold text-[#1a1a2e]">${money(currentMonth.revenue)}</span>
             <span className="text-sm text-[#9a9a9a]">{t("Total this month") || "Total this month"}</span>
           </div>
           <BarChart data={series} />
@@ -184,9 +184,9 @@ const Home = () => {
         {/* Estimated earnings */}
         <div className="rounded-2xl p-5 flex flex-col justify-between" style={{ background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)" }}>
           <p className="text-xs font-semibold tracking-widest text-blue-200 uppercase">{t("Estimated earnings") || "Estimated earnings"}</p>
-          <div className="mt-3 flex items-end justify-between">
-            <span className="text-4xl font-bold text-white tracking-tight">${money(currentMonth.estimatedEarnings)}</span>
-            <span className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white">
+          <div className="mt-3 flex items-end justify-between gap-2">
+            <span className="text-3xl xl:text-4xl font-bold text-white tracking-tight">${money(currentMonth.estimatedEarnings)}</span>
+            <span className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
               <IconTrendUp />
             </span>
           </div>

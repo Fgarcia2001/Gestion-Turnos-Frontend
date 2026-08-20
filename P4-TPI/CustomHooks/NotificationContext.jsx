@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { useAuth } from "./AuthContext";
-import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../src/services/api";
+import { fetchAllAppointments, fetchMyBranchAppointments } from "../src/services/api";
 import { fetchMyAppointments } from "../src/services/appointmentService";
 
 // ── Configuración del hub (ajustar cuando se implemente en el backend) ────────
@@ -11,13 +11,26 @@ const HUB_JOIN_METHOD = "JoinGroup";
 
 const NotificationContext = createContext(null);
 
-const isToday = (appt) => {
-  const [y, m, d] = (appt.day || "").split("-").map(Number);
-  const now = new Date();
-  return y === now.getFullYear() && m === now.getMonth() + 1 && d === now.getDate();
+const isPending = (appt) => !appt.status || appt.status === "Pending";
+
+const seenStorageKey = (userId) => `notification_seen_${userId}`;
+
+const readSeenIds = (userId) => {
+  try {
+    const raw = localStorage.getItem(seenStorageKey(userId));
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
 };
 
-const isPending = (appt) => !appt.status || appt.status === "Pending";
+const saveSeenIds = (userId, ids) => {
+  try {
+    localStorage.setItem(seenStorageKey(userId), JSON.stringify([...ids]));
+  } catch {
+    // storage no disponible: se ignora
+  }
+};
 
 // ── Provider ───────────────────────────────────────────────────────────────────
 export const NotificationProvider = ({ children }) => {
@@ -25,7 +38,14 @@ export const NotificationProvider = ({ children }) => {
   const [appointments, setAppointments] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [connected, setConnected] = useState(false);
+  const appointmentsRef = useRef([]);
   const seenIdsRef = useRef(new Set());
+
+  const userId = user?.sub;
+
+  useEffect(() => {
+    seenIdsRef.current = userId ? readSeenIds(userId) : new Set();
+  }, [userId]);
 
   const isProfessional = user?.role === "2" || user?.role === "Profesional" || user?.role === "Professional";
   const isReceptionist = user?.role === "Recepcionista" || user?.role === "Receptionist";
@@ -37,13 +57,14 @@ export const NotificationProvider = ({ children }) => {
       if (isProfessional) {
         data = await fetchMyAppointments();
       } else if (isReceptionist) {
-        data = await fetchMyBranchAppointmentsByDate(new Date());
+        data = await fetchMyBranchAppointments();
       } else {
-        data = await fetchAppointmentsByDate(new Date(), user.branchId);
+        data = await fetchAllAppointments();
       }
-      const pendingToday = (Array.isArray(data) ? data : []).filter((a) => isToday(a) && isPending(a));
-      setAppointments(pendingToday);
-      const unseen = pendingToday.filter((a) => !seenIdsRef.current.has(a.id)).length;
+      const pendingAppointments = (Array.isArray(data) ? data : []).filter((a) => isPending(a));
+      appointmentsRef.current = pendingAppointments;
+      setAppointments(pendingAppointments);
+      const unseen = pendingAppointments.filter((a) => !seenIdsRef.current.has(a.id)).length;
       setUnreadCount(unseen);
     } catch (e) {
       console.error("Error cargando turnos para notificaciones:", e);
@@ -51,9 +72,11 @@ export const NotificationProvider = ({ children }) => {
   }, [user, isProfessional, isReceptionist]);
 
   const markAllRead = useCallback(() => {
-    seenIdsRef.current = new Set(appointments.map((a) => a.id));
+    const ids = new Set(appointmentsRef.current.map((a) => a.id));
+    seenIdsRef.current = ids;
+    if (userId) saveSeenIds(userId, ids);
     setUnreadCount(0);
-  }, [appointments]);
+  }, [userId]);
 
   // ── Conexión SignalR ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -70,7 +93,21 @@ export const NotificationProvider = ({ children }) => {
       loadAppointments();
     });
     connection.onclose(() => setConnected(false));
-    connection.on(HUB_EVENT_NEW_APPOINTMENT, () => loadAppointments());
+    connection.on(HUB_EVENT_NEW_APPOINTMENT, (payload) => {
+      if (isProfessional) {
+        loadAppointments();
+        return;
+      }
+      if (
+        isPending(payload)
+        && !seenIdsRef.current.has(payload?.id)
+        && !appointmentsRef.current.some((a) => a.id === payload?.id)
+      ) {
+        appointmentsRef.current = [...appointmentsRef.current, payload];
+        setAppointments(appointmentsRef.current);
+        setUnreadCount((c) => c + 1);
+      }
+    });
 
     connection
       .start()
@@ -86,7 +123,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       connection.stop().catch(() => {});
     };
-  }, [user, loadAppointments]);
+  }, [user, loadAppointments, isProfessional]);
 
   const value = { appointments, unreadCount, connected, refresh: loadAppointments, markAllRead };
 

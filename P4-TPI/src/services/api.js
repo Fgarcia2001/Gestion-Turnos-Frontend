@@ -85,4 +85,6 @@ export const fetchStaffData   = () => fetchJson(`${BASE_URL}/Staff/Business/Staf
 export const fetchClientData  = () => fetchJson(`${BASE_URL}/Client`);
 export const fetchBranchData  = () => fetchJson(`${BASE_URL}/Branch`);
 export const fetchServiceData = () => fetchJson(`${BASE_URL}/Service`);
+export const fetchAllAppointments = () => fetchJson(`${BASE_URL}/Appointment`);
+export const fetchMyBranchAppointments = () => fetchJson(`${BASE_URL}/Appointment/my-branch`);
 
