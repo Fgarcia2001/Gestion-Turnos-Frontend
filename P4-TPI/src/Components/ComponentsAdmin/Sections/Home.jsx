@@ -21,19 +21,36 @@ const shortMonth = (month) => {
 
 // ── Bar chart ─────────────────────────────────────────────────────────────────
 const BarChart = ({ data }) => {
+  const { t } = useTranslation();
   const values = (data || []).map((d) => Number(d.revenue) || 0);
   const max = Math.max(...values, 1);
+  const items = data || [];
+
+  if (items.length === 0) {
+    return (
+      <p className="text-xs text-[#9a9a9a] mt-5 text-center">
+        {t("No revenue data") || "No revenue data"}
+      </p>
+    );
+  }
 
   return (
     <div className="flex items-end gap-2 h-24 mt-5">
-      {(data || []).map(({ month, revenue }) => {
+      {items.map(({ month, revenue }) => {
         const value = Number(revenue) || 0;
+        const barHeight = Math.max(Math.round((value / max) * 60), 3);
         return (
-          <div key={month} className="flex flex-col items-center gap-1 flex-1">
-            <div
-              className="w-full rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
-              style={{ height: `${Math.max((value / max) * 100, 3)}%` }}
-            />
+          <div
+            key={month}
+            className="h-full flex-1 min-w-0 flex flex-col items-center justify-end gap-1"
+            title={`$${money(value)}`}
+          >
+            <div className="flex items-end w-full h-16">
+              <div
+                className="w-full rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
+                style={{ height: `${barHeight}px` }}
+              />
+            </div>
             <span className="text-[10px] text-[#9a9a9a]">{shortMonth(month)}</span>
           </div>
         );
