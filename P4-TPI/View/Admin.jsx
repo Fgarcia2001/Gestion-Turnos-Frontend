@@ -8,6 +8,7 @@ import ManagmentBusiness from "../src/Components/ComponentsAdmin/Sections/Managm
 import Appointments from "../src/Components/ComponentsAdmin/Sections/Appointments";
 import Settings from "../src/Components/ComponentsAdmin/Sections/Settings";
 import Calendar from "../src/Components/ComponentsAdmin/Sections/Calendar";
+import Schedule from "../src/Components/ComponentsAdmin/Sections/Schedule";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ const Admin = () => {
       case "managmentBusiness": return <ManagmentBusiness />;
       case "appointments": return <Appointments />;
       case "calendar": return <Calendar />;
+      case "schedule": return <Schedule />;
       case "settings": return <Settings />;
 
       default: return <Home />;
