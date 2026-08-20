@@ -12,6 +12,11 @@ export const fetchAvailableSlots = ({ branchId, staffId, serviceId, date }) => {
   return fetchJsonOrThrow(`${BASE_URL}/appointments/available-slots?${params.toString()}`);
 };
 
+export const fetchBranchSchedule = (branchId, date) => {
+  const params = new URLSearchParams({ branchId, date: toDateParam(date) });
+  return fetchJsonOrThrow(`${BASE_URL}/appointments/schedule?${params.toString()}`);
+};
+
 export const createAppointment = async (payload) => {
   const res = await fetch(`${BASE_URL}/appointment`, {
     method: "POST",
