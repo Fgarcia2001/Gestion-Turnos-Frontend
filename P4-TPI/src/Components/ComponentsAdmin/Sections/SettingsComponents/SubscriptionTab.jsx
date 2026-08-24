@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { BASE_URL, getAuthHeaders } from "../../../../services/api";
-import { IconSparkles, IconCheck } from './SettingsIcons';
+import { BASE_URL, getAuthHeaders, fetchPlans } from "../../../../services/api";
+import { IconSparkles } from './SettingsIcons';
 
 const SubscriptionTab = () => {
   const [plan, setPlan] = useState(null);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const SubscriptionTab = () => {
       }
     }
     fetchSubscription();
+    fetchPlans().then(setPlans);
   }, []);
 
   const planName = plan?.planName || null;
@@ -68,40 +70,50 @@ const SubscriptionTab = () => {
 
       <div>
         <h3 className="text-lg font-semibold text-[#1a1a2e] mb-4">Upgrade your plan</h3>
-        <div className="grid grid-cols-3 gap-6">
-          {[
-            { name: "Starter", desc: "For small businesses getting started", price: "$0", features: ["1 branch", "Up to 3 staff", "Basic appointments", "Email support"], btn: "Downgrade" },
-            { name: "Professional", desc: "For growing businesses", price: "$49", features: ["Up to 5 branches", "Unlimited staff", "Advanced scheduling", "Client management", "Priority support"], btn: "Current plan" },
-            { name: "Enterprise", desc: "For large operations", price: "$149", features: ["Unlimited branches", "Unlimited staff", "Custom integrations", "Analytics dashboard", "Dedicated account manager", "24/7 phone support"], btn: "Upgrade" },
-          ].map((tier) => {
-            const isCurrent = planName && planName.toLowerCase() === tier.name.toLowerCase();
-            return (
-              <div key={tier.name} className={`bg-white rounded-2xl border p-6 flex flex-col relative ${isCurrent ? "border-2 border-[#1a1a2e] shadow-sm" : "border-[#e2ddd8]"}`}>
-                {isCurrent && <div className="absolute top-4 right-4 bg-[#f0ede8] text-[#1a1a2e] text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Current</div>}
-                <h4 className="font-semibold text-[#1a1a2e]">{tier.name}</h4>
-                <p className="text-xs text-[#9a9a9a] mt-1 mb-6">{tier.desc}</p>
-                <div className="mb-8">
-                  <span className="text-3xl font-bold text-[#1a1a2e]">{tier.price}</span>
-                  <span className="text-sm text-[#9a9a9a]">/mo</span>
-                </div>
-                <ul className="space-y-4 mb-10 flex-1">
-                  {tier.features.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-[#5a5a6e]"><IconCheck /> {f}</li>
-                  ))}
-                </ul>
-                {isCurrent ? (
-                  <button className="w-full py-2.5 bg-[#fcfbf9] text-[#9a9a9a] border border-[#e2ddd8] rounded-xl text-sm font-semibold cursor-not-allowed mt-auto">
-                    Current plan
-                  </button>
-                ) : (
-                  <button className="w-full py-2.5 bg-[#1a1a2e] text-white rounded-xl text-sm font-semibold hover:bg-[#2d2d44] transition-colors mt-auto">
-                    {tier.btn}
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        {plans.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-[#e2ddd8] py-12 text-center text-sm text-[#9a9a9a]">
+            No plans available.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...plans]
+              .sort((a, b) => (a.price ?? a.Price ?? 0) - (b.price ?? b.Price ?? 0))
+              .map((tier) => {
+                const id = tier.id ?? tier.Id;
+                const name = tier.name ?? tier.Name;
+                const description = tier.description ?? tier.Description;
+                const price = tier.price ?? tier.Price;
+                const durationDays = tier.durationDays ?? tier.DurationDays;
+                const isCurrent = planName && name && planName.toLowerCase() === name.toLowerCase();
+                return (
+                  <div key={id ?? name} className={`bg-white rounded-2xl border p-6 flex flex-col relative ${isCurrent ? "border-2 border-[#1a1a2e] shadow-sm" : "border-[#e2ddd8]"}`}>
+                    {isCurrent && <div className="absolute top-4 right-4 bg-[#f0ede8] text-[#1a1a2e] text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Current</div>}
+                    <h4 className="font-semibold text-[#1a1a2e]">{name}</h4>
+                    <p className="text-xs text-[#9a9a9a] mt-1 mb-6">{description}</p>
+                    <div className="mb-10 flex-1">
+                      <span className="text-3xl font-bold text-[#1a1a2e]">${price}</span>
+                      {durationDays ? (
+                        <span className="text-sm text-[#9a9a9a]"> / {durationDays} days</span>
+                      ) : null}
+                    </div>
+                    {isCurrent ? (
+                      <button className="w-full py-2.5 bg-[#fcfbf9] text-[#9a9a9a] border border-[#e2ddd8] rounded-xl text-sm font-semibold cursor-not-allowed mt-auto">
+                        Current plan
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        title="Coming soon"
+                        className="w-full py-2.5 bg-[#f0ede8] text-[#9a9a9a] rounded-xl text-sm font-semibold cursor-not-allowed mt-auto"
+                      >
+                        Change plan
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </div>
     </div>
   );

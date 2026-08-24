@@ -68,6 +68,7 @@ export const signUp = async (payload) => {
 };
 
 export const toDateParam = (date) => {
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
   const d = new Date(date);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
@@ -81,10 +82,12 @@ export const fetchAppointmentsByDate = (date, branchId) => {
 export const fetchMyBranchAppointmentsByDate = (date) =>
   fetchJson(`${BASE_URL}/Appointment/my-branch/by-date?day=${toDateParam(date)}`);
 
-export const fetchStaffData   = () => fetchJson(`${BASE_URL}/Staff/Business/Staffs`);
-export const fetchClientData  = () => fetchJson(`${BASE_URL}/Client`);
-export const fetchBranchData  = () => fetchJson(`${BASE_URL}/Branch`);
+export const fetchStaffData = () => fetchJson(`${BASE_URL}/Staff/Business/Staffs`);
+export const fetchClientData = () => fetchJson(`${BASE_URL}/Client`);
+export const fetchBranchData = () => fetchJson(`${BASE_URL}/Branch`);
 export const fetchServiceData = () => fetchJson(`${BASE_URL}/Service`);
+export const fetchPlans = () => fetchJson(`${BASE_URL}/plan`);
+
 export const fetchAllAppointments = () => fetchJson(`${BASE_URL}/Appointment`);
 export const fetchMyBranchAppointments = () => fetchJson(`${BASE_URL}/Appointment/my-branch`);
 
