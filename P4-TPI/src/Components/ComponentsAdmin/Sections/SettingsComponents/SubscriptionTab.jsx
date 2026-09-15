@@ -1,11 +1,27 @@
 import { useState, useEffect } from "react";
 import { BASE_URL, getAuthHeaders, fetchPlans } from "../../../../services/api";
 import { IconSparkles } from './SettingsIcons';
+import PlanDetailsModal from './PlanDetailsModal';
+import ChangePlanConfirmModal from './ChangePlanConfirmModal';
 
 const SubscriptionTab = () => {
   const [plan, setPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [detailsPlan, setDetailsPlan] = useState(null);
+  const [changePlanTarget, setChangePlanTarget] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // TODO: wire to the real change-plan endpoint once available.
+  const handleConfirmChangePlan = () => {
+    setChangePlanTarget(null);
+    showToast("Change request noted — not yet submitted");
+  };
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -38,7 +54,7 @@ const SubscriptionTab = () => {
       <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 mb-8 w-full">
         <h2 className="text-lg font-semibold text-[#1a1a2e]">Current Plan</h2>
         <p className="text-sm text-[#9a9a9a] mb-6 mt-1">{plan?.businessName ? plan.businessName : "Your subscription plan details."}</p>
-        
+
         <div className="bg-[#fcfbf9] border border-[#e2ddd8] rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-[#f0ede8] rounded-xl flex items-center justify-center text-[#1a1a2e]">
@@ -86,7 +102,7 @@ const SubscriptionTab = () => {
                 const durationDays = tier.durationDays ?? tier.DurationDays;
                 const isCurrent = planName && name && planName.toLowerCase() === name.toLowerCase();
                 return (
-                  <div key={id ?? name} className={`bg-white rounded-2xl border p-6 flex flex-col relative ${isCurrent ? "border-2 border-[#1a1a2e] shadow-sm" : "border-[#e2ddd8]"}`}>
+                  <div key={id ?? name} className={`group bg-white rounded-2xl border p-6 flex flex-col relative ${isCurrent ? "border-2 border-[#1a1a2e] shadow-sm" : "border-[#e2ddd8]"}`}>
                     {isCurrent && <div className="absolute top-4 right-4 bg-[#f0ede8] text-[#1a1a2e] text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Current</div>}
                     <h4 className="font-semibold text-[#1a1a2e]">{name}</h4>
                     <p className="text-xs text-[#9a9a9a] mt-1 mb-6">{description}</p>
@@ -96,25 +112,51 @@ const SubscriptionTab = () => {
                         <span className="text-sm text-[#9a9a9a]"> / {durationDays} days</span>
                       ) : null}
                     </div>
-                    {isCurrent ? (
-                      <button className="w-full py-2.5 bg-[#fcfbf9] text-[#9a9a9a] border border-[#e2ddd8] rounded-xl text-sm font-semibold cursor-not-allowed mt-auto">
-                        Current plan
-                      </button>
-                    ) : (
-                      <button
-                        disabled
-                        title="Coming soon"
-                        className="w-full py-2.5 bg-[#f0ede8] text-[#9a9a9a] rounded-xl text-sm font-semibold cursor-not-allowed mt-auto"
-                      >
-                        Change plan
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setDetailsPlan(tier)}
+                      className="w-full py-2.5 bg-[#fcfbf9] text-[#1a1a2e] border border-[#e2ddd8] rounded-xl text-sm font-semibold hover:bg-[#f0ede8] transition-all mt-auto opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                    >
+                      Show details
+                    </button>
                   </div>
                 );
               })}
           </div>
         )}
       </div>
+
+      {detailsPlan && (
+        <PlanDetailsModal
+          plan={detailsPlan}
+          isCurrent={Boolean(
+            planName &&
+              (detailsPlan.name ?? detailsPlan.Name) &&
+              planName.toLowerCase() === (detailsPlan.name ?? detailsPlan.Name).toLowerCase()
+          )}
+          onClose={() => setDetailsPlan(null)}
+          onRequestChange={(selectedPlan) => {
+            setDetailsPlan(null);
+            setChangePlanTarget(selectedPlan);
+          }}
+        />
+      )}
+
+      {changePlanTarget && (
+        <ChangePlanConfirmModal
+          plan={changePlanTarget}
+          onClose={() => setChangePlanTarget(null)}
+          onConfirm={handleConfirmChangePlan}
+        />
+      )}
+
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          {toast}
+        </div>
+      )}
     </div>
   );
 };

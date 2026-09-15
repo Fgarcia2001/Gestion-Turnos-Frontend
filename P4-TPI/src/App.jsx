@@ -11,6 +11,7 @@ import ProtectedRoute from "./Components/Routing/ProtectedRoute";
 import SysAdminLayout from "./Components/ComponentsSysAdmin/SysAdminLayout";
 import SysAdminDashboard from "./Components/ComponentsSysAdmin/SysAdminDashboard";
 import SysAdminBusinesses from "./Components/ComponentsSysAdmin/SysAdminBusinesses";
+import SysAdminPlans from "./Components/ComponentsSysAdmin/SysAdminPlans";
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
             >
               <Route index element={<SysAdminDashboard />} />
               <Route path="businesses" element={<SysAdminBusinesses />} />
+              <Route path="plans" element={<SysAdminPlans />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
