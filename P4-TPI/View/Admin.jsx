@@ -14,6 +14,7 @@ const Admin = () => {
   const { user } = useAuth();
   const isProfessional = user?.role === "2" || user?.role === "Profesional" || user?.role === "Professional";
   const [section, setSection] = useState(isProfessional ? "appointments" : "home");
+  const [settingsTab, setSettingsTab] = useState("business");
 
   const handleSelectSection = (id) => {
     if (isProfessional) return;
@@ -23,12 +24,14 @@ const Admin = () => {
   const renderSection = () => {
     if (isProfessional) return <Appointments />;
     switch (section) {
-      case "home": return <Home />;
+      case "home": return (
+        <Home onUpgradePlan={() => { setSettingsTab("subscription"); setSection("settings"); }} />
+      );
       case "managmentBusiness": return <ManagmentBusiness />;
       case "appointments": return <Appointments />;
       case "calendar": return <Calendar />;
       case "schedule": return <Schedule />;
-      case "settings": return <Settings />;
+      case "settings": return <Settings initialTab={settingsTab} />;
 
       default: return <Home />;
     }

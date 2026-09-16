@@ -4,8 +4,8 @@ import BusinessTab from './SettingsComponents/BusinessTab';
 import SubscriptionTab from './SettingsComponents/SubscriptionTab';
 import AdminTab from './SettingsComponents/AdminTab';
 
-const Settings = () => {
-  const [activeTab, setActiveTab] = useState('business');
+const Settings = ({ initialTab }) => {
+  const [activeTab, setActiveTab] = useState(initialTab || 'business');
 
   const tabs = [
     { id: 'business', label: 'Business', icon: IconBuilding },
