@@ -235,7 +235,7 @@ const ManagmentBusiness = () => {
   const handleEdit = async (updated) => {
     if (tab === "staff") {
       const id = updated.id ?? updated.staffId;
-      const saved = await updateStaff(id, {
+      await updateStaff(id, {
         name: updated.staffName,
         email: updated.staffEmail,
         password: updated.password,
@@ -244,10 +244,7 @@ const ManagmentBusiness = () => {
         rol: Number(updated.rol),
         branchId: updated.branchId,
       });
-      setData((prev) => ({
-        ...prev,
-        staff: prev.staff.map((s) => ((s.id ?? s.staffId) === id ? saved : s)),
-      }));
+      await loadData();
       showToast(t("Staff updated successfully") || "Staff updated successfully");
       return;
     }
@@ -340,7 +337,7 @@ const ManagmentBusiness = () => {
       <div className="flex flex-col gap-6">
 
         {/* Stat cards */}
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           {stats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
 
@@ -348,7 +345,7 @@ const ManagmentBusiness = () => {
         <div className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
 
           {/* Card header */}
-          <div className="flex items-center justify-between px-6 pt-5 pb-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 pt-5 pb-0">
             <TabSelector
               tabs={TABS}
               activeTab={tab}

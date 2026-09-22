@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchDashboardSummary } from "../../../services/dashboardService";
+import { ModalOverlay } from "./ManagmentBusinessComponents/Shared";
+import { IconX } from "./ManagmentBusinessComponents/Icons";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconTrendUp = ({ className = "" }) => (
@@ -8,6 +10,17 @@ const IconTrendUp = ({ className = "" }) => (
     <path d="M3 17L9 11L13 15L21 7" /><path d="M14 7H21V14" />
   </svg>
 );
+
+const IconInfo = ({ className = "" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="10" /><line x1="12" y1="11" x2="12" y2="16" /><circle cx="12" cy="8" r="0.75" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+const CSS_ANIMATIONS = `
+  @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
+`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const money = (value) =>
@@ -93,12 +106,86 @@ const DonutChart = ({ pending = 0, confirmed = 0, cancelled = 0 }) => {
   );
 };
 
+// ── Usage bar ─────────────────────────────────────────────────────────────────
+const UsageBar = ({ label, count, max }) => {
+  const { t } = useTranslation();
+  const unlimited = max === -1;
+  const pct = unlimited ? 100 : max > 0 ? Math.min((count / max) * 100, 100) : 0;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs text-[#6b7280] font-medium">{label}</span>
+        <span className="text-xs font-semibold text-[#1a1a2e]">
+          {count} / {unlimited ? (t("Unlimited") || "Unlimited") : max}
+        </span>
+      </div>
+      <div className="w-full h-2 rounded-full bg-[#f0ede8] overflow-hidden">
+        <div
+          className={`h-full rounded-full ${unlimited ? "bg-[#15803d]" : "bg-[#1a1a2e]"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// ── Plan usage modal ──────────────────────────────────────────────────────────
+const PlanUsageModal = ({ planUsage, onClose, onUpgradePlan }) => {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <style>{CSS_ANIMATIONS}</style>
+      <ModalOverlay onClose={onClose}>
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+          <div className="flex items-start justify-between mb-5">
+            <h2 className="text-lg font-bold text-[#1a1a2e]">{t("Plan Usage") || "Plan Usage"}</h2>
+            <button
+              onClick={onClose}
+              className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8] shrink-0"
+            >
+              <IconX />
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <UsageBar
+              label={t("Staff") || "Staff"}
+              count={Number(planUsage.staffCount) || 0}
+              max={planUsage.maxStaffAllowed ?? 0}
+            />
+            <UsageBar
+              label={t("Branches") || "Branches"}
+              count={Number(planUsage.branchCount) || 0}
+              max={planUsage.maxBranchesAllowed ?? 0}
+            />
+            <UsageBar
+              label={t("Services") || "Services"}
+              count={Number(planUsage.serviceCount) || 0}
+              max={planUsage.maxServicesAllowed ?? 0}
+            />
+          </div>
+
+          <button
+            onClick={() => { onClose(); onUpgradePlan?.(); }}
+            className="w-full mt-5 pt-4 border-t border-[#f0ede8] text-center text-sm font-semibold text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
+          >
+            {t("Need more benefits? Try upgrade your plan") || "Need more benefits? Try upgrade your plan"}
+          </button>
+        </div>
+      </ModalOverlay>
+    </>
+  );
+};
+
 // ── Main Home ─────────────────────────────────────────────────────────────────
-const Home = () => {
+const Home = ({ onUpgradePlan }) => {
   const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showPlanUsage, setShowPlanUsage] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -158,6 +245,7 @@ const Home = () => {
   const pending = Number(currentMonth.pending) || 0;
   const confirmed = Number(currentMonth.confirmed) || 0;
   const cancelled = Number(currentMonth.cancelled) || 0;
+  const planUsage = data?.planUsage || {};
 
   const statusItems = [
     { color: "#f59e0b", label: t("Pending") || "Pending", count: pending },
@@ -167,6 +255,17 @@ const Home = () => {
 
   return (
     <div className="flex flex-col gap-6">
+
+      {/* Plan usage trigger */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowPlanUsage(true)}
+          className="flex items-center gap-1.5 text-md font-semibold text-[#6b7280] hover:text-[#1a1a2e] hover:bg-[#f0ede8] rounded-lg px-3 py-1.5 transition-colors"
+        >
+          <IconInfo />
+          {t("Plan Usage") || "Plan Usage"}
+        </button>
+      </div>
 
       {/* Top row: 3 cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 py-6 sm:py-8 xl:py-10">
@@ -246,6 +345,14 @@ const Home = () => {
           </table>
         </div>
       </div>
+
+      {showPlanUsage && (
+        <PlanUsageModal
+          planUsage={planUsage}
+          onClose={() => setShowPlanUsage(false)}
+          onUpgradePlan={onUpgradePlan}
+        />
+      )}
 
     </div>
   );

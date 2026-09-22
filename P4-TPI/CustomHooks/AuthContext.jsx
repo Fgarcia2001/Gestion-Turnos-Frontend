@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 // ── JWT helpers ────────────────────────────────────────────────────────────────
 const TOKEN_KEY = "auth_token";
 
-const decodeJwt = (token) => {
+export const decodeJwt = (token) => {
   try {
     const payload = token.split(".")[1];
     const json = JSON.parse(atob(payload));

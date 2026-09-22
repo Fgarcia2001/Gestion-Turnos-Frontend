@@ -492,9 +492,9 @@ const Appointments = () => {
         </div>
       )}
 
-      <div className="flex gap-5 items-start">
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
 
-        <div className="w-[300px] shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
+        <div className="w-full lg:w-[300px] lg:shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-base font-bold text-[#1a1a2e]">{t("Calendar") || "Calendar"}</h2>
             <button className="flex items-center gap-1.5 bg-[#1a1a2e] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors">

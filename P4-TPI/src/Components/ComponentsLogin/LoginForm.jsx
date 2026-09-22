@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
-import { useAuth } from "../../../CustomHooks/AuthContext";
+import { useAuth, decodeJwt } from "../../../CustomHooks/AuthContext";
 import { dataLogin, DataLogup } from "./Datalogin/Login";
 import { useNavigate } from "react-router-dom";
 import { fetchBusinessTypes } from "../../services/businessService";
@@ -204,14 +204,14 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) =>
         };
         const data = await signUp(payload, t);
         login(data.token);
-        navigate("/admin");
+        navigate(decodeJwt(data.token)?.role === "SysAdmin" ? "/sysadmin" : "/admin");
       } else {
         const data = await signIn({
           email: loginFields.email,
           password: loginFields.password,
         }, t);
         login(data.token);
-        navigate("/admin");
+        navigate(decodeJwt(data.token)?.role === "SysAdmin" ? "/sysadmin" : "/admin");
       }
     } catch (err) {
       setServerError(err.message);

@@ -5,7 +5,13 @@ import { LanguageProvider } from "../CustomHooks/TraslateHook";
 import { AuthProvider } from "../CustomHooks/AuthContext";
 import BookingPage from "../View/BookingPage";
 import Admin from "../View/Admin";
+import Unauthorized from "../View/Unauthorized";
 import NotFound from "../View/NotFound";
+import ProtectedRoute from "./Components/Routing/ProtectedRoute";
+import SysAdminLayout from "./Components/ComponentsSysAdmin/SysAdminLayout";
+import SysAdminDashboard from "./Components/ComponentsSysAdmin/SysAdminDashboard";
+import SysAdminBusinesses from "./Components/ComponentsSysAdmin/SysAdminBusinesses";
+import SysAdminPlans from "./Components/ComponentsSysAdmin/SysAdminPlans";
 
 function App() {
   return (
@@ -17,7 +23,27 @@ function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/booking" element={<BookingPage />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/sysadmin"
+              element={
+                <ProtectedRoute allowedRoles={["SysAdmin"]}>
+                  <SysAdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<SysAdminDashboard />} />
+              <Route path="businesses" element={<SysAdminBusinesses />} />
+              <Route path="plans" element={<SysAdminPlans />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

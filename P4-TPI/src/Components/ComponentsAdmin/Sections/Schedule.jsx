@@ -120,7 +120,12 @@ const Schedule = () => {
       )}
 
       {!loading && !error && data?.schedule && data.staff && data.staff.length > 0 && (
-        <ScheduleGrid staff={data.staff} schedule={data.schedule} />
+        <ScheduleGrid
+          staff={data.staff}
+          schedule={data.schedule}
+          isToday={selectedDate === toDateParam(new Date())}
+          selectedDate={selectedDate}
+        />
       )}
 
       {!loading && !error && !data && !selectedBranchId && (
