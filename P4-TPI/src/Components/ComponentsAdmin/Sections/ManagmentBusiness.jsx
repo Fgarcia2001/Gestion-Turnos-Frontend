@@ -215,7 +215,7 @@ const ManagmentBusiness = () => {
   const handleEdit = async (updated) => {
     if (tab === "staff") {
       const id = updated.id ?? updated.staffId;
-      const saved = await updateStaff(id, {
+      await updateStaff(id, {
         name: updated.staffName,
         email: updated.staffEmail,
         password: updated.password,
@@ -224,10 +224,7 @@ const ManagmentBusiness = () => {
         rol: Number(updated.rol),
         branchId: updated.branchId,
       });
-      setData((prev) => ({
-        ...prev,
-        staff: prev.staff.map((s) => ((s.id ?? s.staffId) === id ? saved : s)),
-      }));
+      await loadData();
       showToast(t("Staff updated successfully") || "Staff updated successfully");
       return;
     }
