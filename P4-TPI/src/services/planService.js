@@ -1,6 +1,6 @@
 import { BASE_URL, getAuthHeaders, fetchJsonOrThrow } from "./api";
 
-export const fetchAllPlans = () => fetchJsonOrThrow(`${BASE_URL}/plan`);
+export const fetchAllPlans = () => fetchJsonOrThrow(`${BASE_URL}/plan/all`);
 
 export const createPlan = async (payload) => {
   const res = await fetch(`${BASE_URL}/plan`, {

@@ -43,9 +43,8 @@ const PlanDetailsModal = ({ plan, isCurrent, onClose, onRequestChange }) => {
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-[#1a1a2e]">{name}</h2>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
-                  }`}
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
+                    }`}
                 >
                   {isActive ? "Active" : "Inactive"}
                 </span>
