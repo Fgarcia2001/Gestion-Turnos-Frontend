@@ -52,12 +52,12 @@ const Header = ({ username, onNavigateToAppointments }) => {
   };
 
   return (
-    <header className="flex items-center justify-between w-full px-8 py-5 bg-[#f0ede8]">
-      <div>
-        <h1 className="text-2xl font-bold text-[#1a1a2e] leading-tight">
+    <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[#f0ede8]">
+      <div className="min-w-0">
+        <h1 className="text-lg sm:text-2xl font-bold text-[#1a1a2e] leading-tight truncate">
           Hello, <span className="font-bold">{displayName || "there"}</span>
         </h1>
-        <p className="text-sm text-[#9a9a9a] mt-0.5">View and control your appointments here!</p>
+        <p className="text-xs sm:text-sm text-[#9a9a9a] mt-0.5 truncate">View and control your appointments here!</p>
       </div>
       <div className="flex items-center gap-3">
         <div className="relative">
@@ -73,7 +73,7 @@ const Header = ({ username, onNavigateToAppointments }) => {
           {open && (
             <>
               <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
-              <div className="absolute right-0 top-full mt-2 w-80 max-h-96 overflow-y-auto bg-white border border-[#e2ddd8] rounded-2xl shadow-xl z-30">
+              <div className="absolute right-0 top-full mt-2 w-[min(20rem,calc(100vw-2rem))] max-h-96 overflow-y-auto bg-white border border-[#e2ddd8] rounded-2xl shadow-xl z-30">
                 <div className="px-4 py-3 border-b border-[#f0ede8]">
                   <h3 className="text-sm font-bold text-[#1a1a2e]">{t("New appointments") || "New appointments"}</h3>
                   <p className="text-xs text-[#9a9a9a]">{t("Live updates") || "Live updates"}</p>

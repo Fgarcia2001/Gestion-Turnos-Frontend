@@ -104,9 +104,9 @@ const BusinessTab = () => {
       <h2 className="text-lg font-semibold text-[#1a1a2e]">Business Information</h2>
       <p className="text-sm text-[#9a9a9a] mb-6 mt-1">Edit all the data of your business profile.</p>
 
-      <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
         {/* Logo */}
-        <div className="col-span-2 grid grid-cols-[auto_1fr] gap-6 items-start">
+        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start">
           <div className="w-32 h-32 rounded-xl border border-[#e2ddd8] bg-[#fcfbf9] flex items-center justify-center overflow-hidden shrink-0">
             {logoPreview ? (
               <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />

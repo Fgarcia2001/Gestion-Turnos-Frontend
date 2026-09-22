@@ -143,27 +143,29 @@ const SysAdminDashboard = () => {
           <div className="px-5 py-4 border-b border-[#f0ede8]">
             <p className="text-sm font-semibold text-[#1a1a2e]">Top Businesses</p>
           </div>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs text-[#9a9a9a] uppercase tracking-wide">
-                <th className="px-5 py-3 font-semibold">Business</th>
-                <th className="px-5 py-3 font-semibold text-right">Appointments</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topBusinesses.map((b) => (
-                <tr key={b.businessId} className="border-t border-[#f0ede8] hover:bg-[#f9f8f6] transition-colors">
-                  <td className="px-5 py-3 font-semibold text-[#1a1a2e]">{b.businessName || "—"}</td>
-                  <td className="px-5 py-3 text-right font-semibold text-[#1a1a2e]">{b.appointmentCount ?? 0}</td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-xs text-[#9a9a9a] uppercase tracking-wide">
+                  <th className="px-5 py-3 font-semibold">Business</th>
+                  <th className="px-5 py-3 font-semibold text-right">Appointments</th>
                 </tr>
-              ))}
-              {topBusinesses.length === 0 && (
-                <tr className="border-t border-[#f0ede8]">
-                  <td colSpan={2} className="px-5 py-8 text-center text-sm text-[#9a9a9a]">No businesses found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {topBusinesses.map((b) => (
+                  <tr key={b.businessId} className="border-t border-[#f0ede8] hover:bg-[#f9f8f6] transition-colors">
+                    <td className="px-5 py-3 font-semibold text-[#1a1a2e]">{b.businessName || "—"}</td>
+                    <td className="px-5 py-3 text-right font-semibold text-[#1a1a2e]">{b.appointmentCount ?? 0}</td>
+                  </tr>
+                ))}
+                {topBusinesses.length === 0 && (
+                  <tr className="border-t border-[#f0ede8]">
+                    <td colSpan={2} className="px-5 py-8 text-center text-sm text-[#9a9a9a]">No businesses found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

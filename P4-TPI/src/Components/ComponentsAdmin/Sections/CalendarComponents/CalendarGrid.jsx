@@ -35,11 +35,11 @@ const isDateToday = (date) =>
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const StaffHeaders = ({ staffMembers }) => (
-  <div className="flex ml-16 bg-white border-b border-[#e2ddd8] z-30 relative shadow-sm">
+  <div className="flex ml-16 bg-white border-b border-[#e2ddd8] z-30 sticky top-0 shadow-sm">
     {staffMembers.map((staff) => (
       <div
         key={staff.id}
-        className="flex-1 flex flex-col items-center justify-center py-4 border-r border-[#e2ddd8] last:border-r-0"
+        className="flex-1 min-w-[140px] flex flex-col items-center justify-center py-4 border-r border-[#e2ddd8] last:border-r-0"
       >
         <div className="w-9 h-9 rounded-full bg-[#f0ede8] text-[#1a1a2e] flex items-center justify-center text-[13px] font-bold mb-2">
           {staff.initials}
@@ -68,7 +68,7 @@ const TimeColumn = ({ hours }) => (
 const GridBackground = ({ staffMembers, hours }) => (
   <div className="absolute inset-0 flex pointer-events-none">
     {staffMembers.map((staff) => (
-      <div key={`bg-${staff.id}`} className="flex-1 border-r border-[#d4d4d4]">
+      <div key={`bg-${staff.id}`} className="flex-1 min-w-[140px] border-r border-[#d4d4d4]">
         <div className="h-10 border-b border-[#d4d4d4]" />
         {hours.map((_, i) => (
           <div key={i} className="h-16 border-b border-[#d4d4d4]" />
@@ -81,7 +81,7 @@ const GridBackground = ({ staffMembers, hours }) => (
 const InteractiveSlots = ({ staffMembers, hours, onSlotClick }) => (
   <div className="absolute inset-0 flex z-0">
     {staffMembers.map((staff) => (
-      <div key={`interact-${staff.id}`} className="flex-1 flex flex-col relative">
+      <div key={`interact-${staff.id}`} className="flex-1 min-w-[140px] flex flex-col relative">
         <div className="h-10 border-b border-transparent" />
         {hours.map((hour) => (
           <div
@@ -100,7 +100,7 @@ const AppointmentsLayer = ({ staffMembers, appointments, getStyle }) => (
     {staffMembers.map((staff) => {
       const staffAppts = appointments.filter(a => a.staffId === staff.id);
       return (
-        <div key={`appts-${staff.id}`} className="flex-1 relative border-r border-transparent">
+        <div key={`appts-${staff.id}`} className="flex-1 min-w-[140px] relative border-r border-transparent">
           {staffAppts.map((appt) => (
             <div
               key={appt.id}
@@ -205,23 +205,27 @@ const CalendarGrid = ({ staffMembers, appointments, currentDate, timeRange, onSl
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col flex-1 bg-white overflow-hidden relative">
-      <StaffHeaders staffMembers={staffMembers} />
+      <div ref={gridScrollRef} className="flex-1 overflow-auto relative bg-[#e5e5e5]">
+        <div className="flex flex-col" style={{ minWidth: `${64 + staffMembers.length * 140}px` }}>
+          <StaffHeaders staffMembers={staffMembers} />
 
-      <div ref={gridScrollRef} className="flex flex-1 overflow-y-auto relative bg-[#e5e5e5]">
-        <TimeColumn hours={hours} />
+          <div className="flex relative">
+            <TimeColumn hours={hours} />
 
-        <div className="flex-1 flex relative">
-          <GridBackground staffMembers={staffMembers} hours={hours} />
-          <InteractiveSlots staffMembers={staffMembers} hours={hours} onSlotClick={onSlotClick} />
-          <AppointmentsLayer staffMembers={staffMembers} appointments={appointments} getStyle={getAppointmentStyle} />
+            <div className="flex-1 flex relative">
+              <GridBackground staffMembers={staffMembers} hours={hours} />
+              <InteractiveSlots staffMembers={staffMembers} hours={hours} onSlotClick={onSlotClick} />
+              <AppointmentsLayer staffMembers={staffMembers} appointments={appointments} getStyle={getAppointmentStyle} />
 
-          {timeIndicatorPos !== null && (
-            <TimeIndicator
-              pos={timeIndicatorPos}
-              hour={now.getHours()}
-              minute={now.getMinutes()}
-            />
-          )}
+              {timeIndicatorPos !== null && (
+                <TimeIndicator
+                  pos={timeIndicatorPos}
+                  hour={now.getHours()}
+                  minute={now.getMinutes()}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

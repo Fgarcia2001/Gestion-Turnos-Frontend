@@ -55,7 +55,7 @@ const SubscriptionTab = () => {
         <h2 className="text-lg font-semibold text-[#1a1a2e]">Current Plan</h2>
         <p className="text-sm text-[#9a9a9a] mb-6 mt-1">{plan?.businessName ? plan.businessName : "Your subscription plan details."}</p>
 
-        <div className="bg-[#fcfbf9] border border-[#e2ddd8] rounded-xl p-4 flex items-center justify-between">
+        <div className="bg-[#fcfbf9] border border-[#e2ddd8] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-[#f0ede8] rounded-xl flex items-center justify-center text-[#1a1a2e]">
               <IconSparkles />
@@ -70,7 +70,7 @@ const SubscriptionTab = () => {
               <p className="text-xs text-[#9a9a9a]">{plan?.businessName || "---"}</p>
             </div>
           </div>
-          <div className="text-right text-xs text-[#9a9a9a]">
+          <div className="text-left sm:text-right text-xs text-[#9a9a9a]">
             {plan?.startDate ? (
               <>
                 <span className="block font-medium text-[#1a1a2e]">{new Date(plan.startDate).toLocaleDateString()}</span>
