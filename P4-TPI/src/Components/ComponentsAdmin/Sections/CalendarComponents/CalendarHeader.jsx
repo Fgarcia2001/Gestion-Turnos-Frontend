@@ -22,7 +22,7 @@ const formatTitleDate = (date) => {
 // ── Component ─────────────────────────────────────────────────────────────────
 const CalendarHeader = ({ currentDate, onTodayClick, onPrevDay, onNextDay, businessName = "Mi Negocio" }) => {
   return (
-    <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-[#e2ddd8]">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-white border-b border-[#e2ddd8]">
       
       {/* Left side */}
       <div className="flex items-center gap-4">

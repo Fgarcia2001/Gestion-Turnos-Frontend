@@ -106,9 +106,9 @@ const AdminTab = () => {
         <h2 className="text-lg font-semibold text-[#1a1a2e]">Administrator Profile</h2>
         <p className="text-sm text-[#9a9a9a] mb-6 mt-1">Manage your personal account data.</p>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
           {/* Photo */}
-          <div className="col-span-2 grid grid-cols-[auto_1fr] gap-6 items-start pb-6 border-b border-[#e2ddd8]">
+          <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start pb-6 border-b border-[#e2ddd8]">
             <div className="w-20 h-20 rounded-full border border-[#e2ddd8] bg-[#fcfbf9] flex items-center justify-center overflow-hidden shrink-0">
               {photoPreview ? (
                 <img src={photoPreview} alt="Admin" className="w-full h-full object-cover" />
@@ -218,12 +218,12 @@ const AdminTab = () => {
       <div className="bg-white rounded-2xl border border-red-200 p-6">
         <h2 className="text-sm font-semibold text-red-600 mb-1">Danger Zone</h2>
         <p className="text-xs text-[#9a9a9a] mb-4">Irreversible actions for your account.</p>
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
           <div>
             <h4 className="text-sm font-semibold text-[#1a1a2e]">Delete account</h4>
             <p className="text-xs text-[#9a9a9a]">Permanently remove your account and all data.</p>
           </div>
-          <button className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors">
+          <button className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shrink-0">
             Delete account
           </button>
         </div>

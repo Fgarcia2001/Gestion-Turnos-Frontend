@@ -36,9 +36,9 @@ const Section = ({ title, children }) => (
 const Field = ({ label, value }) => {
   if (value === undefined || value === null || String(value).trim() === "") return null;
   return (
-    <div className="flex items-start justify-between gap-4 py-2 border-b border-[#f0ede8] last:border-b-0">
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[#f0ede8] last:border-b-0">
       <span className="text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide shrink-0">{label}</span>
-      <span className="text-sm text-[#1a1a2e] text-right break-all">{value}</span>
+      <span className="text-sm text-[#1a1a2e] sm:text-right break-all">{value}</span>
     </div>
   );
 };

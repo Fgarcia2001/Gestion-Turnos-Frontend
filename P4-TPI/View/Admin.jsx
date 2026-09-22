@@ -51,7 +51,7 @@ const Admin = () => {
           <Header username={user?.name} onNavigateToAppointments={() => setSection("appointments")} />
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-8 pb-8">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">
             {renderSection()}
           </div>
 

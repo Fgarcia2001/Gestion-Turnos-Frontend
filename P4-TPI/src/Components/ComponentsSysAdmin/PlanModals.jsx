@@ -148,7 +148,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
             />
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <label className={labelClass}>Price</label>
               <input
