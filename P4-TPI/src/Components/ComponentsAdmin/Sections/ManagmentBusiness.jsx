@@ -10,31 +10,49 @@ import {
 import { createStaff, updateStaff, deleteStaff } from "../../../services/staffService";
 import { createBranch, updateBranch, deleteBranch } from "../../../services/branchService";
 import { createService, updateService, deleteService } from "../../../services/servicesService";
+import { fetchAllAppointments } from "../../../services/api";
 import { EditModal, CreateModal, SchedulesModal, DeleteModal } from "./ManagmentBusinessComponents/Modals";
 import { TableRow } from "./ManagmentBusinessComponents/TableComponents";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
+const uniqueClientCount = (appointments) =>
+  new Set((appointments || []).map((a) => a.clientName).filter(Boolean)).size;
+
+const average = (total, count) => (count ? (total / count).toFixed(1) : 0);
+
 const STATS_CONFIG = {
-  staff: (data, t) => [
-    { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: "—" },
-    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: "—" },
-  ],
-  client: (data, t) => [
-    { icon: IconUsers, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Clients"), value: data.clients.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: "—" },
-    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: "—" },
-  ],
-  service: (data, t) => [
-    { icon: IconActivity, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Services"), value: data.services.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: "—" },
-    { icon: IconUsers, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: "—" },
-  ],
-  branch: (data, t) => [
-    { icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Total Branches"), value: data.branches.length },
-    { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
-    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: "—" },
-  ],
+  staff: (data, t) => {
+    const totalAppointments = (data.appointments || []).length;
+    return [
+      { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
+      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: totalAppointments },
+      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: average(totalAppointments, data.staff.length) },
+    ];
+  },
+  client: (data, t) => {
+    const totalAppointments = (data.appointments || []).length;
+    return [
+      { icon: IconUsers, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Clients"), value: data.clients.length },
+      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: totalAppointments },
+      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: uniqueClientCount(data.appointments) },
+    ];
+  },
+  service: (data, t) => {
+    const totalAppointments = (data.appointments || []).length;
+    return [
+      { icon: IconActivity, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Services"), value: data.services.length },
+      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: totalAppointments },
+      { icon: IconUsers, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: uniqueClientCount(data.appointments) },
+    ];
+  },
+  branch: (data, t) => {
+    const totalAppointments = (data.appointments || []).length;
+    return [
+      { icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Total Branches"), value: data.branches.length },
+      { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
+      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: average(totalAppointments, data.branches.length) },
+    ];
+  },
 };
 
 const TAB_HEADERS = {
@@ -129,19 +147,21 @@ const ManagmentBusiness = () => {
     clients: [],
     branches: [],
     services: [],
+    appointments: [],
   });
 
   // ── Data fetching ──────────────────────────────────────────────────────────
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [staff, clients, branches, services] = await Promise.all([
+      const [staff, clients, branches, services, appointments] = await Promise.all([
         fetchStaffData(),
         fetchClientData(),
         fetchBranchData(),
         fetchServiceData(),
+        fetchAllAppointments(),
       ]);
-      setData({ staff, clients, branches, services });
+      setData({ staff, clients, branches, services, appointments });
     } catch (e) {
       console.error("Error loading data:", e);
     } finally {
