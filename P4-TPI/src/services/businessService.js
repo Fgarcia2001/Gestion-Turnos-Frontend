@@ -6,3 +6,6 @@ export const fetchBusinessesByType = (typeBusiness) =>
   fetchJsonOrThrow(`${BASE_URL}/business/type/${encodeURIComponent(typeBusiness)}`);
 
 export const fetchGlobalBusinesses = () => fetchJsonOrThrow(`${BASE_URL}/Business/global`);
+
+export const fetchBusinessEcosystemByUrl = (url) =>
+  fetchJsonOrThrow(`${BASE_URL}/Business/by-url/${encodeURIComponent(url)}/ecosystem`);

@@ -21,16 +21,12 @@ const StaffStep = ({ booking, onSelect }) => {
       getId={(item) => item.id}
       isSelected={(item) => item.id === booking.staffId}
       onSelect={(item) => onSelect(item.id, item.name)}
-      renderItem={(item, selected) => (
+      renderItem={(item) => (
         <div className="flex items-center gap-3">
-          <div
-            className={`flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold shrink-0 ${
-              selected ? "bg-white text-[#1A1A1A]" : "bg-gray-100 text-gray-600"
-            }`}
-          >
+          <div className="flex items-center justify-center w-10 h-10 rounded-full text-sm font-bold shrink-0 bg-[#1a1a2e] text-white">
             {getInitials(item.name)}
           </div>
-          <span className="font-semibold">{item.name}</span>
+          <span className="font-semibold text-[#1a1a2e]">{item.name}</span>
         </div>
       )}
       emptyMessage={t("noStaffFound") || "No professionals found at this branch."}

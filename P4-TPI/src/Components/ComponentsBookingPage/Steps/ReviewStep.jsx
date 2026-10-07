@@ -1,10 +1,15 @@
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
-import { IconAlert } from "../Icons";
+import { IconAlert, IconMapPin, IconClipboard, IconUser, IconCalendar, IconClock, IconDollar, IconMail, IconPhone } from "../Icons";
 
-const Row = ({ label, value }) => (
-  <div className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-b-0">
-    <span className="text-sm text-gray-500">{label}</span>
-    <span className="text-sm font-semibold text-gray-900">{value}</span>
+const Row = ({ icon, label, value, strong }) => (
+  <div className="flex items-center gap-3 py-2.5 border-b border-[#e2ddd8] last:border-b-0">
+    <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#F8F5F0] text-[#1a1a2e] shrink-0">
+      {icon}
+    </span>
+    <span className="text-sm text-[#6b6b6b] flex-1">{label}</span>
+    <span className={`text-sm text-right ${strong ? "font-bold text-[#1a1a2e]" : "font-semibold text-[#1a1a2e]"}`}>
+      {value}
+    </span>
   </div>
 );
 
@@ -19,24 +24,32 @@ const ReviewStep = ({ booking, submitError }) => {
   return (
     <div className="w-full max-w-lg mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">{t("reviewYourAppointment") || "Review Your Appointment"}</h2>
-        <p className="text-gray-500 mt-1">{t("reviewSummaryTitle") || "Review your appointment"}</p>
+        <h2 className="text-2xl font-bold text-[#1a1a2e]">{t("reviewYourAppointment") || "Review Your Appointment"}</h2>
+        <p className="text-[#6b6b6b] mt-1">{t("reviewSummaryTitle") || "Revisá que todo esté correcto"}</p>
       </div>
 
-      <div className="rounded-xl border border-gray-200 p-5">
-        <Row label={t("businessLabel") || "Business"} value={booking.businessName} />
-        <Row label={t("branchLabel") || "Branch"} value={booking.branchName} />
-        <Row label={t("serviceLabel") || "Service"} value={booking.serviceName} />
-        {booking.serviceDuration != null && (
-          <Row label={t("durationLabel") || "Duration"} value={`${booking.serviceDuration} ${t("minutesAbbrev") || "min"}`} />
-        )}
-        {booking.servicePrice != null && <Row label={t("priceLabel") || "Price"} value={booking.servicePrice} />}
-        <Row label={t("professionalLabel") || "Professional"} value={booking.staffName} />
-        <Row label={t("dateLabel") || "Date"} value={formatDay(booking.day)} />
-        <Row label={t("timeLabel") || "Time"} value={booking.startTime} />
-        <Row label={t("clientNameLabel") || "Full name"} value={booking.clientName} />
-        <Row label={t("clientEmailLabel") || "Email"} value={booking.clientEmail} />
-        <Row label={t("clientPhoneLabel") || "Phone"} value={booking.clientPhone} />
+      <div className="flex flex-col gap-5">
+        <div className="rounded-2xl border border-[#e2ddd8] bg-white p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#b3aca3] mb-1">Tu turno</p>
+          <Row icon={<IconMapPin />} label={t("branchLabel") || "Sucursal"} value={booking.branchName} />
+          <Row icon={<IconClipboard />} label={t("serviceLabel") || "Servicio"} value={booking.serviceName} />
+          <Row icon={<IconUser />} label={t("professionalLabel") || "Profesional"} value={booking.staffName} />
+          <Row icon={<IconCalendar />} label={t("dateLabel") || "Fecha"} value={formatDay(booking.day)} />
+          <Row icon={<IconClock />} label={t("timeLabel") || "Hora"} value={booking.startTime} />
+          {booking.serviceDuration != null && (
+            <Row icon={<IconClock />} label={t("durationLabel") || "Duración"} value={`${booking.serviceDuration} ${t("minutesAbbrev") || "min"}`} />
+          )}
+          {booking.servicePrice != null && (
+            <Row icon={<IconDollar />} label={t("priceLabel") || "Precio"} value={booking.servicePrice} strong />
+          )}
+        </div>
+
+        <div className="rounded-2xl border border-[#e2ddd8] bg-white p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#b3aca3] mb-1">Tus datos</p>
+          <Row icon={<IconUser />} label={t("clientNameLabel") || "Nombre"} value={booking.clientName} />
+          <Row icon={<IconMail />} label={t("clientEmailLabel") || "Email"} value={booking.clientEmail} />
+          <Row icon={<IconPhone />} label={t("clientPhoneLabel") || "Teléfono"} value={booking.clientPhone} />
+        </div>
       </div>
 
       {submitError && (

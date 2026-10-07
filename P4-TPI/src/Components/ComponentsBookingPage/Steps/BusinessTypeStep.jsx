@@ -13,7 +13,7 @@ const BusinessTypeStep = ({ booking, onSelect }) => {
       getId={(item) => item.id}
       isSelected={(item) => item.id === booking.businessTypeId}
       onSelect={(item) => onSelect(item.id, item.name)}
-      renderItem={(item) => <span className="font-semibold">{item.name}</span>}
+      renderItem={(item) => <span className="font-semibold text-[#1a1a2e]">{item.name}</span>}
       emptyMessage={t("noBusinessTypesFound") || "No business types found."}
       errorMessage={t("loadBusinessTypesError") || "Couldn't load business types."}
     />

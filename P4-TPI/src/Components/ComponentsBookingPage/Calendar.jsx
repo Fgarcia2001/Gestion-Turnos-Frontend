@@ -36,21 +36,23 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
   let next = 1;
   while (cells.length % 7 !== 0) cells.push({ day: next++, cur: false });
 
+  const isToday = (date) => date && isSameDay(date, startOfDay(new Date()));
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F8F5F0] text-[#4a4a4a] transition-colors"
         >
           <IconChevronLeft />
         </button>
-        <span className="text-sm font-semibold text-[#1A1A1A]">
+        <span className="text-sm font-semibold text-[#1a1a2e]">
           {(t(MONTH_KEYS[month]) || MONTH_KEYS[month])} {year}
         </span>
         <button
           onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F8F5F0] text-[#4a4a4a] transition-colors"
         >
           <IconChevronRight />
         </button>
@@ -58,7 +60,7 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
 
       <div className="grid grid-cols-7 mb-1">
         {DAY_KEYS.map((k) => (
-          <div key={k} className="text-center text-[11px] font-semibold text-gray-400 py-1">
+          <div key={k} className="text-center text-[11px] font-semibold text-[#b3aca3] py-1">
             {t(k) || k}
           </div>
         ))}
@@ -69,6 +71,7 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
           const date = c.cur ? new Date(year, month, c.day) : null;
           const isPast = c.cur && min && date < min;
           const isSelected = c.cur && isSameDay(date, selected);
+          const isTodayCell = c.cur && !isSelected && isToday(date);
           const disabled = !c.cur || isPast;
 
           return (
@@ -77,11 +80,12 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
               type="button"
               disabled={disabled}
               onClick={() => !disabled && onSelect(date)}
-              className={`flex items-center justify-center h-9 w-full rounded-lg text-sm transition-colors
-                ${!c.cur ? "text-gray-300 cursor-default" : ""}
-                ${isPast ? "text-gray-300 cursor-not-allowed" : ""}
-                ${c.cur && !isPast && !isSelected ? "text-[#1A1A1A] cursor-pointer hover:bg-gray-100" : ""}
-                ${isSelected ? "bg-[#1A1A1A] text-white font-semibold" : ""}
+              className={`flex items-center justify-center h-9 w-full rounded-full text-sm transition-all
+                ${!c.cur ? "text-transparent cursor-default" : ""}
+                ${isPast ? "text-[#d8d2cb] cursor-not-allowed" : ""}
+                ${c.cur && !isPast && !isSelected ? "text-[#1a1a2e] cursor-pointer hover:bg-[#F8F5F0]" : ""}
+                ${isTodayCell ? "ring-1 ring-inset ring-[#1a1a2e]/40 font-semibold" : ""}
+                ${isSelected ? "bg-[#1a1a2e] text-white font-semibold shadow-sm shadow-[#1a1a2e]/30" : ""}
               `}
             >
               {c.day}
