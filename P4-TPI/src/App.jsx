@@ -3,7 +3,6 @@ import Home from "../View/Home";
 import Login from "../View/Login";
 import { LanguageProvider } from "../CustomHooks/TraslateHook";
 import { AuthProvider } from "../CustomHooks/AuthContext";
-import BookingPage from "../View/BookingPage";
 import BusinessPublicPage from "../View/BusinessPublicPage";
 import Admin from "../View/Admin";
 import Unauthorized from "../View/Unauthorized";
@@ -23,8 +22,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/booking" element={<BookingPage />} />
-            <Route path="/empresa/:businessSlug" element={<BusinessPublicPage />} />
+            <Route path="/:businessSlug" element={<BusinessPublicPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route
               path="/admin"

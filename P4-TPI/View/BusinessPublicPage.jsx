@@ -111,7 +111,6 @@ const BusinessPublicPage = () => {
     setBookingPrefill({
       businessId: business?.id,
       businessName: business?.name,
-      category: business?.category,
       ...(branch && {
         branchId: branch.id,
         branchName: branch.name,

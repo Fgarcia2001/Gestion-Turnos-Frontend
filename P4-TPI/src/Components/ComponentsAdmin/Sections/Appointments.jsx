@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
 import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
@@ -6,6 +6,7 @@ import { updateAppointmentStatus, fetchMyAppointments } from "../../../services/
 import { useAuth } from "../../../../CustomHooks/AuthContext";
 import { ModalOverlay } from "./ManagmentBusinessComponents/Shared";
 import { IconX, IconWarning } from "./ManagmentBusinessComponents/Icons";
+import NewAppointmentModal from "./AppointmentsComponents/NewAppointmentModal";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconChevronLeft = () => (
@@ -397,6 +398,7 @@ const Appointments = () => {
   const [branches, setBranches] = useState([]);
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const [toast, setToast] = useState(null);
+  const [showNewAppointment, setShowNewAppointment] = useState(false);
 
   const showToast = (message, isError = false) => {
     setToast({ message, isError });
@@ -404,8 +406,6 @@ const Appointments = () => {
   };
 
   const { user } = useAuth();
-
-  const isProfessional = role === "2" || role === "Profesional" || role === "Professional";
 
   useEffect(() => {
     if (user) {
@@ -424,32 +424,39 @@ const Appointments = () => {
     fetchBranchData().then(setBranches);
   }, [role]);
 
-  useEffect(() => {
-    async function loadAppointments() {
-      setLoading(true);
-      try {
-        const day = new Date(viewDate.getFullYear(), viewDate.getMonth(), selectedDay);
-        let data;
-        if (role === "2" || role === "Profesional" || role === "Professional") {
-          const all = await fetchMyAppointments();
-          data = all.filter((a) => {
-            const [y, m, d] = (a.day || "").split("-").map(Number);
-            return y === viewDate.getFullYear() && m === viewDate.getMonth() + 1 && d === selectedDay;
-          });
-        } else if (role === "Recepcionista" || role === "Receptionist") {
-          data = await fetchMyBranchAppointmentsByDate(day);
-        } else {
-          data = await fetchAppointmentsByDate(day, selectedBranchId);
-        }
-        setAppointments(Array.isArray(data) ? data : []);
-      } catch {
-        setAppointments([]);
-      } finally {
-        setLoading(false);
+  const loadAppointments = useCallback(async () => {
+    setLoading(true);
+    try {
+      const day = new Date(viewDate.getFullYear(), viewDate.getMonth(), selectedDay);
+      let data;
+      if (role === "2" || role === "Profesional" || role === "Professional") {
+        const all = await fetchMyAppointments();
+        data = all.filter((a) => {
+          const [y, m, d] = (a.day || "").split("-").map(Number);
+          return y === viewDate.getFullYear() && m === viewDate.getMonth() + 1 && d === selectedDay;
+        });
+      } else if (role === "Recepcionista" || role === "Receptionist") {
+        data = await fetchMyBranchAppointmentsByDate(day);
+      } else {
+        data = await fetchAppointmentsByDate(day, selectedBranchId);
       }
+      setAppointments(Array.isArray(data) ? data : []);
+    } catch {
+      setAppointments([]);
+    } finally {
+      setLoading(false);
     }
-    if (role && selectedDay) loadAppointments();
   }, [selectedDay, selectedBranchId, role, viewDate]);
+
+  useEffect(() => {
+    if (role && selectedDay) loadAppointments();
+  }, [loadAppointments, role, selectedDay]);
+
+  const handleAppointmentCreated = () => {
+    setShowNewAppointment(false);
+    showToast(t("Appointment created") || "Turno creado correctamente.");
+    loadAppointments();
+  };
 
   const handleStatusChange = async (apptId, statusValue) => {
     const prevAppointments = appointments;
@@ -492,12 +499,23 @@ const Appointments = () => {
         </div>
       )}
 
+      {showNewAppointment && (
+        <NewAppointmentModal
+          branches={branches}
+          onClose={() => setShowNewAppointment(false)}
+          onCreated={handleAppointmentCreated}
+        />
+      )}
+
       <div className="flex flex-col lg:flex-row gap-5 items-start">
 
         <div className="w-full lg:w-[300px] lg:shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-base font-bold text-[#1a1a2e]">{t("Calendar") || "Calendar"}</h2>
-            <button className="flex items-center gap-1.5 bg-[#1a1a2e] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors">
+            <button
+              onClick={() => setShowNewAppointment(true)}
+              className="flex items-center gap-1.5 bg-[#1a1a2e] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors"
+            >
               <IconPlus />
               {t("New Appointment") || "New Appointment"}
             </button>
@@ -538,7 +556,7 @@ const Appointments = () => {
                   <p className="text-sm text-[#9a9a9a]">{t("No appointments for this day") || "No appointments for this day"}</p>
                 </div>
               ) : (
-                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} canChangeStatus={!isProfessional} />)
+                appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} canChangeStatus />)
               )}
             </>
           )}

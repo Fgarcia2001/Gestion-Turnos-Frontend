@@ -11,7 +11,7 @@ export const createService = async (payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to create service. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to create service. Please try again.");
   }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
@@ -25,7 +25,7 @@ export const updateService = async (id, payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to update service. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to update service. Please try again.");
   }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
@@ -38,6 +38,6 @@ export const deleteService = async (id) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to delete service. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to delete service. Please try again.");
   }
 };

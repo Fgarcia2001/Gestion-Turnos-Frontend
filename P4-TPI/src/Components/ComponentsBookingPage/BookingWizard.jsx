@@ -5,8 +5,6 @@ import { toDateParam } from "../../services/api";
 import StepIndicator from "./StepIndicator";
 import { STEP } from "./stepMeta";
 import { IconMapPin, IconClipboard, IconUser, IconCalendar } from "./Icons";
-import BusinessTypeStep from "./Steps/BusinessTypeStep";
-import BusinessStep from "./Steps/BusinessStep";
 import BranchStep from "./Steps/BranchStep";
 import ServiceStep from "./Steps/ServiceStep";
 import StaffStep from "./Steps/StaffStep";
@@ -15,8 +13,6 @@ import ClientInfoStep from "./Steps/ClientInfoStep";
 import ReviewStep from "./Steps/ReviewStep";
 import ConfirmationStep from "./Steps/ConfirmationStep";
 import {
-  isBusinessTypeStepComplete,
-  isBusinessStepComplete,
   isBranchStepComplete,
   isServiceStepComplete,
   isStaffStepComplete,
@@ -25,8 +21,7 @@ import {
 } from "./Steps/stepValidation";
 
 const emptyBooking = {
-  currentStep: STEP.BUSINESS_TYPE,
-  businessTypeId: null, businessTypeName: "",
+  currentStep: STEP.BRANCH,
   businessId: null, businessName: "",
   branchId: null, branchName: "", branchAddress: "",
   serviceId: null, serviceName: "", serviceDuration: null, servicePrice: null,
@@ -36,34 +31,21 @@ const emptyBooking = {
   observation: "", payment: 0,
 };
 
-// Mirrors the TypeBusiness enum declaration order in the backend (Business.cs):
-// Barberia = 0, Spa = 1. Lets us jump straight into the wizard when arriving
-// from a business's public page without re-fetching business types just to
-// resolve this id.
-const BUSINESS_TYPE_IDS = { Barberia: 0, Spa: 1 };
-
-// A prefill (business, optionally branch) means those steps were already
-// answered elsewhere (e.g. the /empresa/:slug public page), so the wizard
-// should open past them instead of making the user pick again.
-const resolveStartStep = (prefill) => {
-  if (!prefill?.businessId) return STEP.BUSINESS_TYPE;
-  return prefill.branchId ? STEP.SERVICE : STEP.BRANCH;
-};
+// The business (and optionally branch) is always already resolved by the time
+// this wizard opens, from the business's public page at /:businessSlug — so
+// it always starts at the branch step, or past it when a branch was picked
+// directly (e.g. via that branch's own "Reservar acá" button).
+const resolveStartStep = (prefill) => (prefill?.branchId ? STEP.SERVICE : STEP.BRANCH);
 
 const buildInitialBooking = (prefill) => {
-  const startStep = resolveStartStep(prefill);
-  if (startStep === STEP.BUSINESS_TYPE) return emptyBooking;
-
   const booking = {
     ...emptyBooking,
-    businessTypeId: BUSINESS_TYPE_IDS[prefill.category] ?? null,
-    businessTypeName: prefill.category || "",
-    businessId: prefill.businessId,
-    businessName: prefill.businessName || "",
-    currentStep: startStep,
+    businessId: prefill?.businessId ?? null,
+    businessName: prefill?.businessName || "",
+    currentStep: resolveStartStep(prefill),
   };
 
-  if (prefill.branchId) {
+  if (prefill?.branchId) {
     booking.branchId = prefill.branchId;
     booking.branchName = prefill.branchName || "";
     booking.branchAddress = prefill.branchAddress || "";
@@ -90,15 +72,14 @@ const SummaryRow = ({ icon, label, value }) =>
 
 // The booking wizard's content: stepper + current step + persistent selection
 // summary. Deliberately has no page chrome of its own (no nav bar, no <main>
-// wrapper) so it can drop into any page — the caller supplies the header
-// (standalone /booking has its own nav; embedded in a business's public page
-// at /empresa/:slug, that page's own header stays on screen the whole time
-// instead of being replaced by a different one).
+// wrapper) — it's embedded directly in a business's public page at
+// /:businessSlug, whose own header stays on screen the whole time.
 //
 // `prefill` (business, optionally branch) means those steps were already
-// answered elsewhere, so the wizard opens past them. `onExit`, when given,
-// is called instead of disabling the back button once there's nowhere left
-// to go — e.g. to collapse the embedded wizard back into the business page.
+// answered elsewhere (by navigating to that business's page), so the wizard
+// opens past them. `onExit`, when given, is called instead of disabling the
+// back button once there's nowhere left to go — collapsing the wizard back
+// into the business page's branch listing.
 const BookingWizard = ({ prefill = null, onExit }) => {
   const { t } = useTranslation();
   const minStep = resolveStartStep(prefill);
@@ -109,25 +90,6 @@ const BookingWizard = ({ prefill = null, onExit }) => {
   const [showClientErrors, setShowClientErrors] = useState(false);
 
   const updateBooking = (partial) => setBooking((prev) => ({ ...prev, ...partial }));
-
-  const selectBusinessType = (id, name) =>
-    updateBooking({
-      businessTypeId: id, businessTypeName: name,
-      businessId: null, businessName: "",
-      branchId: null, branchName: "", branchAddress: "",
-      serviceId: null, serviceName: "", serviceDuration: null, servicePrice: null,
-      staffId: null, staffName: "",
-      day: null, startTime: null, endTime: null,
-    });
-
-  const selectBusiness = (id, name) =>
-    updateBooking({
-      businessId: id, businessName: name,
-      branchId: null, branchName: "", branchAddress: "",
-      serviceId: null, serviceName: "", serviceDuration: null, servicePrice: null,
-      staffId: null, staffName: "",
-      day: null, startTime: null, endTime: null,
-    });
 
   const selectBranch = (id, name, address) =>
     updateBooking({
@@ -149,8 +111,6 @@ const BookingWizard = ({ prefill = null, onExit }) => {
   const selectSlot = (startTime, endTime) => updateBooking({ startTime, endTime });
 
   const stepCompletion = {
-    [STEP.BUSINESS_TYPE]: isBusinessTypeStepComplete(booking),
-    [STEP.BUSINESS]: isBusinessStepComplete(booking),
     [STEP.BRANCH]: isBranchStepComplete(booking),
     [STEP.SERVICE]: isServiceStepComplete(booking),
     [STEP.STAFF]: isStaffStepComplete(booking),
@@ -226,10 +186,6 @@ const BookingWizard = ({ prefill = null, onExit }) => {
 
   const renderStep = () => {
     switch (booking.currentStep) {
-      case STEP.BUSINESS_TYPE:
-        return <BusinessTypeStep booking={booking} onSelect={selectBusinessType} />;
-      case STEP.BUSINESS:
-        return <BusinessStep booking={booking} onSelect={selectBusiness} />;
       case STEP.BRANCH:
         return <BranchStep booking={booking} onSelect={selectBranch} />;
       case STEP.SERVICE:

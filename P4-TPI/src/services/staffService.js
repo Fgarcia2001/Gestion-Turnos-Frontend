@@ -11,7 +11,7 @@ export const createStaff = async (payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to create staff. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to create staff. Please try again.");
   }
   return res.json();
 };
@@ -24,7 +24,7 @@ export const updateStaff = async (id, payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to update staff. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to update staff. Please try again.");
   }
   return res.json();
 };
@@ -36,6 +36,6 @@ export const deleteStaff = async (id) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to delete staff. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to delete staff. Please try again.");
   }
 };
