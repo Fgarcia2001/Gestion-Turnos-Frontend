@@ -35,7 +35,7 @@ export const fetchJsonOrThrow = async (url) => {
   }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "apiError");
+    throw new Error(err?.detail || err?.message || "apiError");
   }
   const text = await res.text();
   return text ? JSON.parse(text) : [];
@@ -49,7 +49,7 @@ export const signIn = async (credentials) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Invalid credentials. Please try again.");
+    throw new Error(err?.detail || err?.message || "Invalid credentials. Please try again.");
   }
   return res.json();
 };
@@ -62,7 +62,7 @@ export const signUp = async (payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Registration failed. Please try again.");
+    throw new Error(err?.detail || err?.message || "Registration failed. Please try again.");
   }
   return res.json();
 };

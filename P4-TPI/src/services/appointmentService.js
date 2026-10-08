@@ -25,7 +25,7 @@ export const createAppointment = async (payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "bookingFailed");
+    throw new Error(err?.detail || err?.message || "bookingFailed");
   }
   return res.json();
 };
@@ -38,7 +38,7 @@ export const updateAppointmentStatus = async (id, status) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to update appointment status. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to update appointment status. Please try again.");
   }
   const text = await res.text();
   return text ? JSON.parse(text) : null;

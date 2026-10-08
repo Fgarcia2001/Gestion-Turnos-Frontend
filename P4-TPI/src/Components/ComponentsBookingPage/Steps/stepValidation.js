@@ -1,10 +1,8 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[0-9+\-\s()]{6,20}$/;
 
-// IDs can legitimately be 0 (e.g. the first business type), so completion checks
-// must use != null rather than Boolean(), which treats 0 as falsy/incomplete.
-export const isBusinessTypeStepComplete = (booking) => booking.businessTypeId != null;
-export const isBusinessStepComplete = (booking) => booking.businessId != null;
+// IDs can legitimately be 0, so completion checks must use != null rather than
+// Boolean(), which treats 0 as falsy/incomplete.
 export const isBranchStepComplete = (booking) => booking.branchId != null;
 export const isServiceStepComplete = (booking) => booking.serviceId != null;
 export const isStaffStepComplete = (booking) => booking.staffId != null;

@@ -7,6 +7,22 @@ import StatusPanel from "../StatusPanel";
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+const PERIODS = [
+  { key: "morning", label: "Mañana", test: (h) => h < 12 },
+  { key: "afternoon", label: "Tarde", test: (h) => h >= 12 && h < 19 },
+  { key: "evening", label: "Noche", test: (h) => h >= 19 },
+];
+
+const groupByPeriod = (slots) => {
+  const groups = { morning: [], afternoon: [], evening: [] };
+  slots.forEach((slot) => {
+    const hour = parseInt(slot.startTime.split(":")[0], 10);
+    const period = PERIODS.find((p) => p.test(hour)) || PERIODS[0];
+    groups[period.key].push(slot);
+  });
+  return groups;
+};
+
 const DateTimeStep = ({ booking, onSelectDay, onSelectSlot }) => {
   const { t } = useTranslation();
   const initialViewDate = booking.day || today;
@@ -40,14 +56,16 @@ const DateTimeStep = ({ booking, onSelectDay, onSelectSlot }) => {
     loadSlots();
   }, [loadSlots]);
 
+  const groups = groupByPeriod(slots);
+
   return (
     <div className="w-full">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">{t("selectDateTime") || "Select a Date & Time"}</h2>
-        <p className="text-gray-500 mt-1">{t("bookingSubtitle") || "Choose your preferred appointment date and time slot"}</p>
+        <h2 className="text-2xl font-bold text-[#1a1a2e]">{t("selectDateTime") || "Select a Date & Time"}</h2>
+        <p className="text-[#6b6b6b] mt-1">{t("bookingSubtitle") || "Choose your preferred appointment date and time slot"}</p>
       </div>
 
-      <div className="w-full max-w-sm mx-auto border border-gray-200 rounded-xl p-6 mb-8 shadow-sm">
+      <div className="w-full max-w-sm mx-auto border border-[#e2ddd8] rounded-2xl p-6 mb-8 shadow-sm bg-white">
         <BookingCalendar
           selected={booking.day}
           onSelect={onSelectDay}
@@ -65,24 +83,33 @@ const DateTimeStep = ({ booking, onSelectDay, onSelectSlot }) => {
           emptyMessage={t("noSlotsAvailable") || "No available time slots for this day. Try another day."}
           onRetry={loadSlots}
         >
-          <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-w-xl mx-auto">
-            {slots.map((slot) => {
-              const selected = booking.startTime === slot.startTime;
-              return (
-                <button
-                  key={slot.startTime}
-                  type="button"
-                  onClick={() => onSelectSlot(slot.startTime, slot.endTime)}
-                  className={`py-2.5 rounded-lg border text-sm font-semibold transition-colors ${
-                    selected
-                      ? "border-[#1A1A1A] bg-[#1A1A1A] text-white"
-                      : "border-gray-200 hover:border-gray-400"
-                  }`}
-                >
-                  {slot.startTime}
-                </button>
-              );
-            })}
+          <div className="max-w-xl mx-auto flex flex-col gap-5">
+            {PERIODS.map(({ key, label }) =>
+              groups[key].length ? (
+                <div key={key}>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#b3aca3] mb-2">{label}</p>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {groups[key].map((slot) => {
+                      const selected = booking.startTime === slot.startTime;
+                      return (
+                        <button
+                          key={slot.startTime}
+                          type="button"
+                          onClick={() => onSelectSlot(slot.startTime, slot.endTime)}
+                          className={`py-2.5 rounded-xl border-2 text-sm font-semibold transition-all ${
+                            selected
+                              ? "border-[#1a1a2e] bg-[#1a1a2e] text-white shadow-sm"
+                              : "border-[#e2ddd8] text-[#1a1a2e] hover:border-[#b3aca3] bg-white"
+                          }`}
+                        >
+                          {slot.startTime}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null
+            )}
           </div>
         </StatusPanel>
       )}

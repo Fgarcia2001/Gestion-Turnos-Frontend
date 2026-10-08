@@ -10,7 +10,7 @@ export const createPlan = async (payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to create plan. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to create plan. Please try again.");
   }
   return res.json();
 };
@@ -23,7 +23,7 @@ export const updatePlan = async (id, payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to update plan. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to update plan. Please try again.");
   }
   return res.json();
 };
@@ -35,6 +35,6 @@ export const deletePlan = async (id) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to delete plan. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to delete plan. Please try again.");
   }
 };
