@@ -41,6 +41,50 @@ export const fetchJsonOrThrow = async (url) => {
   return text ? JSON.parse(text) : [];
 };
 
+// ── Errores de la API ──────────────────────────────────────────────────────────
+// Los endpoints de BusinessSubscription/payments devuelven problemas RFC7807:
+// { status, title, detail, traceId }. `detail` es el mensaje visible.
+export class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+const parseApiError = async (res) => {
+  const body = await res.json().catch(() => null);
+  return body?.detail || body?.title || body?.message || `Error ${res.status}`;
+};
+
+const requestJson = async (url, method) => {
+  let res;
+  try {
+    res = await fetch(url, { method, headers: getAuthHeaders() });
+  } catch {
+    throw new ApiError("No se pudo conectar con el servidor", 0);
+  }
+  if (!res.ok) {
+    throw new ApiError(await parseApiError(res), res.status);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+};
+
+export const getJson = (url) => requestJson(url, "GET");
+export const postJson = (url) => requestJson(url, "POST");
+
+// ── Suscripción y pagos (MercadoPago Checkout Pro) ─────────────────────────────
+export const fetchMySubscription = () => getJson(`${BASE_URL}/BusinessSubscription/my`);
+
+export const changePlanCheckout = (planId) =>
+  postJson(`${BASE_URL}/BusinessSubscription/my/change-plan/${planId}/checkout`);
+
+export const renewCheckout = () => postJson(`${BASE_URL}/BusinessSubscription/my/renew/checkout`);
+
+export const fetchPaymentStatus = (orderId, paymentId) =>
+  getJson(`${BASE_URL}/payments/${orderId}/status?paymentId=${encodeURIComponent(paymentId ?? "")}`);
+
 export const signIn = async (credentials) => {
   const res = await fetch(`${AUTH_URL}/SignIn`, {
     method: "POST",

@@ -8,9 +8,9 @@ const CSS_ANIMATIONS = `
   @keyframes scaleIn { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
 `;
 
-// NOTE: Confirm is currently a placeholder — it does not call a change-plan
-// endpoint yet. That wiring (and any resulting subscription refresh) is left
-// for a future task; this modal only captures the user's intent for now.
+// NOTE: Confirm crea el checkout en MercadoPago (Checkout Pro). Si el plan es
+// gratis el padre aplica el cambio directamente; si requiere pago, redirige a
+// initPoint en la misma pestaña y el botón queda en spinner.
 const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
   const [confirming, setConfirming] = useState(false);
 
@@ -46,7 +46,9 @@ const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
             You are about to switch to <span className="font-semibold text-[#1a1a2e]">{name}</span>
             {price != null ? <> (${price}{durationDays ? ` / ${durationDays} days` : ""})</> : null}.
           </p>
-          <p className="text-xs text-[#9a9a9a] mb-6">This request will be reviewed later — no changes are applied yet.</p>
+          <p className="text-xs text-[#9a9a9a] mb-6">
+            You&apos;ll be redirected to MercadoPago to complete the payment. Free plans are applied instantly.
+          </p>
 
           <div className="flex gap-3">
             <button
@@ -61,7 +63,7 @@ const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
               disabled={confirming}
               className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50"
             >
-              Confirm
+              {confirming ? "Redirecting…" : "Confirm"}
             </button>
           </div>
         </div>

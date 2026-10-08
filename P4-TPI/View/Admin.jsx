@@ -10,11 +10,22 @@ import Settings from "../src/Components/ComponentsAdmin/Sections/Settings";
 import Calendar from "../src/Components/ComponentsAdmin/Sections/Calendar";
 import Schedule from "../src/Components/ComponentsAdmin/Sections/Schedule";
 
+// MercadoPago (Checkout Pro) redirige a /admin?payment_id=...&external_reference=<orderId>.
+// Se resuelve en el initializer de useState para que Settings/SubscriptionTab
+// monte ya en el tab correcto (un useEffect correría después del primer render).
+const isMpPaymentReturn = () => {
+  const params = new URLSearchParams(window.location.search);
+  return Boolean(
+    params.get("payment_id") || params.get("collection_id") || params.get("external_reference")
+  );
+};
+
 const Admin = () => {
   const { user } = useAuth();
   const isProfessional = user?.role === "2" || user?.role === "Profesional" || user?.role === "Professional";
-  const [section, setSection] = useState(isProfessional ? "appointments" : "home");
-  const [settingsTab, setSettingsTab] = useState("business");
+  const mpReturn = isMpPaymentReturn();
+  const [section, setSection] = useState(() => (mpReturn ? "settings" : isProfessional ? "appointments" : "home"));
+  const [settingsTab, setSettingsTab] = useState(() => (mpReturn ? "subscription" : "business"));
 
   const handleSelectSection = (id) => {
     if (isProfessional) return;
@@ -31,7 +42,7 @@ const Admin = () => {
       case "appointments": return <Appointments />;
       case "calendar": return <Calendar />;
       case "schedule": return <Schedule />;
-      case "settings": return <Settings initialTab={settingsTab} />;
+      case "settings": return <Settings key={settingsTab} initialTab={settingsTab} />;
 
       default: return <Home />;
     }

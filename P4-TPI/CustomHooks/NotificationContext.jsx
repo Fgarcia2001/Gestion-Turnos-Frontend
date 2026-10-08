@@ -81,6 +81,7 @@ export const NotificationProvider = ({ children }) => {
   // ── Conexión SignalR ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (!user) return;
+    let cancelled = false;
     const token = localStorage.getItem("auth_token");
     const connection = new HubConnectionBuilder()
       .withUrl(HUB_URL, { accessTokenFactory: () => token })
@@ -112,15 +113,25 @@ export const NotificationProvider = ({ children }) => {
     connection
       .start()
       .then(() => {
+        if (cancelled) {
+          connection.stop().catch(() => {});
+          return;
+        }
         setConnected(true);
         if (HUB_JOIN_METHOD && user.businessId) {
           connection.invoke(HUB_JOIN_METHOD, user.businessId).catch(() => {});
         }
         loadAppointments();
       })
-      .catch((e) => console.error("SignalR no disponible:", e));
+      .catch((e) => {
+        // StrictMode (dev) desmonta y remonta el effect: el cleanup cancela la
+        // negociación en vuelo y eso lanza AbortError. No es un fallo real.
+        if (cancelled || e?.name === "AbortError") return;
+        console.error("SignalR no disponible:", e);
+      });
 
     return () => {
+      cancelled = true;
       connection.stop().catch(() => {});
     };
   }, [user, loadAppointments, isProfessional]);

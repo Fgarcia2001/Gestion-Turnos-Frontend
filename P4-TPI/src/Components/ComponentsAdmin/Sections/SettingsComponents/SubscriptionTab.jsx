@@ -1,50 +1,226 @@
-import { useState, useEffect } from "react";
-import { BASE_URL, getAuthHeaders, fetchPlans } from "../../../../services/api";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  fetchPlans,
+  fetchMySubscription,
+  changePlanCheckout,
+  renewCheckout,
+  fetchPaymentStatus,
+} from "../../../../services/api";
+import { useAuth } from "../../../../../CustomHooks/AuthContext";
 import { IconSparkles } from './SettingsIcons';
 import PlanDetailsModal from './PlanDetailsModal';
 import ChangePlanConfirmModal from './ChangePlanConfirmModal';
 
+const MP_ORDER_STORAGE_KEY = "mp_checkout";
+const POLL_INTERVAL_MS = 2500;
+const POLL_MAX_ATTEMPTS = 24; // ~60 s
+
+const readMpReturn = () => {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    orderId: params.get("external_reference"),
+    paymentId: params.get("payment_id") || params.get("collection_id"),
+    // Retorno fresco de MercadoPago: hay parámetros de pago en la URL.
+    isMpReturn: params.has("external_reference") || params.has("payment_id") || params.has("collection_id"),
+  };
+};
+
 const SubscriptionTab = () => {
+  const { user } = useAuth();
   const [plan, setPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [detailsPlan, setDetailsPlan] = useState(null);
   const [changePlanTarget, setChangePlanTarget] = useState(null);
+  const [renewing, setRenewing] = useState(false);
   const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
 
-  const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 3000);
-  };
+  const isAdmin = user?.role === "Admin";
 
-  // TODO: wire to the real change-plan endpoint once available.
-  const handleConfirmChangePlan = () => {
-    setChangePlanTarget(null);
-    showToast("Change request noted — not yet submitted");
-  };
+  const showToast = useCallback((message, type = "success") => {
+    setToast({ message, type });
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 4500);
+  }, []);
+
+  const loadSubscription = useCallback(async () => {
+    try {
+      const data = await fetchMySubscription();
+      setPlan(data);
+    } catch {
+      // sin suscripción vigente o error de red: se muestra vacío
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchSubscription() {
-      try {
-        const res = await fetch(`${BASE_URL}/BusinessSubscription/my`, { headers: getAuthHeaders() });
-        const data = await res.json();
-        setPlan(data);
-      } catch {
-        // API not available yet
-      } finally {
-        setLoading(false);
-      }
+    let alive = true;
+    async function init() {
+      await loadSubscription();
+      if (alive) setLoading(false);
     }
-    fetchSubscription();
-    fetchPlans().then(setPlans);
+    init();
+    fetchPlans().then((data) => {
+      if (alive) setPlans(Array.isArray(data) ? data : []);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [loadSubscription]);
+
+  useEffect(() => () => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
   }, []);
+
+  // ── Retorno desde MercadoPago: polling del estado de la orden ────────────────
+  useEffect(() => {
+    const { orderId: urlOrderId, paymentId, isMpReturn } = readMpReturn();
+    const storedOrderId = sessionStorage.getItem(MP_ORDER_STORAGE_KEY);
+    const orderId = urlOrderId || storedOrderId;
+
+    const clearPaymentState = () => {
+      sessionStorage.removeItem(MP_ORDER_STORAGE_KEY);
+      const url = new URL(window.location.href);
+      if (url.search) {
+        url.search = "";
+        window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+    };
+
+    if (!orderId) {
+      if (storedOrderId) clearPaymentState();
+      return undefined;
+    }
+
+    let cancelled = false;
+    let timer = null;
+    let attempts = 0;
+
+    const finish = (message, type, refresh) => {
+      if (cancelled) return;
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+      clearPaymentState();
+      if (refresh) loadSubscription();
+      if (message) showToast(message, type);
+    };
+
+    // paymentId puede faltar (MercadoPago a veces no lo agrega en la back_url);
+    // en ese caso el backend resuelve el pago por external_reference.
+    const poll = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      try {
+        const data = await fetchPaymentStatus(orderId, paymentId);
+        const status = data?.status;
+        if (status === "approved") {
+          // Solo avisa en un retorno fresco de MercadoPago; en un refresh simple
+          // (orden ya aprobada) solo refresca sin molestar.
+          finish(isMpReturn ? "Pago aprobado. Suscripción actualizada." : null, "success", true);
+          return;
+        }
+        if (status === "rejected" || status === "cancelled" || status === "expired") {
+          finish("El pago no se completó", "error", false);
+          return;
+        }
+      } catch (err) {
+        if (err?.status === 401) {
+          finish("Sesión expirada, volvé a iniciar sesión", "error", false);
+          return;
+        }
+        if (err?.status && err.status < 500 && err.status !== 404) {
+          finish("No se pudo consultar el pago", "error", false);
+          return;
+        }
+      }
+      if (attempts >= POLL_MAX_ATTEMPTS) {
+        finish("Pago pendiente de confirmación", "success", false);
+        return;
+      }
+      timer = setTimeout(poll, POLL_INTERVAL_MS);
+    };
+
+    poll();
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [loadSubscription, showToast]);
+
+  // ── Checkout ─────────────────────────────────────────────────────────────────
+  const startPayment = (result) => {
+    if (result?.status === "pending" && result?.initPoint) {
+      if (result.orderId) sessionStorage.setItem(MP_ORDER_STORAGE_KEY, result.orderId);
+      window.location.href = result.initPoint;
+      return true; // el botón queda en spinner hasta salir de la página
+    }
+    return false;
+  };
+
+  const handleConfirmChangePlan = async (selectedPlan) => {
+    const planId = selectedPlan?.id ?? selectedPlan?.Id;
+    try {
+      const result = await changePlanCheckout(planId);
+      if (startPayment(result)) return;
+      if (result?.status === "noPaymentRequired") {
+        await loadSubscription();
+        setChangePlanTarget(null);
+        showToast("Plan actualizado");
+        return;
+      }
+      setChangePlanTarget(null);
+      showToast(result?.status || "No se pudo iniciar el pago", "error");
+    } catch (err) {
+      setChangePlanTarget(null);
+      showToast(err?.message || "No se pudo solicitar el cambio de plan", "error");
+    }
+  };
+
+  const handleRenew = async () => {
+    setRenewing(true);
+    try {
+      const result = await renewCheckout();
+      if (startPayment(result)) return;
+      if (result?.status === "noPaymentRequired") {
+        await loadSubscription();
+        showToast("Subscription renewed");
+        return;
+      }
+      showToast(result?.status || "No se pudo renovar la suscripción", "error");
+    } catch (err) {
+      showToast(err?.message || "No se pudo renovar la suscripción", "error");
+    } finally {
+      setRenewing(false);
+    }
+  };
 
   const planName = plan?.planName || null;
 
+  const toastEl = toast ? (
+    <div
+      className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out] ${toast.type === "error" ? "bg-[#b91c1c]" : "bg-[#1a1a2e]"}`}
+    >
+      {toast.type === "error" ? (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6 9 17l-5-5" />
+        </svg>
+      )}
+      {toast.message}
+    </div>
+  ) : null;
+
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+      <div className="flex flex-col w-full max-w-5xl mx-auto">
+        <div className="flex justify-center py-12">
+          <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+        </div>
+        {toastEl}
       </div>
     );
   }
@@ -70,15 +246,31 @@ const SubscriptionTab = () => {
               <p className="text-xs text-[#9a9a9a]">{plan?.businessName || "---"}</p>
             </div>
           </div>
-          <div className="text-left sm:text-right text-xs text-[#9a9a9a]">
-            {plan?.startDate ? (
-              <>
-                <span className="block font-medium text-[#1a1a2e]">{new Date(plan.startDate).toLocaleDateString()}</span>
-                <span className="block text-[10px]">to</span>
-                <span className="block font-medium text-[#1a1a2e]">{new Date(plan.endDate).toLocaleDateString()}</span>
-              </>
-            ) : (
-              <span className="text-xl font-bold text-[#1a1a2e]">--</span>
+          <div className="flex flex-col sm:items-end gap-3">
+            <div className="text-left sm:text-right text-xs text-[#9a9a9a]">
+              {plan?.startDate ? (
+                <>
+                  <span className="block font-medium text-[#1a1a2e]">{new Date(plan.startDate).toLocaleDateString()}</span>
+                  <span className="block text-[10px]">to</span>
+                  <span className="block font-medium text-[#1a1a2e]">{new Date(plan.endDate).toLocaleDateString()}</span>
+                </>
+              ) : (
+                <span className="text-xl font-bold text-[#1a1a2e]">--</span>
+              )}
+            </div>
+
+            {isAdmin && plan && (
+              <button
+                type="button"
+                onClick={handleRenew}
+                disabled={renewing}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#1a1a2e] text-white text-xs font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-60 disabled:cursor-not-allowed sm:ml-auto"
+              >
+                {renewing && (
+                  <span className="size-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                )}
+                {renewing ? "Redirecting…" : "Renew subscription"}
+              </button>
             )}
           </div>
         </div>
@@ -149,14 +341,7 @@ const SubscriptionTab = () => {
         />
       )}
 
-      {toast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 6L9 17l-5-5" />
-          </svg>
-          {toast}
-        </div>
-      )}
+      {toastEl}
     </div>
   );
 };
