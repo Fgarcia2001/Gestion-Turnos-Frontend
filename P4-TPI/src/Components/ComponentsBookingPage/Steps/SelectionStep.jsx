@@ -49,8 +49,8 @@ const SelectionStep = ({
   return (
     <div className="w-full">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-        {subtitle && <p className="text-gray-500 mt-1">{subtitle}</p>}
+        <h2 className="text-2xl font-bold text-[#1a1a2e]">{title}</h2>
+        {subtitle && <p className="text-[#6b6b6b] mt-1">{subtitle}</p>}
       </div>
       <StatusPanel
         loading={loading}
@@ -67,12 +67,19 @@ const SelectionStep = ({
                 key={getId(item)}
                 type="button"
                 onClick={() => onSelect(item)}
-                className={`text-left p-4 rounded-xl border transition-all ${
+                className={`relative text-left p-4 rounded-2xl border-2 bg-white transition-all duration-200 ${
                   selected
-                    ? "border-[#1A1A1A] bg-[#1A1A1A] text-white"
-                    : "border-gray-200 hover:border-gray-400"
+                    ? "border-[#1a1a2e] shadow-md shadow-[#1a1a2e]/10"
+                    : "border-[#e2ddd8] hover:border-[#b3aca3] hover:shadow-sm"
                 }`}
               >
+                {selected && (
+                  <span className="absolute top-3 right-3 flex items-center justify-center w-5 h-5 rounded-full bg-[#1a1a2e] text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                  </span>
+                )}
                 {renderItem(item, selected)}
               </button>
             );

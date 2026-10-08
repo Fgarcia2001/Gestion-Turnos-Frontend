@@ -3,6 +3,9 @@ import { BASE_URL, getAuthHeaders, fetchJsonOrThrow } from "./api";
 export const fetchBranchesByBusiness = (businessId) =>
   fetchJsonOrThrow(`${BASE_URL}/branches/business/${businessId}`);
 
+export const fetchBranchInfo = (branchId) =>
+  fetchJsonOrThrow(`${BASE_URL}/Branch/InfoBranch/${branchId}`);
+
 export const createBranch = async (payload) => {
   const res = await fetch(`${BASE_URL}/Branch`, {
     method: "POST",
@@ -11,7 +14,7 @@ export const createBranch = async (payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to create branch. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to create branch. Please try again.");
   }
   return res.json();
 };
@@ -24,7 +27,7 @@ export const updateBranch = async (id, payload) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to update branch. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to update branch. Please try again.");
   }
   return res.json();
 };
@@ -36,6 +39,6 @@ export const deleteBranch = async (id) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Failed to delete branch. Please try again.");
+    throw new Error(err?.detail || err?.message || "Failed to delete branch. Please try again.");
   }
 };

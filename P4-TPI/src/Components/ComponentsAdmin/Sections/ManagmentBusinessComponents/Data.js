@@ -30,6 +30,8 @@ export const fetchStaffData = () => fetchJson(`${BASE_URL}/Staff/Business/Staffs
 export const fetchClientData = () => fetchJson(`${BASE_URL}/Client`);
 export const fetchBranchData = () => fetchJson(`${BASE_URL}/Branch`);
 export const fetchServiceData = () => fetchJson(`${BASE_URL}/Service`);
+export const searchClients = (query) =>
+  fetchJson(`${BASE_URL}/Client/search?query=${encodeURIComponent(query)}`);
 
 // ── Static data ────────────────────────────────────────────────────────────
 export const DEFAULT_SCHEDULES = [
