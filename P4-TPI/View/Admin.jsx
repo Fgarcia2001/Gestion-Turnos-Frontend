@@ -9,6 +9,7 @@ import Appointments from "../src/Components/ComponentsAdmin/Sections/Appointment
 import Settings from "../src/Components/ComponentsAdmin/Sections/Settings";
 import Calendar from "../src/Components/ComponentsAdmin/Sections/Calendar";
 import Schedule from "../src/Components/ComponentsAdmin/Sections/Schedule";
+import Help from "../src/Components/ComponentsAdmin/Sections/Help";
 
 // MercadoPago (Checkout Pro) redirige a /admin?payment_id=...&external_reference=<orderId>.
 // Se resuelve en el initializer de useState para que Settings/SubscriptionTab
@@ -28,12 +29,13 @@ const Admin = () => {
   const [settingsTab, setSettingsTab] = useState(() => (mpReturn ? "subscription" : "business"));
 
   const handleSelectSection = (id) => {
-    if (isProfessional) return;
+    // Los profesionales solo ven Appointments y Help en el navbar.
+    if (isProfessional && id !== "help" && id !== "appointments") return;
     setSection(id);
   };
 
   const renderSection = () => {
-    if (isProfessional) return <Appointments />;
+    if (isProfessional && section !== "help") return <Appointments />;
     switch (section) {
       case "home": return (
         <Home onUpgradePlan={() => { setSettingsTab("subscription"); setSection("settings"); }} />
@@ -43,6 +45,7 @@ const Admin = () => {
       case "calendar": return <Calendar />;
       case "schedule": return <Schedule />;
       case "settings": return <Settings key={settingsTab} initialTab={settingsTab} />;
+      case "help": return <Help />;
 
       default: return <Home />;
     }
