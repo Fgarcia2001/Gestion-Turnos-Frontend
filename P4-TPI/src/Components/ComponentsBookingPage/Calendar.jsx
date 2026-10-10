@@ -19,12 +19,13 @@ const startOfDay = (date) => {
   return d;
 };
 
-const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDate }) => {
+const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDate, maxDate }) => {
   const { t } = useTranslation();
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   const min = minDate ? startOfDay(minDate) : null;
+  const max = maxDate ? startOfDay(maxDate) : null;
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysCount = new Date(year, month + 1, 0).getDate();
@@ -70,9 +71,11 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
         {cells.map((c, i) => {
           const date = c.cur ? new Date(year, month, c.day) : null;
           const isPast = c.cur && min && date < min;
+          const isTooFar = c.cur && max && date > max;
+          const isOutOfRange = isPast || isTooFar;
           const isSelected = c.cur && isSameDay(date, selected);
           const isTodayCell = c.cur && !isSelected && isToday(date);
-          const disabled = !c.cur || isPast;
+          const disabled = !c.cur || isOutOfRange;
 
           return (
             <button
@@ -82,8 +85,8 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
               onClick={() => !disabled && onSelect(date)}
               className={`flex items-center justify-center h-9 w-full rounded-full text-sm transition-all
                 ${!c.cur ? "text-transparent cursor-default" : ""}
-                ${isPast ? "text-[#d8d2cb] cursor-not-allowed" : ""}
-                ${c.cur && !isPast && !isSelected ? "text-[#1a1a2e] cursor-pointer hover:bg-[#F8F5F0]" : ""}
+                ${isOutOfRange ? "text-[#d8d2cb] cursor-not-allowed" : ""}
+                ${c.cur && !isOutOfRange && !isSelected ? "text-[#1a1a2e] cursor-pointer hover:bg-[#F8F5F0]" : ""}
                 ${isTodayCell ? "ring-1 ring-inset ring-[#1a1a2e]/40 font-semibold" : ""}
                 ${isSelected ? "bg-[#1a1a2e] text-white font-semibold shadow-sm shadow-[#1a1a2e]/30" : ""}
               `}

@@ -4,7 +4,7 @@ import BusinessTab from './SettingsComponents/BusinessTab';
 import SubscriptionTab from './SettingsComponents/SubscriptionTab';
 import AdminTab from './SettingsComponents/AdminTab';
 
-const Settings = ({ initialTab }) => {
+const Settings = ({ initialTab, autoOpenPlanId }) => {
   const [activeTab, setActiveTab] = useState(initialTab || 'business');
 
   const tabs = [
@@ -40,7 +40,7 @@ const Settings = ({ initialTab }) => {
       {/* Content */}
       <div className="mt-2 w-full max-w-6xl">
         {activeTab === 'business' && <BusinessTab />}
-        {activeTab === 'subscription' && <SubscriptionTab />}
+        {activeTab === 'subscription' && <SubscriptionTab autoOpenPlanId={autoOpenPlanId} />}
         {activeTab === 'admin' && <AdminTab />}
       </div>
     </div>

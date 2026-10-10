@@ -3,6 +3,7 @@ import { useAuth } from "../../../../../CustomHooks/AuthContext";
 import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 import { validateClientInfo } from "../../../ComponentsBookingPage/Steps/stepValidation";
 import BookingCalendar from "../../../ComponentsBookingPage/Calendar";
+import { addMonthsClamped } from "../../../ComponentsBookingPage/dateUtils";
 import { createAppointment, fetchAvailableSlots } from "../../../../services/appointmentService";
 import { toDateParam } from "../../../../services/api";
 import { fetchStaffByBranch } from "../../../../services/staffService";
@@ -162,6 +163,8 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
   // ── Date & time ──
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  // Mismo límite que el backend (AppointmentService.MaxAppointmentMonthsAhead).
+  const maxBookingDate = addMonthsClamped(today, 2);
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [day, setDay] = useState(null);
   const [startTime, setStartTime] = useState(null);
@@ -398,7 +401,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
         return (
           <div className="flex flex-col gap-5">
             <div className="w-full max-w-sm mx-auto border border-[#e2ddd8] rounded-2xl p-5">
-              <BookingCalendar selected={day} onSelect={selectDay} viewDate={viewDate} onViewDateChange={setViewDate} minDate={today} />
+              <BookingCalendar selected={day} onSelect={selectDay} viewDate={viewDate} onViewDateChange={setViewDate} minDate={today} maxDate={maxBookingDate} />
             </div>
             {day && (
               slotsLoading ? (

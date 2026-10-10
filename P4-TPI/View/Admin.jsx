@@ -10,6 +10,7 @@ import Settings from "../src/Components/ComponentsAdmin/Sections/Settings";
 import Calendar from "../src/Components/ComponentsAdmin/Sections/Calendar";
 import Schedule from "../src/Components/ComponentsAdmin/Sections/Schedule";
 import Help from "../src/Components/ComponentsAdmin/Sections/Help";
+import { PENDING_PLAN_KEY } from "../src/services/api";
 
 // MercadoPago (Checkout Pro) redirige a /admin?payment_id=...&external_reference=<orderId>.
 // Se resuelve en el initializer de useState para que Settings/SubscriptionTab
@@ -21,12 +22,18 @@ const isMpPaymentReturn = () => {
   );
 };
 
+// Plan elegido en la landing antes de registrarse (ver PlansSection.jsx). Se lee
+// aquí sin borrarlo todavía: SubscriptionTab lo consume y recién ahí lo limpia,
+// una vez que ya abrió el checkout de ese plan.
+const getPendingPlanId = () => sessionStorage.getItem(PENDING_PLAN_KEY);
+
 const Admin = () => {
   const { user } = useAuth();
   const isProfessional = user?.role === "2" || user?.role === "Profesional" || user?.role === "Professional";
   const mpReturn = isMpPaymentReturn();
-  const [section, setSection] = useState(() => (mpReturn ? "settings" : isProfessional ? "appointments" : "home"));
-  const [settingsTab, setSettingsTab] = useState(() => (mpReturn ? "subscription" : "business"));
+  const pendingPlanId = getPendingPlanId();
+  const [section, setSection] = useState(() => (mpReturn || pendingPlanId ? "settings" : isProfessional ? "appointments" : "home"));
+  const [settingsTab, setSettingsTab] = useState(() => (mpReturn || pendingPlanId ? "subscription" : "business"));
 
   const handleSelectSection = (id) => {
     // Los profesionales solo ven Appointments y Help en el navbar.
@@ -44,7 +51,7 @@ const Admin = () => {
       case "appointments": return <Appointments />;
       case "calendar": return <Calendar />;
       case "schedule": return <Schedule />;
-      case "settings": return <Settings key={settingsTab} initialTab={settingsTab} />;
+      case "settings": return <Settings key={settingsTab} initialTab={settingsTab} autoOpenPlanId={pendingPlanId} />;
       case "help": return <Help />;
 
       default: return <Home />;

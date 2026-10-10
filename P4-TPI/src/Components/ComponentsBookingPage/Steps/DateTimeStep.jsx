@@ -2,10 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchAvailableSlots } from "../../../services/appointmentService";
 import BookingCalendar from "../Calendar";
+import { addMonthsClamped } from "../dateUtils";
 import StatusPanel from "../StatusPanel";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
+
+// Mismo límite que el backend (AppointmentService.MaxAppointmentMonthsAhead).
+const maxBookingDate = addMonthsClamped(today, 2);
 
 const PERIODS = [
   { key: "morning", label: "Mañana", test: (h) => h < 12 },
@@ -72,6 +76,7 @@ const DateTimeStep = ({ booking, onSelectDay, onSelectSlot }) => {
           viewDate={viewDate}
           onViewDateChange={setViewDate}
           minDate={today}
+          maxDate={maxBookingDate}
         />
       </div>
 
