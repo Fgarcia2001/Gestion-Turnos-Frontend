@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ModalOverlay, inputClass, labelClass, Avatar } from './Shared';
 import { IconPhoto, IconX, IconWarning, IconClock } from './Icons';
+import { fetchBranchWeeklySchedule, updateBranchWeeklySchedule } from '../../../../services/scheduleService';
 
 // ── Role label ↔ id mapping ────────────────────────────────────────────────────
 // The staff list endpoint returns rol as a text label (e.g. "Recepcionista"),
@@ -416,22 +417,90 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
 // ── Schedules Modal (branch only) ─────────────────────────────────────────────
 export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
+const DEFAULT_SLOT_MINUTES = 30;
+
+const emptyDay = (day) => ({ day, isActive: false, startTime: "09:00", endTime: "18:00", slotDurationMinutes: DEFAULT_SLOT_MINUTES });
+
+// El backend devuelve/espera TimeSpan como "HH:mm:ss"; <input type="time"> solo entiende "HH:mm".
+const toHm = (value) => (typeof value === "string" ? value.slice(0, 5) : value);
+const toHms = (value) => (value && value.length === 5 ? `${value}:00` : value);
+
 export const SchedulesModal = ({ row, onClose, onSave }) => {
-  const [schedules, setSchedules] = useState(
-    row.schedules
-      ? row.schedules.map(s => ({ ...s }))
-      : DAYS.map(day => ({ day, open: day !== "Saturday" && day !== "Sunday", startTime: "09:00", endTime: "18:00" }))
-  );
+  const branchId = row.id ?? row.branchId;
+  const [schedules, setSchedules] = useState(DAYS.map(emptyDay));
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    fetchBranchWeeklySchedule(branchId)
+      .then((data) => {
+        if (!active) return;
+        const byDay = new Map((Array.isArray(data) ? data : []).map((s) => [s.day, s]));
+        setSchedules(
+          DAYS.map((day) => {
+            const existing = byDay.get(day);
+            if (!existing) return emptyDay(day);
+            return {
+              day,
+              isActive: existing.isActive,
+              startTime: toHm(existing.startTime) || "09:00",
+              endTime: toHm(existing.endTime) || "18:00",
+              slotDurationMinutes: existing.slotDurationMinutes || DEFAULT_SLOT_MINUTES,
+            };
+          })
+        );
+      })
+      .catch(() => {
+        if (active) setError("No se pudo cargar el horario actual.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => { active = false; };
+  }, [branchId]);
 
   const toggle = (i) =>
-    setSchedules(prev => prev.map((s, idx) => idx === i ? { ...s, open: !s.open } : s));
+    setSchedules((prev) => prev.map((s, idx) => (idx === i ? { ...s, isActive: !s.isActive } : s)));
 
-  const setTime = (i, field, val) =>
-    setSchedules(prev => prev.map((s, idx) => idx === i ? { ...s, [field]: val } : s));
+  const setField = (i, field, val) =>
+    setSchedules((prev) => prev.map((s, idx) => (idx === i ? { ...s, [field]: val } : s)));
 
-  const handleSave = () => {
-    onSave({ ...row, schedules });
-    onClose();
+  const handleSave = async () => {
+    setError("");
+
+    for (const s of schedules) {
+      if (!s.isActive) continue;
+      if (!s.startTime || !s.endTime || s.startTime >= s.endTime) {
+        setError(`${s.day}: la hora de inicio debe ser anterior a la hora de fin.`);
+        return;
+      }
+      if (!s.slotDurationMinutes || Number(s.slotDurationMinutes) <= 0) {
+        setError(`${s.day}: la duración del turno debe ser mayor a 0.`);
+        return;
+      }
+    }
+
+    setSaving(true);
+    try {
+      await updateBranchWeeklySchedule(
+        branchId,
+        schedules.map((s) => ({
+          day: s.day,
+          startTime: toHms(s.startTime),
+          endTime: toHms(s.endTime),
+          slotDurationMinutes: Number(s.slotDurationMinutes),
+          isActive: s.isActive,
+        }))
+      );
+      onSave({ ...row, schedules });
+      onClose();
+    } catch (err) {
+      setError(err.message || "No se pudo guardar el horario.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const timeInput = "border border-[#e2ddd8] rounded-lg px-2.5 py-1.5 text-sm text-[#1a1a2e] bg-[#faf9f7] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 focus:border-[#1a1a2e] transition-all";
@@ -444,55 +513,78 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-lg font-bold text-[#1a1a2e]">
-              Schedules <span className="text-[#9a9a9a] font-semibold">— {row.name}</span>
+              Horarios <span className="text-[#9a9a9a] font-semibold">— {row.name}</span>
             </h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">Set open days and working hours</p>
+            <p className="text-xs text-[#9a9a9a] mt-0.5">Activá los días y definí el horario de atención</p>
           </div>
           <button onClick={onClose} className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
             <IconX />
           </button>
         </div>
 
-        {/* Day rows */}
-        <div className="flex flex-col gap-3">
-          {schedules.map((s, i) => (
-            <div key={s.day}
-              className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${s.open ? "border-[#1a1a2e]/20 bg-[#faf9f7]" : "border-[#f0ede8] bg-white opacity-60"}`}>
+        {error && (
+          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
 
-              {/* Toggle */}
-              <button
-                type="button"
-                onClick={() => toggle(i)}
-                className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${s.open ? "bg-[#1a1a2e]" : "bg-[#e2ddd8]"}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${s.open ? "translate-x-5" : "translate-x-0"}`} />
-              </button>
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <div className="size-7 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {schedules.map((s, i) => (
+              <div key={s.day}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${s.isActive ? "border-[#1a1a2e]/20 bg-[#faf9f7]" : "border-[#f0ede8] bg-white opacity-60"}`}>
 
-              {/* Day name */}
-              <span className="text-sm font-semibold text-[#1a1a2e] w-24 shrink-0">{s.day}</span>
+                {/* Toggle */}
+                <button
+                  type="button"
+                  onClick={() => toggle(i)}
+                  className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${s.isActive ? "bg-[#1a1a2e]" : "bg-[#e2ddd8]"}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${s.isActive ? "translate-x-5" : "translate-x-0"}`} />
+                </button>
 
-              {s.open ? (
-                <div className="flex items-center gap-2 flex-1">
-                  <input type="time" value={s.startTime || "09:00"} onChange={(e) => setTime(i, "startTime", e.target.value)} className={timeInput} />
-                  <span className="text-xs text-[#9a9a9a] font-medium">to</span>
-                  <input type="time" value={s.endTime || "18:00"} onChange={(e) => setTime(i, "endTime", e.target.value)} className={timeInput} />
-                </div>
-              ) : (
-                <span className="text-xs text-[#9a9a9a] italic flex-1">Closed</span>
-              )}
-            </div>
-          ))}
-        </div>
+                {/* Day name */}
+                <span className="text-sm font-semibold text-[#1a1a2e] w-24 shrink-0">{s.day}</span>
+
+                {s.isActive ? (
+                  <div className="flex items-center gap-2 flex-1 flex-wrap">
+                    <input type="time" value={s.startTime} onChange={(e) => setField(i, "startTime", e.target.value)} className={timeInput} />
+                    <span className="text-xs text-[#9a9a9a] font-medium">a</span>
+                    <input type="time" value={s.endTime} onChange={(e) => setField(i, "endTime", e.target.value)} className={timeInput} />
+                    <div className="flex items-center gap-1.5 ml-auto">
+                      <IconClock />
+                      <input
+                        type="number"
+                        min="5"
+                        step="5"
+                        value={s.slotDurationMinutes}
+                        onChange={(e) => setField(i, "slotDurationMinutes", e.target.value)}
+                        className={timeInput + " w-16"}
+                      />
+                      <span className="text-xs text-[#9a9a9a]">min</span>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="text-xs text-[#9a9a9a] italic flex-1">Cerrado</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3 mt-6">
-          <button onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors">
-            Cancel
+          <button onClick={onClose} disabled={saving}
+            className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50">
+            Cancelar
           </button>
-          <button onClick={handleSave}
-            className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors">
-            Save schedule
+          <button onClick={handleSave} disabled={loading || saving}
+            className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50">
+            {saving ? "Guardando..." : "Guardar horario"}
           </button>
         </div>
       </div>

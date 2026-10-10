@@ -315,9 +315,8 @@ const ManagmentBusiness = () => {
     // TODO: wire to API + update local state
   };
 
-  const handleSchedulesSave = (updated) => {
-    console.log("Schedules saved:", updated);
-    // TODO: wire to API + update local state
+  const handleSchedulesSave = () => {
+    showToast("Horario actualizado");
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
