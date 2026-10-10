@@ -132,6 +132,10 @@ export const fetchBranchData = () => fetchJson(`${BASE_URL}/Branch`);
 export const fetchServiceData = () => fetchJson(`${BASE_URL}/Service`);
 export const fetchPlans = () => fetchJson(`${BASE_URL}/plan`);
 
+// Plan elegido en la landing antes de registrarse, para retomarlo en el
+// dashboard (SubscriptionTab) y disparar el checkout automáticamente.
+export const PENDING_PLAN_KEY = "pending_plan_id";
+
 export const fetchAllAppointments = () => fetchJson(`${BASE_URL}/Appointment`);
 export const fetchMyBranchAppointments = () => fetchJson(`${BASE_URL}/Appointment/my-branch`);
 

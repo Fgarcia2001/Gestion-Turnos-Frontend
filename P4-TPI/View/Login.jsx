@@ -1,10 +1,14 @@
 import LoginForm from "../src/Components/ComponentsLogin/LoginForm";
 import { useTranslation } from "../CustomHooks/TraslateHook";
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { t, toggleLanguage, language } = useTranslation();
-  const [isRegister, setIsRegister] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialRegister = Boolean(location.state?.register);
+  const [isRegister, setIsRegister] = useState(initialRegister);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const handleRegister = () => {
     setIsRegister(!isRegister);
@@ -37,8 +41,11 @@ const Login = () => {
       {/* SECCIÓN IZQUIERDA: Hero / Info */}
       <section className="hidden lg:flex w-1/2 bg-[#1A1A1A] text-white p-12 flex-col justify-center">
         <div className="max-w-xl mx-auto">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="bg-white/10 p-2 rounded-lg">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity"
+          >
+            <div className="brand-icon bg-white/10 p-2 rounded-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -56,8 +63,8 @@ const Login = () => {
                 <line x1="3" x2="21" y1="10" y2="10" />
               </svg>
             </div>
-            <span className="text-2xl font-bold">FGSTurniFy</span>
-          </div>
+            <span className="text-2xl font-bold">{t("brandName")}</span>
+          </button>
 
           <h1 className="text-5xl font-bold leading-tight mb-6">
             {t("heroTitle")}
@@ -83,7 +90,32 @@ const Login = () => {
       </section>
 
       {/* SECCIÓN DERECHA: Formulario */}
-      <section className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <section className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8">
+        <button
+          onClick={() => navigate("/")}
+          className="lg:hidden flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity"
+        >
+          <div className="brand-icon bg-[#1a1a2e] p-2 rounded-lg text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+              <line x1="16" x2="16" y1="2" y2="6" />
+              <line x1="8" x2="8" y1="2" y2="6" />
+              <line x1="3" x2="21" y1="10" y2="10" />
+            </svg>
+          </div>
+          <span className="text-xl font-bold text-gray-900">{t("brandName")}</span>
+        </button>
+
         <div className="w-full max-w-md bg-white p-10 rounded-2xl shadow-sm border border-gray-100">
           <div className="text-center mb-8">
             {isForgotPassword ? (
@@ -108,6 +140,7 @@ const Login = () => {
             handleRegister={handleRegister}
             isForgotPassword={isForgotPassword}
             setIsForgotPassword={setIsForgotPassword}
+            initialRegister={initialRegister}
           />
         </div>
       </section>

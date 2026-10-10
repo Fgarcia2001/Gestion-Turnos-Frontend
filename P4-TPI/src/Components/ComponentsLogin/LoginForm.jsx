@@ -145,12 +145,12 @@ const signUp = async (payload, t) => {
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
-const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword }) => {
+const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, initialRegister = false }) => {
   const { t } = useTranslation();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading]       = useState(false);
-  const [register, setRegister]         = useState(false);
+  const [register, setRegister]         = useState(initialRegister);
 
   const navigate = useNavigate();
   const [loginFields, setLoginFields]   = useState({ ...dataLogin });

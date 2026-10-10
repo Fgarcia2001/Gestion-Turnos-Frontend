@@ -5,6 +5,7 @@ import {
   changePlanCheckout,
   renewCheckout,
   fetchPaymentStatus,
+  PENDING_PLAN_KEY,
 } from "../../../../services/api";
 import { useAuth } from "../../../../../CustomHooks/AuthContext";
 import { IconSparkles } from './SettingsIcons';
@@ -25,7 +26,7 @@ const readMpReturn = () => {
   };
 };
 
-const SubscriptionTab = () => {
+const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
   const { user } = useAuth();
   const [plan, setPlan] = useState(null);
   const [plans, setPlans] = useState([]);
@@ -35,6 +36,7 @@ const SubscriptionTab = () => {
   const [renewing, setRenewing] = useState(false);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
+  const autoOpenHandled = useRef(false);
 
   const isAdmin = user?.role === "Admin";
 
@@ -71,6 +73,28 @@ const SubscriptionTab = () => {
   useEffect(() => () => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
   }, []);
+
+  // Plan elegido en la landing antes de registrarse (ver PlansSection.jsx):
+  // una sola vez, cuando ya cargaron los planes y la suscripción actual, abre
+  // el mismo modal de confirmación que usa "Upgrade your plan" para ese plan
+  // puntual. Si es el Free Plan o ya coincide con el actual, no hace nada.
+  useEffect(() => {
+    if (autoOpenHandled.current || loading || !autoOpenPlanId || plans.length === 0) return;
+    autoOpenHandled.current = true;
+    sessionStorage.removeItem(PENDING_PLAN_KEY);
+
+    const target = plans.find((p) => (p.id ?? p.Id) === autoOpenPlanId);
+    if (!target) return;
+
+    const price = target.price ?? target.Price;
+    const name = target.name ?? target.Name;
+    const currentPlanName = plan?.planName;
+    const isAlreadyCurrent = currentPlanName && name && currentPlanName.toLowerCase() === name.toLowerCase();
+
+    if (price > 0 && !isAlreadyCurrent) {
+      setChangePlanTarget(target);
+    }
+  }, [autoOpenPlanId, loading, plans, plan]);
 
   // ── Retorno desde MercadoPago: polling del estado de la orden ────────────────
   useEffect(() => {
