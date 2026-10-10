@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import {
   IconUsers, IconCalendar, IconTrendUp, IconBuilding, IconActivity, IconPlus
@@ -20,37 +20,40 @@ const uniqueClientCount = (appointments) =>
 
 const average = (total, count) => (count ? (total / count).toFixed(1) : 0);
 
+// Las métricas que dependen de appointments (historial completo del negocio,
+// sin paginar del lado del backend) se calculan en un fetch aparte que no
+// bloquea la tabla principal — mientras tanto muestran "…" en vez de 0.
 const STATS_CONFIG = {
-  staff: (data, t) => {
+  staff: (data, t, statsLoading) => {
     const totalAppointments = (data.appointments || []).length;
     return [
       { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
-      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: totalAppointments },
-      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: average(totalAppointments, data.staff.length) },
+      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: statsLoading ? "…" : totalAppointments },
+      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: statsLoading ? "…" : average(totalAppointments, data.staff.length) },
     ];
   },
-  client: (data, t) => {
+  client: (data, t, statsLoading) => {
     const totalAppointments = (data.appointments || []).length;
     return [
       { icon: IconUsers, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Clients"), value: data.clients.length },
-      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: totalAppointments },
-      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: uniqueClientCount(data.appointments) },
+      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: statsLoading ? "…" : totalAppointments },
+      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: statsLoading ? "…" : uniqueClientCount(data.appointments) },
     ];
   },
-  service: (data, t) => {
+  service: (data, t, statsLoading) => {
     const totalAppointments = (data.appointments || []).length;
     return [
       { icon: IconActivity, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Services"), value: data.services.length },
-      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: totalAppointments },
-      { icon: IconUsers, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: uniqueClientCount(data.appointments) },
+      { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: statsLoading ? "…" : totalAppointments },
+      { icon: IconUsers, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: statsLoading ? "…" : uniqueClientCount(data.appointments) },
     ];
   },
-  branch: (data, t) => {
+  branch: (data, t, statsLoading) => {
     const totalAppointments = (data.appointments || []).length;
     return [
       { icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Total Branches"), value: data.branches.length },
       { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
-      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: average(totalAppointments, data.branches.length) },
+      { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: statsLoading ? "…" : average(totalAppointments, data.branches.length) },
     ];
   },
 };
@@ -137,6 +140,7 @@ const ManagmentBusiness = () => {
   // ── State ──────────────────────────────────────────────────────────────────
   const [tab, setTab] = useState("staff");
   const [isLoading, setIsLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [createTarget, setCreateTarget] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -151,27 +155,48 @@ const ManagmentBusiness = () => {
   });
 
   // ── Data fetching ──────────────────────────────────────────────────────────
-  const loadData = async () => {
+  // fetchAllAppointments trae TODO el historial de turnos del negocio (sin
+  // paginar del lado del backend), así que puede tardar bastante más que el
+  // resto — se pide aparte para no bloquear la tabla principal con eso. Solo
+  // alimenta 3 números de las stat cards (Total/Avg Appointments, Active
+  // Clients), que mientras tanto muestran "…".
+  const loadCoreData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [staff, clients, branches, services, appointments] = await Promise.all([
+      const [staff, clients, branches, services] = await Promise.all([
         fetchStaffData(),
         fetchClientData(),
         fetchBranchData(),
         fetchServiceData(),
-        fetchAllAppointments(),
       ]);
-      setData({ staff, clients, branches, services, appointments });
+      setData((prev) => ({ ...prev, staff, clients, branches, services }));
     } catch (e) {
       console.error("Error loading data:", e);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  const loadAppointmentStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const appointments = await fetchAllAppointments();
+      setData((prev) => ({ ...prev, appointments }));
+    } catch (e) {
+      console.error("Error loading appointment stats:", e);
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
+  const loadData = useCallback(
+    () => Promise.all([loadCoreData(), loadAppointmentStats()]),
+    [loadCoreData, loadAppointmentStats]
+  );
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   const showToast = (message) => {
     setToast(message);
@@ -186,7 +211,7 @@ const ManagmentBusiness = () => {
     service: data.services,
   }[tab] ?? [];
 
-  const stats = STATS_CONFIG[tab]?.(data, t) ?? [];
+  const stats = STATS_CONFIG[tab]?.(data, t, statsLoading) ?? [];
   const addLabel = t(ADD_LABELS[tab]);
 
   // ── Handlers ───────────────────────────────────────────────────────────────
