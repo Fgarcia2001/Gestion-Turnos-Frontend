@@ -13,6 +13,7 @@ import SysAdminDashboard from "./Components/ComponentsSysAdmin/SysAdminDashboard
 import SysAdminBusinesses from "./Components/ComponentsSysAdmin/SysAdminBusinesses";
 import SysAdminPlans from "./Components/ComponentsSysAdmin/SysAdminPlans";
 import SysAdminLanding from "./Components/ComponentsSysAdmin/SysAdminLanding";
+import SysAdminSubscriptions from "./Components/ComponentsSysAdmin/SysAdminSubscriptions";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
               <Route index element={<SysAdminDashboard />} />
               <Route path="businesses" element={<SysAdminBusinesses />} />
               <Route path="plans" element={<SysAdminPlans />} />
+              <Route path="subscriptions" element={<SysAdminSubscriptions />} />
               <Route path="landing" element={<SysAdminLanding />} />
             </Route>
             <Route path="*" element={<NotFound />} />

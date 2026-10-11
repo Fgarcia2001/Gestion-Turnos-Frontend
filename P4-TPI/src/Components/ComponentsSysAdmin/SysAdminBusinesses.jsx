@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { fetchSysAdminBusinesses, fetchSysAdminBusinessById } from "../../services/sysAdminService";
-import { fetchBusinessTypes } from "../../services/businessService";
+import { fetchBusinessTypes, updateBusinessAsAdmin } from "../../services/businessService";
+import { fetchAllPlans } from "../../services/planService";
+import { changeSubscriptionPlan } from "../../services/subscriptionService";
 import BusinessCard from "./BusinessCard";
 import BusinessDetailModal from "./BusinessDetailModal";
+import ChangePlanModal from "./ChangePlanModal";
+import EditBusinessModal from "./EditBusinessModal";
 
 const ALL = "All";
 
@@ -23,9 +27,11 @@ const SkeletonCard = () => (
 const SysAdminBusinesses = () => {
   const [businesses, setBusinesses] = useState([]);
   const [types, setTypes] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(ALL);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [toast, setToast] = useState(null);
 
   // Detail modal state
   const [selectedId, setSelectedId] = useState(null);
@@ -33,16 +39,28 @@ const SysAdminBusinesses = () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState(false);
   const [detailReloadKey, setDetailReloadKey] = useState(0);
+  const [changingPlan, setChangingPlan] = useState(false);
+  const [editingBusiness, setEditingBusiness] = useState(false);
 
   const modalOpen = selectedId != null;
+
+  const showToast = (message) => {
+    setToast(message);
+    setTimeout(() => setToast(null), 3000);
+  };
 
   const load = async () => {
     setLoading(true);
     setError(false);
     try {
-      const [businessList, typeList] = await Promise.all([fetchSysAdminBusinesses(), fetchBusinessTypes()]);
+      const [businessList, typeList, planList] = await Promise.all([
+        fetchSysAdminBusinesses(),
+        fetchBusinessTypes(),
+        fetchAllPlans(),
+      ]);
       setBusinesses(Array.isArray(businessList) ? businessList : []);
       setTypes(Array.isArray(typeList) ? typeList : []);
+      setPlans(Array.isArray(planList) ? planList : []);
     } catch {
       setError(true);
     } finally {
@@ -56,10 +74,15 @@ const SysAdminBusinesses = () => {
       setLoading(true);
       setError(false);
       try {
-        const [businessList, typeList] = await Promise.all([fetchSysAdminBusinesses(), fetchBusinessTypes()]);
+        const [businessList, typeList, planList] = await Promise.all([
+          fetchSysAdminBusinesses(),
+          fetchBusinessTypes(),
+          fetchAllPlans(),
+        ]);
         if (!cancelled) {
           setBusinesses(Array.isArray(businessList) ? businessList : []);
           setTypes(Array.isArray(typeList) ? typeList : []);
+          setPlans(Array.isArray(planList) ? planList : []);
         }
       } catch {
         if (!cancelled) setError(true);
@@ -100,9 +123,24 @@ const SysAdminBusinesses = () => {
     setDetail(null);
     setDetailError(false);
     setDetailLoading(false);
+    setChangingPlan(false);
+    setEditingBusiness(false);
   };
 
   const retryDetail = () => setDetailReloadKey((k) => k + 1);
+
+  const handleChangePlan = async (planId) => {
+    await changeSubscriptionPlan(selectedId, planId);
+    retryDetail();
+    showToast("Plan changed");
+  };
+
+  const handleEditBusiness = async (payload) => {
+    await updateBusinessAsAdmin(selectedId, payload);
+    retryDetail();
+    await load();
+    showToast("Business updated");
+  };
 
   if (loading) {
     return (
@@ -200,7 +238,36 @@ const SysAdminBusinesses = () => {
           error={detailError}
           onClose={closeModal}
           onRetry={retryDetail}
+          onChangePlan={!detailLoading && !detailError && detail ? () => setChangingPlan(true) : null}
+          onEdit={!detailLoading && !detailError && detail ? () => setEditingBusiness(true) : null}
         />
+      )}
+
+      {changingPlan && detail && (
+        <ChangePlanModal
+          businessName={detail.name}
+          currentPlanId={detail.currentPlanId}
+          plans={plans}
+          onClose={() => setChangingPlan(false)}
+          onConfirm={handleChangePlan}
+        />
+      )}
+
+      {editingBusiness && detail && (
+        <EditBusinessModal
+          business={detail}
+          onClose={() => setEditingBusiness(false)}
+          onSave={handleEditBusiness}
+        />
+      )}
+
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          {toast}
+        </div>
       )}
     </div>
   );

@@ -2,7 +2,7 @@
 // Presentational: all fetch state (detail/loading/error) is owned by the parent.
 import { useEffect, useState } from "react";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
-import { IconX } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { IconX, IconEdit } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { getBusinessInitials, statusStyle } from "./businessStatus";
 
 const CSS_ANIMATIONS = `
@@ -50,7 +50,7 @@ const StatTile = ({ label, value }) => (
   </div>
 );
 
-const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
+const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onEdit }) => {
   const [logoFailed, setLogoFailed] = useState(false);
 
   useEffect(() => {
@@ -89,14 +89,26 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
         <div className="w-full max-w-2xl bg-white rounded-2xl border border-[#e2ddd8] shadow-xl max-h-[90vh] flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[#e2ddd8] shrink-0">
             <h2 className="text-base font-bold text-[#1a1a2e]">{name || "Business details"}</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
-              aria-label="Close"
-            >
-              <IconX />
-            </button>
+            <div className="flex items-center gap-2">
+              {onEdit && !loading && !error && detail && (
+                <button
+                  type="button"
+                  onClick={onEdit}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+                >
+                  <IconEdit />
+                  Edit
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
+                aria-label="Close"
+              >
+                <IconX />
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
@@ -151,16 +163,30 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
                 </Section>
 
                 <Section title="Subscription">
-                  {hasSubscription ? (
-                    <>
-                      <Field label="Plan" value={currentPlan || "Not provided"} />
-                      <Field label="Status" value={subscriptionStatus || "Not provided"} />
-                      <Field label="Start date" value={formatDate(subscriptionStartDate) || "Not provided"} />
-                      <Field label="End date" value={formatDate(subscriptionEndDate) || "Not provided"} />
-                    </>
-                  ) : (
-                    <p className="text-sm text-[#9a9a9a]">No subscription information.</p>
-                  )}
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <div className="flex-1">
+                      {hasSubscription ? (
+                        <>
+                          <Field label="Plan" value={currentPlan || "Not provided"} />
+                          <Field label="Status" value={subscriptionStatus || "Not provided"} />
+                          <Field label="Start date" value={formatDate(subscriptionStartDate) || "Not provided"} />
+                          <Field label="End date" value={formatDate(subscriptionEndDate) || "Not provided"} />
+                        </>
+                      ) : (
+                        <p className="text-sm text-[#9a9a9a]">No subscription information.</p>
+                      )}
+                    </div>
+                    {onChangePlan && (
+                      <button
+                        type="button"
+                        onClick={onChangePlan}
+                        className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+                      >
+                        <IconEdit />
+                        Change plan
+                      </button>
+                    )}
+                  </div>
                 </Section>
 
                 <Section title="Statistics">
