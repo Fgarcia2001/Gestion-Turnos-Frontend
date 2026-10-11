@@ -32,6 +32,20 @@ export const updateBranch = async (id, payload) => {
   return res.json();
 };
 
+// SysAdmin: habilita/deshabilita cualquier sucursal (no solo las del propio negocio).
+export const setBranchActiveStatus = async (id, isActive) => {
+  const res = await fetch(`${BASE_URL}/Branch/${id}/status`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ isActive }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.detail || err?.message || "Failed to update the branch status. Please try again.");
+  }
+  return res.json();
+};
+
 export const deleteBranch = async (id) => {
   const res = await fetch(`${BASE_URL}/Branch/${id}`, {
     method: "DELETE",

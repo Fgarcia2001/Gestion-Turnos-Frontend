@@ -139,3 +139,17 @@ export const PENDING_PLAN_KEY = "pending_plan_id";
 export const fetchAllAppointments = () => fetchJson(`${BASE_URL}/Appointment`);
 export const fetchMyBranchAppointments = () => fetchJson(`${BASE_URL}/Appointment/my-branch`);
 
+// Version liviana de las stats de turnos del negocio (2 numeros) en vez de
+// traer el historial completo via fetchAllAppointments.
+export const fetchAppointmentStats = async () => {
+  const fallback = { totalAppointments: 0, activeClients: 0 };
+  try {
+    const res = await fetch(`${BASE_URL}/Appointment/stats`, { headers: getAuthHeaders() });
+    if (!res.ok) return fallback;
+    const text = await res.text();
+    return text ? JSON.parse(text) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+

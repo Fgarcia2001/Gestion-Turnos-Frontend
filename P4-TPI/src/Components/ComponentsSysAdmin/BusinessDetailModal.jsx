@@ -2,7 +2,7 @@
 // Presentational: all fetch state (detail/loading/error) is owned by the parent.
 import { useEffect, useState } from "react";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
-import { IconX } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { IconX, IconEdit, IconEye, IconEyeOff } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { getBusinessInitials, statusStyle } from "./businessStatus";
 
 const CSS_ANIMATIONS = `
@@ -50,7 +50,7 @@ const StatTile = ({ label, value }) => (
   </div>
 );
 
-const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
+const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onEdit, onToggleBranch, togglingBranchId }) => {
   const [logoFailed, setLogoFailed] = useState(false);
 
   useEffect(() => {
@@ -89,14 +89,26 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
         <div className="w-full max-w-2xl bg-white rounded-2xl border border-[#e2ddd8] shadow-xl max-h-[90vh] flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[#e2ddd8] shrink-0">
             <h2 className="text-base font-bold text-[#1a1a2e]">{name || "Business details"}</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
-              aria-label="Close"
-            >
-              <IconX />
-            </button>
+            <div className="flex items-center gap-2">
+              {onEdit && !loading && !error && detail && (
+                <button
+                  type="button"
+                  onClick={onEdit}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+                >
+                  <IconEdit />
+                  Edit
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
+                aria-label="Close"
+              >
+                <IconX />
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
@@ -151,16 +163,30 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
                 </Section>
 
                 <Section title="Subscription">
-                  {hasSubscription ? (
-                    <>
-                      <Field label="Plan" value={currentPlan || "Not provided"} />
-                      <Field label="Status" value={subscriptionStatus || "Not provided"} />
-                      <Field label="Start date" value={formatDate(subscriptionStartDate) || "Not provided"} />
-                      <Field label="End date" value={formatDate(subscriptionEndDate) || "Not provided"} />
-                    </>
-                  ) : (
-                    <p className="text-sm text-[#9a9a9a]">No subscription information.</p>
-                  )}
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <div className="flex-1">
+                      {hasSubscription ? (
+                        <>
+                          <Field label="Plan" value={currentPlan || "Not provided"} />
+                          <Field label="Status" value={subscriptionStatus || "Not provided"} />
+                          <Field label="Start date" value={formatDate(subscriptionStartDate) || "Not provided"} />
+                          <Field label="End date" value={formatDate(subscriptionEndDate) || "Not provided"} />
+                        </>
+                      ) : (
+                        <p className="text-sm text-[#9a9a9a]">No subscription information.</p>
+                      )}
+                    </div>
+                    {onChangePlan && (
+                      <button
+                        type="button"
+                        onClick={onChangePlan}
+                        className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+                      >
+                        <IconEdit />
+                        Change plan
+                      </button>
+                    )}
+                  </div>
                 </Section>
 
                 <Section title="Statistics">
@@ -178,11 +204,37 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry }) => {
                   ) : (
                     <div className="flex flex-col gap-2">
                       {branches.map((branch, i) => (
-                        <div key={branch.id ?? i} className="border border-[#e2ddd8] rounded-xl px-4 py-3">
-                          <p className="text-sm font-semibold text-[#1a1a2e]">{branch.name || "—"}</p>
-                          {branch.address && <p className="text-xs text-[#5a5a6e] mt-0.5">{branch.address}</p>}
-                          {branch.city && <p className="text-xs text-[#5a5a6e]">{branch.city}</p>}
-                          {branch.phone && <p className="text-xs text-[#9a9a9a] mt-0.5">{branch.phone}</p>}
+                        <div
+                          key={branch.id ?? i}
+                          className="flex items-center justify-between gap-3 border border-[#e2ddd8] rounded-xl px-4 py-3"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-semibold text-[#1a1a2e]">{branch.name || "—"}</p>
+                              <span
+                                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                  branch.isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
+                                }`}
+                              >
+                                {branch.isActive ? "Public" : "Hidden"}
+                              </span>
+                            </div>
+                            {branch.address && <p className="text-xs text-[#5a5a6e] mt-0.5">{branch.address}</p>}
+                            {branch.city && <p className="text-xs text-[#5a5a6e]">{branch.city}</p>}
+                            {branch.phone && <p className="text-xs text-[#9a9a9a] mt-0.5">{branch.phone}</p>}
+                          </div>
+                          {onToggleBranch && (
+                            <button
+                              type="button"
+                              onClick={() => onToggleBranch(branch)}
+                              disabled={togglingBranchId === branch.id}
+                              title={branch.isActive ? "Hide from public" : "Make public"}
+                              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+                            >
+                              {branch.isActive ? <IconEyeOff /> : <IconEye />}
+                              {branch.isActive ? "Hide" : "Make public"}
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
