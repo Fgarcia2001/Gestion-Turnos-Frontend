@@ -154,6 +154,10 @@ const SysAdminLanding = () => {
             heroTitleEn: data.heroTitleEn || "",
             heroDescriptionEs: data.heroDescriptionEs || "",
             heroDescriptionEn: data.heroDescriptionEn || "",
+            plansTitleEs: data.plansTitleEs || "",
+            plansTitleEn: data.plansTitleEn || "",
+            plansSubtitleEs: data.plansSubtitleEs || "",
+            plansSubtitleEn: data.plansSubtitleEn || "",
           });
         }
       } catch {
