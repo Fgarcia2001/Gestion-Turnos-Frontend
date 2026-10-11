@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { IconDots, IconEdit, IconClock, IconTrash } from './Icons';
+import { IconDots, IconEdit, IconClock, IconTrash, IconEye, IconEyeOff } from './Icons';
 import { Avatar, Badge } from './Shared';
 
 // ── Dropdown context menu ─────────────────────────────────────────────────────
-export const RowMenu = ({ tab, onEdit, onDelete, onSchedules }) => {
+export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActive }) => {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef(null);
@@ -61,7 +61,7 @@ export const RowMenu = ({ tab, onEdit, onDelete, onSchedules }) => {
             Edit
           </button>
 
-          {/* Schedules — branch only */}
+          {/* Schedules + visibility toggle — branch only */}
           {tab === "branch" && (
             <>
               <div className="h-px bg-[#f0ede8]" />
@@ -71,6 +71,14 @@ export const RowMenu = ({ tab, onEdit, onDelete, onSchedules }) => {
               >
                 <IconClock />
                 Schedules
+              </button>
+              <div className="h-px bg-[#f0ede8]" />
+              <button
+                onClick={() => { setOpen(false); onToggleActive(row); }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1a1a2e] hover:bg-[#f0ede8] transition-colors font-medium"
+              >
+                {row.isActive ? <IconEyeOff /> : <IconEye />}
+                {row.isActive ? "Hide from public" : "Make public"}
               </button>
             </>
           )}
@@ -91,7 +99,7 @@ export const RowMenu = ({ tab, onEdit, onDelete, onSchedules }) => {
 };
 
 // ── Table row ─────────────────────────────────────────────────────────────────
-export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules }) => {
+export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleActive }) => {
   const tdClass = "py-3 pr-6 text-sm text-[#6b7280]";
   
   if (tab === "staff") {
@@ -146,8 +154,17 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules }) => {
         <td className={tdClass}>{row.address}</td>
         <td className={tdClass}>{row.phone}</td>
         <td className={tdClass}>{row.city}</td>
+        <td className="py-3 pr-6">
+          <span
+            className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+              row.isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
+            }`}
+          >
+            {row.isActive ? "Public" : "Hidden"}
+          </span>
+        </td>
         <td className="py-3 text-right">
-          <RowMenu tab={tab} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
+          <RowMenu tab={tab} row={row} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} onToggleActive={onToggleActive} />
         </td>
       </tr>
     );

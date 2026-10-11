@@ -48,7 +48,7 @@ const STATS_CONFIG = {
 const TAB_HEADERS = {
   staff: ["Name", "Email", "Phone", "Role", "Branch"],
   client: ["Name", "Email", "Phone", "Birthday"],
-  branch: ["Name", "Address", "Phone", "City"],
+  branch: ["Name", "Address", "Phone", "City", "Status"],
   service: ["Name", "Category", "Description", "Duration", "Price"],
 };
 
@@ -331,6 +331,23 @@ const ManagmentBusiness = () => {
     showToast("Horario actualizado");
   };
 
+  const handleToggleBranchActive = async (branch) => {
+    const id = branch.id ?? branch.branchId;
+    const nextActive = !branch.isActive;
+    const saved = await updateBranch(id, {
+      Name: branch.name,
+      Address: branch.address,
+      phone: branch.phone,
+      City: branch.city,
+      isActive: nextActive,
+    });
+    setData((prev) => ({
+      ...prev,
+      branches: prev.branches.map((b) => ((b.id ?? b.branchId) === id ? saved : b)),
+    }));
+    showToast(nextActive ? "Branch is now public" : "Branch hidden from the public page");
+  };
+
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <>
@@ -392,6 +409,7 @@ const ManagmentBusiness = () => {
                         onEdit={() => setEditTarget(row)}
                         onDelete={() => setDeleteTarget(row)}
                         onSchedules={() => setSchedulesTarget(row)}
+                        onToggleActive={handleToggleBranchActive}
                       />
                     ))
                   )}

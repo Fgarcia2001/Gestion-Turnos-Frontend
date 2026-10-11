@@ -3,6 +3,7 @@ import { fetchSysAdminBusinesses, fetchSysAdminBusinessById } from "../../servic
 import { fetchBusinessTypes, updateBusinessAsAdmin } from "../../services/businessService";
 import { fetchAllPlans } from "../../services/planService";
 import { changeSubscriptionPlan } from "../../services/subscriptionService";
+import { setBranchActiveStatus } from "../../services/branchService";
 import BusinessCard from "./BusinessCard";
 import BusinessDetailModal from "./BusinessDetailModal";
 import ChangePlanModal from "./ChangePlanModal";
@@ -41,6 +42,7 @@ const SysAdminBusinesses = () => {
   const [detailReloadKey, setDetailReloadKey] = useState(0);
   const [changingPlan, setChangingPlan] = useState(false);
   const [editingBusiness, setEditingBusiness] = useState(false);
+  const [togglingBranchId, setTogglingBranchId] = useState(null);
 
   const modalOpen = selectedId != null;
 
@@ -142,6 +144,24 @@ const SysAdminBusinesses = () => {
     showToast("Business updated");
   };
 
+  const handleToggleBranch = async (branch) => {
+    setTogglingBranchId(branch.id);
+    try {
+      const updated = await setBranchActiveStatus(branch.id, !branch.isActive);
+      setDetail((prev) =>
+        prev && {
+          ...prev,
+          branches: prev.branches.map((b) => (b.id === branch.id ? { ...b, isActive: updated.isActive } : b)),
+        }
+      );
+      showToast(updated.isActive ? "Branch is now public" : "Branch hidden from the public page");
+    } catch (err) {
+      showToast(err.message || "Failed to update the branch");
+    } finally {
+      setTogglingBranchId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="pt-8 flex flex-col gap-6">
@@ -240,6 +260,8 @@ const SysAdminBusinesses = () => {
           onRetry={retryDetail}
           onChangePlan={!detailLoading && !detailError && detail ? () => setChangingPlan(true) : null}
           onEdit={!detailLoading && !detailError && detail ? () => setEditingBusiness(true) : null}
+          onToggleBranch={handleToggleBranch}
+          togglingBranchId={togglingBranchId}
         />
       )}
 

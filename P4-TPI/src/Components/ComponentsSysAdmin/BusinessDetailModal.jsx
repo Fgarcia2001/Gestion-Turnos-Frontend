@@ -2,7 +2,7 @@
 // Presentational: all fetch state (detail/loading/error) is owned by the parent.
 import { useEffect, useState } from "react";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
-import { IconX, IconEdit } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { IconX, IconEdit, IconEye, IconEyeOff } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { getBusinessInitials, statusStyle } from "./businessStatus";
 
 const CSS_ANIMATIONS = `
@@ -50,7 +50,7 @@ const StatTile = ({ label, value }) => (
   </div>
 );
 
-const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onEdit }) => {
+const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onEdit, onToggleBranch, togglingBranchId }) => {
   const [logoFailed, setLogoFailed] = useState(false);
 
   useEffect(() => {
@@ -204,11 +204,37 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                   ) : (
                     <div className="flex flex-col gap-2">
                       {branches.map((branch, i) => (
-                        <div key={branch.id ?? i} className="border border-[#e2ddd8] rounded-xl px-4 py-3">
-                          <p className="text-sm font-semibold text-[#1a1a2e]">{branch.name || "—"}</p>
-                          {branch.address && <p className="text-xs text-[#5a5a6e] mt-0.5">{branch.address}</p>}
-                          {branch.city && <p className="text-xs text-[#5a5a6e]">{branch.city}</p>}
-                          {branch.phone && <p className="text-xs text-[#9a9a9a] mt-0.5">{branch.phone}</p>}
+                        <div
+                          key={branch.id ?? i}
+                          className="flex items-center justify-between gap-3 border border-[#e2ddd8] rounded-xl px-4 py-3"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-semibold text-[#1a1a2e]">{branch.name || "—"}</p>
+                              <span
+                                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                                  branch.isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
+                                }`}
+                              >
+                                {branch.isActive ? "Public" : "Hidden"}
+                              </span>
+                            </div>
+                            {branch.address && <p className="text-xs text-[#5a5a6e] mt-0.5">{branch.address}</p>}
+                            {branch.city && <p className="text-xs text-[#5a5a6e]">{branch.city}</p>}
+                            {branch.phone && <p className="text-xs text-[#9a9a9a] mt-0.5">{branch.phone}</p>}
+                          </div>
+                          {onToggleBranch && (
+                            <button
+                              type="button"
+                              onClick={() => onToggleBranch(branch)}
+                              disabled={togglingBranchId === branch.id}
+                              title={branch.isActive ? "Hide from public" : "Make public"}
+                              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+                            >
+                              {branch.isActive ? <IconEyeOff /> : <IconEye />}
+                              {branch.isActive ? "Hide" : "Make public"}
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
