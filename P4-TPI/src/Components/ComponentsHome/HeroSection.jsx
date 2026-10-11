@@ -1,21 +1,11 @@
-import { useEffect, useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
-import { fetchLandingContent } from "../../services/landingContentService";
+import { useLandingContent } from "../../../CustomHooks/useLandingContent";
 
 const HeroSection = () => {
   const { t, language } = useTranslation();
-  const [content, setContent] = useState(null);
+  const content = useLandingContent();
 
-  useEffect(() => {
-    let cancelled = false;
-    fetchLandingContent().then((data) => {
-      if (!cancelled) setContent(data);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+  const brandName = content?.brandName || t("brandName");
   const heroTitle =
     (language === "en" ? content?.heroTitleEn : content?.heroTitleEs) || t("heroTitle");
   const heroDesc =
@@ -42,7 +32,7 @@ const HeroSection = () => {
             <line x1="3" x2="21" y1="10" y2="10" />
           </svg>
         </div>
-        <span className="text-sm font-semibold text-[#1a1a2e]">{t("brandName")}</span>
+        <span className="text-sm font-semibold text-[#1a1a2e]">{brandName}</span>
       </div>
 
       <h1 className="text-4xl md:text-6xl font-bold text-[#1a1a2e] leading-tight max-w-3xl mx-auto">
