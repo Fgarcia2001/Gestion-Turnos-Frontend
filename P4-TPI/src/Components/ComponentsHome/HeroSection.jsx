@@ -1,7 +1,15 @@
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+import { useLandingContent } from "../../../CustomHooks/useLandingContent";
 
 const HeroSection = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const content = useLandingContent();
+
+  const brandName = content?.brandName || t("brandName");
+  const heroTitle =
+    (language === "en" ? content?.heroTitleEn : content?.heroTitleEs) || t("heroTitle");
+  const heroDesc =
+    (language === "en" ? content?.heroDescriptionEn : content?.heroDescriptionEs) || t("heroDesc");
 
   return (
     <section className="text-center px-4 pt-20 pb-16 md:pt-28 md:pb-20">
@@ -24,15 +32,15 @@ const HeroSection = () => {
             <line x1="3" x2="21" y1="10" y2="10" />
           </svg>
         </div>
-        <span className="text-sm font-semibold text-[#1a1a2e]">{t("brandName")}</span>
+        <span className="text-sm font-semibold text-[#1a1a2e]">{brandName}</span>
       </div>
 
       <h1 className="text-4xl md:text-6xl font-bold text-[#1a1a2e] leading-tight max-w-3xl mx-auto">
-        {t("heroTitle")}
+        {heroTitle}
       </h1>
 
       <p className="text-[#6b6b6b] text-base md:text-lg mt-6 max-w-xl mx-auto">
-        {t("heroDesc")}
+        {heroDesc}
       </p>
     </section>
   );

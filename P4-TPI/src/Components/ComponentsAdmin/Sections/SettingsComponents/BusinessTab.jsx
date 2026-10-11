@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react";
 import { BASE_URL, getAuthHeaders } from "../../../../services/api";
-import { IconGlobe, IconCamera } from './SettingsIcons';
+import { fetchBusinessTypes } from "../../../../services/businessService";
+import { IconGlobe, IconCamera, IconCheck } from './SettingsIcons';
 
 const IconUpload = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+  </svg>
+);
+
+const IconCopy = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
   </svg>
 );
 
@@ -16,6 +23,12 @@ const BusinessTab = () => {
   const [logoInputMode, setLogoInputMode] = useState("url");
   const [logoPreview, setLogoPreview] = useState("");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [businessTypes, setBusinessTypes] = useState([]);
+
+  useEffect(() => {
+    fetchBusinessTypes().then(setBusinessTypes);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -42,6 +55,17 @@ const BusinessTab = () => {
   }, []);
 
   const hasChanges = originalData && JSON.stringify(formData) !== JSON.stringify(originalData);
+  const fullUrl = `${window.location.origin}/${formData.url}`;
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(fullUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API no disponible/denegada: no hay fallback, el usuario puede copiar a mano.
+    }
+  };
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
@@ -166,12 +190,18 @@ const BusinessTab = () => {
         {/* Category */}
         <div>
           <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Category</label>
-          <input
-            type="text"
+          <select
             value={formData.category}
             onChange={handleChange("category")}
             className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
-          />
+          >
+            {!businessTypes.some((type) => type.name === formData.category) && formData.category && (
+              <option value={formData.category}>{formData.category}</option>
+            )}
+            {businessTypes.map((type) => (
+              <option key={type.id} value={type.name}>{type.name}</option>
+            ))}
+          </select>
         </div>
 
         {/* Website */}
@@ -179,13 +209,27 @@ const BusinessTab = () => {
           <label className="flex items-center gap-1.5 text-xs font-semibold text-[#1a1a2e] mb-2">
             <IconGlobe /> Website
           </label>
-          <input
-            type="text"
-            value={formData.url}
-            onChange={handleChange("url")}
-            placeholder="https://example.com"
-            className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
-          />
+          <div className="flex items-center gap-2">
+            <div className="flex items-center flex-1 min-w-0 border-b border-[#e2ddd8] focus-within:border-[#1a1a2e] transition-colors">
+              <span className="text-sm text-[#9a9a9a] pb-2 whitespace-nowrap">{window.location.origin}/</span>
+              <input
+                type="text"
+                value={formData.url}
+                onChange={handleChange("url")}
+                placeholder="mi-negocio"
+                className="w-full pb-2 text-sm text-[#1a1a2e] focus:outline-none bg-transparent min-w-0"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyUrl}
+              title="Copiar URL"
+              className={`flex items-center gap-1.5 shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${copied ? "bg-[#dcfce7] text-[#15803d]" : "bg-[#f0ede8] text-[#1a1a2e] hover:bg-[#e2ddd8]"}`}
+            >
+              {copied ? <IconCheck /> : <IconCopy />}
+              {copied ? "Copiado" : "Copiar"}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -1,10 +1,15 @@
 import LoginForm from "../src/Components/ComponentsLogin/LoginForm";
 import { useTranslation } from "../CustomHooks/TraslateHook";
+import { useLandingContent } from "../CustomHooks/useLandingContent";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const { t, toggleLanguage, language } = useTranslation();
+  const content = useLandingContent();
+  const brandName = content?.brandName || t("brandName");
+  const heroTitle = (language === "en" ? content?.heroTitleEn : content?.heroTitleEs) || t("heroTitle");
+  const heroDesc = (language === "en" ? content?.heroDescriptionEn : content?.heroDescriptionEs) || t("heroDesc");
   const location = useLocation();
   const navigate = useNavigate();
   const initialRegister = Boolean(location.state?.register);
@@ -63,14 +68,14 @@ const Login = () => {
                 <line x1="3" x2="21" y1="10" y2="10" />
               </svg>
             </div>
-            <span className="text-2xl font-bold">{t("brandName")}</span>
+            <span className="text-2xl font-bold">{brandName}</span>
           </button>
 
           <h1 className="text-5xl font-bold leading-tight mb-6">
-            {t("heroTitle")}
+            {heroTitle}
           </h1>
 
-          <p className="text-gray-400 text-lg mb-12">{t("heroDesc")}</p>
+          <p className="text-gray-400 text-lg mb-12">{heroDesc}</p>
 
           <div className="grid grid-cols-3 gap-8 pt-8 border-t border-white/10">
             <div>
@@ -113,7 +118,7 @@ const Login = () => {
               <line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-xl font-bold text-gray-900">{t("brandName")}</span>
+          <span className="text-xl font-bold text-gray-900">{brandName}</span>
         </button>
 
         <div className="w-full max-w-md bg-white p-10 rounded-2xl shadow-sm border border-gray-100">

@@ -22,6 +22,11 @@ const IconCreditCard = () => (
     <rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" />
   </svg>
 );
+const IconLanding = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="16" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="7" y1="13" x2="13" y2="13" /><line x1="7" y1="16" x2="11" y2="16" />
+  </svg>
+);
 const IconLogout = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 8V6A2 2 0 0 0 12 4H6A2 2 0 0 0 4 6V18A2 2 0 0 0 6 20H12A2 2 0 0 0 14 18V16" /><path d="M9 12H21M21 12L18 9M21 12L18 15" />
@@ -38,6 +43,7 @@ const navItems = [
   { to: "/sysadmin/businesses", label: "Businesses", Icon: IconBuilding },
   { to: "/sysadmin/plans", label: "Plans", Icon: IconLayers },
   { to: "/sysadmin/subscriptions", label: "Subscriptions", Icon: IconCreditCard },
+  { to: "/sysadmin/landing", label: "Landing Page", Icon: IconLanding },
 ];
 
 const getInitials = (name) => {

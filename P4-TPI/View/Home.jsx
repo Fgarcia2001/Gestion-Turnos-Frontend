@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../CustomHooks/TraslateHook";
+import { useLandingContent } from "../CustomHooks/useLandingContent";
 import HeroSection from "../src/Components/ComponentsHome/HeroSection";
 import OptionCard from "../src/Components/ComponentsHome/OptionCard";
 import PlansSection from "../src/Components/ComponentsHome/PlansSection";
+import AboutSection from "../src/Components/ComponentsHome/AboutSection";
+import Footer from "../src/Components/ComponentsHome/Footer";
 
 const BuildingIcon = () => (
   <svg
@@ -33,8 +36,11 @@ const BuildingIcon = () => (
 const Home = () => {
   const navigate = useNavigate();
   const { t, toggleLanguage, language } = useTranslation();
+  const content = useLandingContent();
+  const brandName = content?.brandName || t("brandName");
 
   const goToRegister = () => navigate("/login", { state: { register: true } });
+  const scrollToAbout = () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
 
   return (
     <main className="min-h-screen w-full bg-[#F8F5F0]">
@@ -45,7 +51,13 @@ const Home = () => {
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-lg font-bold text-[#1a1a2e]">{t("brandName")}</span>
+          <span className="text-lg font-bold text-[#1a1a2e]">{brandName}</span>
+          <button
+            onClick={scrollToAbout}
+            className="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-semibold text-[#1a1a2e] hover:bg-[#F0EDE8] transition-colors"
+          >
+            {t("navAbout")}
+          </button>
         </div>
 
         <div className="flex items-center gap-3">
@@ -86,7 +98,11 @@ const Home = () => {
         </section>
 
         <PlansSection />
+
+        <AboutSection />
       </div>
+
+      <Footer />
     </main>
   );
 };
