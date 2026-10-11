@@ -8,6 +8,8 @@ const Login = () => {
   const { t, toggleLanguage, language } = useTranslation();
   const content = useLandingContent();
   const brandName = content?.brandName || t("brandName");
+  const heroTitle = (language === "en" ? content?.heroTitleEn : content?.heroTitleEs) || t("heroTitle");
+  const heroDesc = (language === "en" ? content?.heroDescriptionEn : content?.heroDescriptionEs) || t("heroDesc");
   const location = useLocation();
   const navigate = useNavigate();
   const initialRegister = Boolean(location.state?.register);
@@ -70,10 +72,10 @@ const Login = () => {
           </button>
 
           <h1 className="text-5xl font-bold leading-tight mb-6">
-            {t("heroTitle")}
+            {heroTitle}
           </h1>
 
-          <p className="text-gray-400 text-lg mb-12">{t("heroDesc")}</p>
+          <p className="text-gray-400 text-lg mb-12">{heroDesc}</p>
 
           <div className="grid grid-cols-3 gap-8 pt-8 border-t border-white/10">
             <div>

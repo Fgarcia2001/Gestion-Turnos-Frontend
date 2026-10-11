@@ -30,7 +30,7 @@ const PlansSection = () => {
   if (loading) return null;
 
   return (
-    <section className="pb-20">
+    <section id="plans" className="pb-20">
       <div className="text-center mb-10">
         <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a2e]">{plansTitle}</h2>
         <p className="text-[#6b6b6b] mt-2 max-w-xl mx-auto">{plansSubtitle}</p>
@@ -39,7 +39,7 @@ const PlansSection = () => {
       {plans.length === 0 ? (
         <p className="text-center text-sm text-[#9a9a9a]">{t("noPlansAvailable")}</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="flex flex-wrap justify-center gap-6">
           {[...plans]
             .sort((a, b) => (a.price ?? a.Price ?? 0) - (b.price ?? b.Price ?? 0))
             .map((tier) => {
@@ -51,7 +51,7 @@ const PlansSection = () => {
               return (
                 <div
                   key={id ?? name}
-                  className="bg-white rounded-2xl shadow-sm border border-[#e2ddd8] p-6 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  className="w-full sm:w-[300px] bg-white rounded-2xl shadow-sm border border-[#e2ddd8] p-6 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
                 >
                   <h3 className="font-bold text-lg text-[#1a1a2e]">{name}</h3>
                   {description && <p className="text-sm text-[#6b6b6b] mt-1 mb-6 flex-1">{description}</p>}

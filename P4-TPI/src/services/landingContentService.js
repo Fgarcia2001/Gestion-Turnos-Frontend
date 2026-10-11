@@ -14,6 +14,12 @@ export const fetchLandingContent = async () => {
   }
 };
 
+// Reemplaza el placeholder "{brandName}" dentro de textos editables (por
+// ahora, la descripcion de "Quienes somos") por el nombre de marca actual,
+// asi ese texto no queda desactualizado si se cambia el BrandName.
+export const applyBrandName = (text, brandName) =>
+  text ? text.replace(/\{brandName\}/g, brandName || "") : text;
+
 export const updateLandingContent = async (payload) => {
   const res = await fetch(`${BASE_URL}/LandingContent`, {
     method: "PUT",
