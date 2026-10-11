@@ -12,6 +12,7 @@ import SysAdminLayout from "./Components/ComponentsSysAdmin/SysAdminLayout";
 import SysAdminDashboard from "./Components/ComponentsSysAdmin/SysAdminDashboard";
 import SysAdminBusinesses from "./Components/ComponentsSysAdmin/SysAdminBusinesses";
 import SysAdminPlans from "./Components/ComponentsSysAdmin/SysAdminPlans";
+import SysAdminLanding from "./Components/ComponentsSysAdmin/SysAdminLanding";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
               <Route index element={<SysAdminDashboard />} />
               <Route path="businesses" element={<SysAdminBusinesses />} />
               <Route path="plans" element={<SysAdminPlans />} />
+              <Route path="landing" element={<SysAdminLanding />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

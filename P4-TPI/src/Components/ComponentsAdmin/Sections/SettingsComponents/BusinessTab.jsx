@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { BASE_URL, getAuthHeaders } from "../../../../services/api";
+import { fetchBusinessTypes } from "../../../../services/businessService";
 import { IconGlobe, IconCamera, IconCheck } from './SettingsIcons';
 
 const IconUpload = () => (
@@ -23,6 +24,11 @@ const BusinessTab = () => {
   const [logoPreview, setLogoPreview] = useState("");
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [businessTypes, setBusinessTypes] = useState([]);
+
+  useEffect(() => {
+    fetchBusinessTypes().then(setBusinessTypes);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -184,12 +190,18 @@ const BusinessTab = () => {
         {/* Category */}
         <div>
           <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Category</label>
-          <input
-            type="text"
+          <select
             value={formData.category}
             onChange={handleChange("category")}
             className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
-          />
+          >
+            {!businessTypes.some((type) => type.name === formData.category) && formData.category && (
+              <option value={formData.category}>{formData.category}</option>
+            )}
+            {businessTypes.map((type) => (
+              <option key={type.id} value={type.name}>{type.name}</option>
+            ))}
+          </select>
         </div>
 
         {/* Website */}

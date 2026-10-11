@@ -1,7 +1,25 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+import { fetchLandingContent } from "../../services/landingContentService";
 
 const HeroSection = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const [content, setContent] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchLandingContent().then((data) => {
+      if (!cancelled) setContent(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const heroTitle =
+    (language === "en" ? content?.heroTitleEn : content?.heroTitleEs) || t("heroTitle");
+  const heroDesc =
+    (language === "en" ? content?.heroDescriptionEn : content?.heroDescriptionEs) || t("heroDesc");
 
   return (
     <section className="text-center px-4 pt-20 pb-16 md:pt-28 md:pb-20">
@@ -28,11 +46,11 @@ const HeroSection = () => {
       </div>
 
       <h1 className="text-4xl md:text-6xl font-bold text-[#1a1a2e] leading-tight max-w-3xl mx-auto">
-        {t("heroTitle")}
+        {heroTitle}
       </h1>
 
       <p className="text-[#6b6b6b] text-base md:text-lg mt-6 max-w-xl mx-auto">
-        {t("heroDesc")}
+        {heroDesc}
       </p>
     </section>
   );
