@@ -1,4 +1,4 @@
-export const BASE_URL = "https://localhost:7032/api";
+export const BASE_URL = `${import.meta.env.VITE_API_ORIGIN || "https://api.turnify.lat"}/api`;
 
 const TOKEN_KEY = "auth_token";
 

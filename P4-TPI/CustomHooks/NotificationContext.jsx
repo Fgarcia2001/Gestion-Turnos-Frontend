@@ -5,7 +5,7 @@ import { fetchAllAppointments, fetchMyBranchAppointments } from "../src/services
 import { fetchMyAppointments } from "../src/services/appointmentService";
 
 // ── Configuración del hub (ajustar cuando se implemente en el backend) ────────
-const HUB_URL = "https://localhost:7032/notificationHub";
+const HUB_URL = `${import.meta.env.VITE_API_ORIGIN || "https://api.turnify.lat"}/notificationHub`;
 const HUB_EVENT_NEW_APPOINTMENT = "NewAppointment";
 const HUB_JOIN_METHOD = "JoinGroup";
 

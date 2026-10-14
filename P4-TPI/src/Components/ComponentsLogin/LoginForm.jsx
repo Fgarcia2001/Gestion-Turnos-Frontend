@@ -113,7 +113,7 @@ const validateSignup = (fields, t) => {
 };
 
 // ── API calls ─────────────────────────────────────────────────────────────────
-const BASE_URL = "https://localhost:7032/api/Auth";
+const BASE_URL = `${import.meta.env.VITE_API_ORIGIN || "https://api.turnify.lat"}/api/Auth`;
 const token = import.meta.env.VITE_JWT_TOKEN;
 
 const signIn = async (credentials, t) => {

@@ -1,4 +1,8 @@
-export const BASE_URL = "https://localhost:7032/api";
+// VITE_API_ORIGIN permite apuntar a localhost:7032 para pruebas locales sin
+// tocar el codigo: se define en P4-TPI/.env.local (gitignored), ej.
+// VITE_API_ORIGIN=https://localhost:7032 (reiniciar el dev server tras editarlo).
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "https://api.turnify.lat";
+export const BASE_URL = `${API_ORIGIN}/api`;
 export const AUTH_URL = `${BASE_URL}/Auth`;
 
 const TOKEN_KEY = "auth_token";
