@@ -78,10 +78,10 @@ const Header = ({ username, onNavigateToAppointments }) => {
     setOpen((o) => !o);
   };
 
-  const handleSelect = () => {
+  const handleSelect = (appt) => {
     markAllRead();
     setOpen(false);
-    onNavigateToAppointments?.();
+    onNavigateToAppointments?.(appt?.day);
   };
 
   return (
@@ -135,7 +135,7 @@ const Header = ({ username, onNavigateToAppointments }) => {
                   appointments.map((appt) => (
                     <button
                       key={appt.id}
-                      onClick={handleSelect}
+                      onClick={() => handleSelect(appt)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f0ede8] transition-colors border-b border-[#f0ede8] last:border-b-0 cursor-pointer"
                     >
                       <div className="w-8 h-8 rounded-full bg-[#dbeafe] flex items-center justify-center text-xs font-semibold text-[#1a1a2e] shrink-0">

@@ -386,11 +386,19 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
-const Appointments = () => {
+const parseInitialDate = (value) => {
+  const [y, m, d] = (value || "").split("-").map(Number);
+  return y && m && d ? { y, m, d } : null;
+};
+
+const Appointments = ({ initialDate }) => {
   const { t } = useTranslation();
   const today = new Date();
-  const [selectedDay, setSelectedDay] = useState(today.getDate());
-  const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const initial = parseInitialDate(initialDate);
+  const [selectedDay, setSelectedDay] = useState(initial ? initial.d : today.getDate());
+  const [viewDate, setViewDate] = useState(
+    initial ? new Date(initial.y, initial.m - 1, 1) : new Date(today.getFullYear(), today.getMonth(), 1)
+  );
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState(null);

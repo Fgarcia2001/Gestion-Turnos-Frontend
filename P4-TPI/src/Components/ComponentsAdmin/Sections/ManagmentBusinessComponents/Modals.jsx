@@ -22,7 +22,11 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
         branchId: row.branchId ?? matchedBranch?.id ?? matchedBranch?.branchId ?? "",
       };
     }
-    return { ...row };
+    return {
+      ...row,
+      // <input type="date"> only accepts yyyy-MM-dd; the backend sends "2006-02-11T00:00:00"
+      ...(row.birthday ? { birthday: String(row.birthday).slice(0, 10) } : {}),
+    };
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");

@@ -35,20 +35,34 @@ const Admin = () => {
   const [section, setSection] = useState(() => (mpReturn || pendingPlanId ? "settings" : isProfessional ? "appointments" : "home"));
   const [settingsTab, setSettingsTab] = useState(() => (mpReturn || pendingPlanId ? "subscription" : "business"));
 
+  // Día al que debe abrir Appointments cuando se llega desde una notificación.
+  // El nonce fuerza el remount aunque ya se esté en Appointments.
+  const [appointmentsTarget, setAppointmentsTarget] = useState(null);
+
   const handleSelectSection = (id) => {
     // Los profesionales solo ven Appointments y Help en el navbar.
     if (isProfessional && id !== "help" && id !== "appointments") return;
+    setAppointmentsTarget(null);
     setSection(id);
   };
 
+  const handleNotificationNavigate = (day) => {
+    setAppointmentsTarget({ day, nonce: Date.now() });
+    setSection("appointments");
+  };
+
+  const renderAppointments = () => (
+    <Appointments initialDate={appointmentsTarget?.day} key={appointmentsTarget?.nonce} />
+  );
+
   const renderSection = () => {
-    if (isProfessional && section !== "help") return <Appointments />;
+    if (isProfessional && section !== "help") return renderAppointments();
     switch (section) {
       case "home": return (
         <Home onUpgradePlan={() => { setSettingsTab("subscription"); setSection("settings"); }} />
       );
       case "managmentBusiness": return <ManagmentBusiness />;
-      case "appointments": return <Appointments />;
+      case "appointments": return renderAppointments();
       case "calendar": return <Calendar />;
       case "schedule": return <Schedule />;
       case "settings": return <Settings key={settingsTab} initialTab={settingsTab} autoOpenPlanId={pendingPlanId} />;
@@ -69,7 +83,7 @@ const Admin = () => {
         <div className="flex flex-col flex-1 overflow-hidden">
 
           {/* Header */}
-          <Header username={user?.name} onNavigateToAppointments={() => setSection("appointments")} />
+          <Header username={user?.name} onNavigateToAppointments={handleNotificationNavigate} />
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">
