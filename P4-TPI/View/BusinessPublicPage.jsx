@@ -51,7 +51,11 @@ const BranchCard = ({ branch, onBook }) => (
             {branch.schedules.map((schedule, idx) => (
               <li key={idx} className="flex items-center justify-between text-sm text-[#4a4a4a]">
                 <span>{DAY_LABELS[schedule.day] || schedule.day}</span>
-                <span>{formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}</span>
+                {schedule.isActive !== false ? (
+                  <span>{formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}</span>
+                ) : (
+                  <span className="text-[#9a9a9a]">Cerrado</span>
+                )}
               </li>
             ))}
           </ul>
