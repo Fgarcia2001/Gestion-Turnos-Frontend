@@ -74,6 +74,9 @@ const LivePreview = ({
   socials,
   lang,
   onToggleLang,
+  primaryColor,
+  backgroundColor,
+  accentColor,
 }) => (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
@@ -88,26 +91,26 @@ const LivePreview = ({
       </button>
     </div>
 
-    <div className="bg-[#F8F5F0] border border-[#e2ddd8] rounded-2xl overflow-hidden">
-      <div className="h-8 bg-[#eee9e2] border-b border-[#e2ddd8] flex items-center gap-1.5 px-3">
+    <div className="border rounded-2xl overflow-hidden" style={{ backgroundColor, borderColor: accentColor }}>
+      <div className="h-8 flex items-center gap-1.5 px-3 border-b" style={{ backgroundColor: "#eee9e2", borderColor: accentColor }}>
         <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
         <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
         <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
       </div>
 
       <div className="px-5 py-8 text-center">
-        <div className="inline-flex items-center gap-1.5 bg-white/60 border border-[#e2ddd8] px-3 py-1 rounded-full mb-4">
-          <div className="bg-[#1a1a2e] p-1 rounded-md">
+        <div className="inline-flex items-center gap-1.5 bg-white/60 border px-3 py-1 rounded-full mb-4" style={{ borderColor: accentColor }}>
+          <div className="p-1 rounded-md" style={{ backgroundColor: primaryColor }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-[11px] font-semibold text-[#1a1a2e] truncate max-w-[160px]">
+          <span className="text-[11px] font-semibold truncate max-w-[160px]" style={{ color: primaryColor }}>
             {brandName || "Turnify FMC"}
           </span>
         </div>
 
-        <h1 className="text-xl font-bold text-[#1a1a2e] leading-tight max-w-xs mx-auto break-words">
+        <h1 className="text-xl font-bold leading-tight max-w-xs mx-auto break-words" style={{ color: primaryColor }}>
           {title || "..."}
         </h1>
 
@@ -116,8 +119,8 @@ const LivePreview = ({
         </p>
       </div>
 
-      <div className="px-5 py-6 border-t border-[#e2ddd8] text-center">
-        <h2 className="text-sm font-bold text-[#1a1a2e] break-words">{plansTitle || "..."}</h2>
+      <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
+        <h2 className="text-sm font-bold break-words" style={{ color: primaryColor }}>{plansTitle || "..."}</h2>
         <p className="text-[#6b6b6b] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
           {plansSubtitle || "..."}
         </p>
@@ -130,9 +133,10 @@ const LivePreview = ({
               return (
                 <div
                   key={id ?? name}
-                  className="w-[68px] h-14 rounded-lg bg-white border border-[#e2ddd8] flex flex-col items-center justify-center px-1"
+                  className="w-[68px] h-14 rounded-lg bg-white border flex flex-col items-center justify-center px-1"
+                  style={{ borderColor: accentColor }}
                 >
-                  <span className="text-[9px] font-semibold text-[#1a1a2e] truncate w-full text-center">{name}</span>
+                  <span className="text-[9px] font-semibold truncate w-full text-center" style={{ color: primaryColor }}>{name}</span>
                   <span className="text-[9px] text-[#9a9a9a]">${price}</span>
                 </div>
               );
@@ -141,20 +145,20 @@ const LivePreview = ({
         ) : (
           <div className="flex flex-wrap justify-center gap-1.5 mt-3">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="w-[68px] h-10 rounded-lg bg-white border border-[#e2ddd8]" />
+              <div key={i} className="w-[68px] h-10 rounded-lg bg-white border" style={{ borderColor: accentColor }} />
             ))}
           </div>
         )}
       </div>
 
-      <div className="px-5 py-6 border-t border-[#e2ddd8] text-center">
-        <h2 className="text-sm font-bold text-[#1a1a2e] break-words">{aboutTitle || "..."}</h2>
+      <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
+        <h2 className="text-sm font-bold break-words" style={{ color: primaryColor }}>{aboutTitle || "..."}</h2>
         <p className="text-[#6b6b6b] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
           {aboutDesc || "..."}
         </p>
       </div>
 
-      <div className="bg-[#1a1a2e] text-white px-5 py-6 flex flex-col items-center text-center">
+      <div className="text-white px-5 py-6 flex flex-col items-center text-center" style={{ backgroundColor: primaryColor }}>
         <div className="flex items-center gap-1.5 mb-2">
           <div className="bg-white/10 p-1 rounded-md">
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -196,8 +200,31 @@ const LivePreview = ({
   </div>
 );
 
+const ColorField = ({ label, value, onChange }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-xs font-semibold text-[#5a5a6e]">{label}</label>
+    <div className="flex items-center gap-2 rounded-xl border border-[#e2ddd8] px-2 py-1.5">
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-8 h-8 rounded-lg cursor-pointer shrink-0"
+      />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full text-sm text-[#1a1a2e] focus:outline-none bg-transparent"
+      />
+    </div>
+  </div>
+);
+
 const mapResponseToForm = (data) => ({
   brandName: data.brandName || "",
+  primaryColor: data.primaryColor || "#1a1a2e",
+  backgroundColor: data.backgroundColor || "#F8F5F0",
+  accentColor: data.accentColor || "#e2ddd8",
   heroTitleEs: data.heroTitleEs || "",
   heroTitleEn: data.heroTitleEn || "",
   heroDescriptionEs: data.heroDescriptionEs || "",
@@ -230,6 +257,9 @@ const SysAdminLanding = () => {
   const [translating, setTranslating] = useState({});
   const [form, setForm] = useState({
     brandName: "",
+    primaryColor: "#1a1a2e",
+    backgroundColor: "#F8F5F0",
+    accentColor: "#e2ddd8",
     heroTitleEs: "",
     heroTitleEn: "",
     heroDescriptionEs: "",
@@ -375,6 +405,14 @@ const SysAdminLanding = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 items-start">
           <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 flex flex-col gap-5">
             <Field label="Brand name" value={form.brandName} onChange={handleChange("brandName")} />
+
+            <div className="h-px bg-[#e2ddd8]" />
+            <p className="text-xs font-semibold text-[#5a5a6e]">Color palette</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <ColorField label="Primary" value={form.primaryColor} onChange={handleChange("primaryColor")} />
+              <ColorField label="Background" value={form.backgroundColor} onChange={handleChange("backgroundColor")} />
+              <ColorField label="Accent" value={form.accentColor} onChange={handleChange("accentColor")} />
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
@@ -529,6 +567,9 @@ const SysAdminLanding = () => {
             footerDesc={previewFooterDesc}
             contactEmail={form.contactEmail}
             contactPhone={form.contactPhone}
+            primaryColor={form.primaryColor}
+            backgroundColor={form.backgroundColor}
+            accentColor={form.accentColor}
             socials={previewSocials}
             lang={previewLang}
             onToggleLang={() => setPreviewLang((prev) => (prev === "es" ? "en" : "es"))}

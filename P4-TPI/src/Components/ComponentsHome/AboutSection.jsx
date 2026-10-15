@@ -13,11 +13,13 @@ const AboutSection = () => {
     (language === "en" ? content?.aboutDescriptionEn : content?.aboutDescriptionEs) || t("aboutDesc"),
     brandName
   );
+  const primaryColor = content?.primaryColor || "#1a1a2e";
+  const accentColor = content?.accentColor || "#e2ddd8";
 
   return (
     <section id="about" className="pb-20">
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] px-6 py-12 sm:px-12 text-center max-w-3xl mx-auto">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a2e]">{aboutTitle}</h2>
+      <div className="bg-white rounded-2xl border px-6 py-12 sm:px-12 text-center max-w-3xl mx-auto" style={{ borderColor: accentColor }}>
+        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: primaryColor }}>{aboutTitle}</h2>
         <p className="text-[#6b6b6b] text-base mt-4 leading-relaxed">{aboutDesc}</p>
       </div>
     </section>

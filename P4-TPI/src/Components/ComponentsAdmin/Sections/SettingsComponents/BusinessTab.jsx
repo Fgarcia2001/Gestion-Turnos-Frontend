@@ -15,8 +15,59 @@ const IconCopy = () => (
   </svg>
 );
 
+const IconBuildingSmall = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18Z" /><path d="M6 12H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2" /><path d="M18 9h2a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-2" /><path d="M10 6h.01" /><path d="M14 6h.01" /><path d="M10 10h.01" /><path d="M14 10h.01" /><path d="M10 14h.01" /><path d="M14 14h.01" />
+  </svg>
+);
+
+// Mini mockup de la pagina publica del negocio (BusinessPublicPage.jsx), a
+// escala reducida, reflejando en vivo lo que el admin esta tipeando en el form.
+const BusinessPreview = ({ name, category, logoUrl, color, url }) => (
+  <div className="lg:sticky lg:top-4 flex flex-col gap-3">
+    <p className="text-xs font-semibold text-[#5a5a6e] uppercase tracking-wide">Public page preview</p>
+
+    <div className="bg-[#F8F5F0] border border-[#e2ddd8] rounded-2xl overflow-hidden">
+      <div className="h-8 bg-[#eee9e2] border-b border-[#e2ddd8] flex items-center gap-1.5 px-3">
+        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
+        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
+        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
+      </div>
+
+      <div className="text-white px-4 py-5 flex items-center gap-3" style={{ backgroundColor: color }}>
+        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden shrink-0">
+          {logoUrl ? <img src={logoUrl} alt={name} className="w-full h-full object-cover" /> : <IconBuildingSmall />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold truncate">{name || "Business name"}</p>
+          {category && <p className="text-[10px] text-white/70 truncate">{category}</p>}
+        </div>
+        <span className="hidden sm:inline-block text-[10px] font-semibold bg-white px-2.5 py-1.5 rounded-lg shrink-0" style={{ color }}>
+          Reservar turno
+        </span>
+      </div>
+
+      <div className="p-4">
+        <div className="bg-white border border-[#e2ddd8] rounded-xl p-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-[#1a1a2e] truncate">Sucursal</p>
+            <p className="text-[10px] text-[#9a9a9a] truncate">Dirección, Ciudad</p>
+          </div>
+          <span className="text-[10px] font-semibold text-white px-2.5 py-1.5 rounded-lg shrink-0" style={{ backgroundColor: color }}>
+            Reservar acá
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <p className="text-[11px] text-[#9a9a9a] text-center truncate">
+      {window.location.origin}/{url || "..."}
+    </p>
+  </div>
+);
+
 const BusinessTab = () => {
-  const [formData, setFormData] = useState({ name: "", category: "", url: "", logoUrl: "" });
+  const [formData, setFormData] = useState({ name: "", category: "", url: "", logoUrl: "", color: "#1a1a2e" });
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,6 +92,7 @@ const BusinessTab = () => {
           category: data.category || "",
           url: data.url || "",
           logoUrl: data.logoUrl || "",
+          color: data.color || "#1a1a2e",
         };
         setFormData(initial);
         setOriginalData(initial);
@@ -124,7 +176,8 @@ const BusinessTab = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 max-w-3xl mx-auto">
+    <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 items-start max-w-5xl mx-auto">
+    <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
       <h2 className="text-lg font-semibold text-[#1a1a2e]">Business Information</h2>
       <p className="text-sm text-[#9a9a9a] mb-6 mt-1">Edit all the data of your business profile.</p>
 
@@ -185,6 +238,26 @@ const BusinessTab = () => {
             onChange={handleChange("name")}
             className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
           />
+        </div>
+
+        {/* Brand color */}
+        <div>
+          <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Brand color</label>
+          <div className="flex items-center gap-2 border-b border-[#e2ddd8] pb-2">
+            <input
+              type="color"
+              value={formData.color}
+              onChange={handleChange("color")}
+              className="w-8 h-8 rounded-lg cursor-pointer shrink-0"
+            />
+            <input
+              type="text"
+              value={formData.color}
+              onChange={handleChange("color")}
+              className="w-full text-sm text-[#1a1a2e] focus:outline-none bg-transparent"
+            />
+          </div>
+          <p className="text-[11px] text-[#9a9a9a] mt-1.5">Shown on your public page at {window.location.origin}/{formData.url || "..."}</p>
         </div>
 
         {/* Category */}
@@ -253,6 +326,15 @@ const BusinessTab = () => {
           {saving ? "Saving..." : "Save changes"}
         </button>
       </div>
+    </div>
+
+    <BusinessPreview
+      name={formData.name}
+      category={formData.category}
+      logoUrl={logoPreview}
+      color={formData.color}
+      url={formData.url}
+    />
     </div>
   );
 };

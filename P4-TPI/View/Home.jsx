@@ -38,23 +38,35 @@ const Home = () => {
   const { t, toggleLanguage, language } = useTranslation();
   const content = useLandingContent();
   const brandName = content?.brandName || t("brandName");
+  const primaryColor = content?.primaryColor || "#1a1a2e";
+  const backgroundColor = content?.backgroundColor || "#F8F5F0";
+  const accentColor = content?.accentColor || "#e2ddd8";
 
   const goToRegister = () => navigate("/login", { state: { register: true } });
   const scrollToAbout = () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <main className="min-h-screen w-full bg-[#F8F5F0]">
+    <main
+      className="min-h-screen w-full"
+      style={{
+        backgroundColor,
+        "--landing-primary": primaryColor,
+        "--landing-bg": backgroundColor,
+        "--landing-accent": accentColor,
+      }}
+    >
       <nav className="w-full px-4 py-6 flex items-center justify-between max-w-5xl mx-auto">
         <div className="flex items-center gap-2">
-          <div className="brand-icon bg-[#1a1a2e] p-1.5 rounded-lg text-white cursor-pointer">
+          <div className="brand-icon p-1.5 rounded-lg text-white cursor-pointer" style={{ backgroundColor: primaryColor }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-lg font-bold text-[#1a1a2e]">{brandName}</span>
+          <span className="text-lg font-bold" style={{ color: primaryColor }}>{brandName}</span>
           <button
             onClick={scrollToAbout}
-            className="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-semibold text-[#1a1a2e] hover:bg-[#F0EDE8] transition-colors"
+            className="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#F0EDE8] transition-colors"
+            style={{ color: primaryColor }}
           >
             {t("navAbout")}
           </button>
@@ -63,21 +75,24 @@ const Home = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={toggleLanguage}
-            className="bg-white border border-[#e2ddd8] px-3 py-1.5 rounded-full shadow-sm hover:bg-[#F0EDE8] transition-all font-medium text-xs flex items-center gap-1.5"
+            className="bg-white border px-3 py-1.5 rounded-full shadow-sm hover:bg-[#F0EDE8] transition-all font-medium text-xs flex items-center gap-1.5"
+            style={{ borderColor: accentColor }}
           >
-            <span className={language === "es" ? "font-bold text-[#1a1a2e]" : "text-[#b3aca3]"}>ES</span>
-            <span className="text-[#e2ddd8]">|</span>
-            <span className={language === "en" ? "font-bold text-[#1a1a2e]" : "text-[#b3aca3]"}>EN</span>
+            <span style={language === "es" ? { fontWeight: "bold", color: primaryColor } : { color: "#b3aca3" }}>ES</span>
+            <span style={{ color: accentColor }}>|</span>
+            <span style={language === "en" ? { fontWeight: "bold", color: primaryColor } : { color: "#b3aca3" }}>EN</span>
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 rounded-xl text-sm font-semibold text-[#1a1a2e] hover:bg-[#F0EDE8] transition-colors"
+            className="px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#F0EDE8] transition-colors"
+            style={{ color: primaryColor }}
           >
             {t("signIn")}
           </button>
           <button
             onClick={goToRegister}
-            className="px-4 py-2 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors"
+            className="px-4 py-2 rounded-xl text-white text-sm font-semibold transition-colors"
+            style={{ backgroundColor: primaryColor }}
           >
             {t("registerBusinessCta")}
           </button>
