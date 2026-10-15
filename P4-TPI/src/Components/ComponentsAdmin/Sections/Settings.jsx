@@ -16,7 +16,7 @@ const Settings = ({ initialTab, autoOpenPlanId }) => {
   return (
     <div className="flex flex-col gap-6 w-full h-full pb-10 items-center">
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-[#f0ede8] rounded-xl p-1 mx-auto max-w-full overflow-x-auto">
+      <div className="flex items-center flex-wrap justify-center gap-1 bg-[#f0ede8] rounded-xl p-1 mx-auto max-w-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
