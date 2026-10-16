@@ -114,6 +114,10 @@ export const useProductTour = ({ onNavigate, enabled = true } = {}) => {
   const driverRef = useRef(null);
   const startedRef = useRef(false);
   const startRef = useRef(null);
+  // Mascota flotante: vive fuera del popover (a nivel document.body).
+  const mascotRef = useRef(null);
+  const popoverRef = useRef(null);
+  const rafRef = useRef(null);
 
   const startTour = useCallback(async () => {
     if (startedRef.current) return;
@@ -137,6 +141,55 @@ export const useProductTour = ({ onNavigate, enabled = true } = {}) => {
     const firstSection = steps.find((st) => st.data?.section)?.data.section;
     if (firstSection) onNavigate?.(firstSection);
 
+    const clearMascot = () => {
+      if (mascotRef.current) {
+        mascotRef.current.remove();
+        mascotRef.current = null;
+      }
+    };
+
+    // Coloca la mascota en el lado con más espacio alrededor del popover.
+    const positionMascot = () => {
+      const el = mascotRef.current;
+      const pop = popoverRef.current;
+      if (!el || !pop) return;
+      const r = pop.getBoundingClientRect();
+      if (!r.width && !r.height) return;
+      const size = 112;
+      const gap = 14;
+      const margin = 12;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+      const centerTop = clamp(r.top + r.height / 2 - size / 2, margin, vh - margin - size);
+
+      let left;
+      let top;
+      if (r.right + gap + size <= vw - margin) {
+        left = r.right + gap;
+        top = centerTop;
+      } else if (r.left - gap - size >= margin) {
+        left = r.left - gap - size;
+        top = centerTop;
+      } else if (r.bottom + gap + size <= vh - margin) {
+        left = clamp(r.left + r.width / 2 - size / 2, margin, vw - margin - size);
+        top = r.bottom + gap;
+      } else {
+        left = clamp(r.left + r.width / 2 - size / 2, margin, vw - margin - size);
+        top = clamp(r.top - gap - size, margin, vh - margin - size);
+      }
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
+    };
+
+    // El popover se mueve con smoothScroll y los flips del arrow: reposicionamos
+    // por frame mientras el tour está abierto.
+    const tick = () => {
+      if (!driverRef.current) return;
+      positionMascot();
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
     const instance = driver({
       steps,
       showProgress: true,
@@ -145,27 +198,32 @@ export const useProductTour = ({ onNavigate, enabled = true } = {}) => {
       prevBtnText: t("tourPrev"),
       doneBtnText: t("tourDone"),
       allowClose: true,
+      // Clic afuera no cierra: solo la X (o el botón Listo) cierran el tour.
+      overlayClickBehavior: "none",
       // Las flechas del teclado moverían de paso sin pasar por los hooks de
       // navegación y desincronizarían la sección; Esc y cerrar siguen activos.
       allowKeyboardControl: false,
       smoothScroll: true,
       skipMissingElement: true,
       popoverClass: "app-tour",
-      // Inyecta la mascota (SVG string) en el popover cuando el paso la define.
+      // La mascota vive fuera del popover (en body) y se posiciona al lado.
       onPopoverRender: (popover, opts) => {
+        popoverRef.current = popover.wrapper;
         const idx =
           opts?.state?.activeIndex ??
           opts?.index ??
           driverRef.current?.getActiveIndex?.() ??
           0;
         const pose = steps[idx]?.data?.mascot;
+        clearMascot();
         if (!pose) return;
-        if (popover.wrapper.querySelector(".tour-mascot")) return;
         const holder = document.createElement("div");
-        holder.className = "tour-mascot";
+        holder.className = "tour-mascot-float";
         holder.setAttribute("aria-hidden", "true");
         holder.innerHTML = mascotSvg(pose);
-        popover.wrapper.appendChild(holder);
+        document.body.appendChild(holder);
+        mascotRef.current = holder;
+        positionMascot();
       },
       onNextClick: (_el, _st, { driver: d, index }) => {
         const next = steps[(index ?? d.getActiveIndex?.() ?? 0) + 1];
@@ -179,6 +237,12 @@ export const useProductTour = ({ onNavigate, enabled = true } = {}) => {
       },
       onDestroyed: () => {
         markTourSeen(sub);
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = null;
+        }
+        clearMascot();
+        popoverRef.current = null;
         driverRef.current = null;
         // Permite volver a abrirlo desde el botón de Help.
         startedRef.current = false;
@@ -187,6 +251,7 @@ export const useProductTour = ({ onNavigate, enabled = true } = {}) => {
 
     driverRef.current = instance;
     instance.drive();
+    rafRef.current = requestAnimationFrame(tick);
   }, [t, user?.role, sub, onNavigate]);
 
   // El auto-start no depende de la identidad de startTour (que puede cambiar),
@@ -205,8 +270,10 @@ export const useProductTour = ({ onNavigate, enabled = true } = {}) => {
     return () => clearTimeout(timer);
   }, [enabled, sub]);
 
-  // Si se desmonta Admin con el tour abierto, no dejar el overlay colgado.
+  // Si se desmonta Admin con el tour abierto, no dejar overlay ni mascota colgados.
   useEffect(() => () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (mascotRef.current) mascotRef.current.remove();
     driverRef.current?.destroy();
   }, []);
 

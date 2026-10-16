@@ -1,28 +1,41 @@
-// Mascota "libreta" del tutorial. SVG line-art generado como string para
-// inyectarlo en el popover de driver.js (que es DOM puro, no React).
+// Mascota "calendario amigable" del tutorial. SVG line-art generado como
+// string para colgarlo a nivel document.body (fuera del popover de driver.js).
 // Poses: "wave" (saluda), "point" (señala), "celebrate" (festeja).
 
+const SHELL = `
+  <rect x="28" y="36" width="104" height="100" rx="16" fill="#ffffff" stroke="#1a1a2e" stroke-width="4" />
+  <rect x="52" y="18" width="8" height="28" rx="4" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />
+  <rect x="100" y="18" width="8" height="28" rx="4" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />
+  <path d="M28 52 q0-16 16-16 h72 q16 0 16 16 v8 H28 Z" fill="#1a1a2e" />
+  <circle cx="44" cy="76" r="4" fill="#e2ddd8" />
+  <circle cx="60" cy="76" r="4" fill="#e2ddd8" />
+  <circle cx="76" cy="76" r="4" fill="#e2ddd8" />
+  <circle cx="92" cy="76" r="4" fill="#e2ddd8" />
+  <circle cx="108" cy="76" r="4" fill="#e2ddd8" />
+  <circle cx="124" cy="76" r="4.5" fill="#f59e0b" />`;
+
 const FACE = `
+  <circle cx="46" cy="116" r="7" fill="#fde3c0" opacity="0.75" />
+  <circle cx="114" cy="116" r="7" fill="#fde3c0" opacity="0.75" />
   <g class="tour-eye">
-    <ellipse cx="26" cy="30" rx="2.4" ry="2.9" fill="#1a1a2e" />
-    <ellipse cx="38" cy="30" rx="2.4" ry="2.9" fill="#1a1a2e" />
+    <ellipse cx="62" cy="106" rx="6" ry="7.5" fill="#1a1a2e" />
+    <ellipse cx="98" cy="106" rx="6" ry="7.5" fill="#1a1a2e" />
+    <circle cx="64" cy="103.5" r="2" fill="#ffffff" />
+    <circle cx="100" cy="103.5" r="2" fill="#ffffff" />
   </g>`;
 
-const SHELL_TOP = `
-  <rect x="15" y="12" width="34" height="40" rx="6" fill="#faf9f7" stroke="#1a1a2e" stroke-width="2.5" />
-  <path d="M49 12 L49 20 L41 12 Z" fill="#f0ede8" stroke="#1a1a2e" stroke-width="2.5" stroke-linejoin="round" />
-  <line x1="15" y1="21" x2="21" y2="21" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" />
-  <line x1="15" y1="30" x2="21" y2="30" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" />
-  <line x1="15" y1="39" x2="21" y2="39" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" />
-  <line x1="15" y1="48" x2="21" y2="48" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round" />`;
+const ARM_REST_LEFT = `
+  <path d="M28 106 Q18 108 14 116" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
+  <circle cx="12" cy="119" r="7" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />`;
 
-const ARM_REST = `
-  <path d="M49 33 Q56 33 57 37" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />`;
+const ARM_REST_RIGHT = `
+  <path d="M132 106 Q142 108 146 116" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
+  <circle cx="148" cy="119" r="7" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />`;
 
 const svg = (inner) => `
-<svg viewBox="0 0 64 64" width="40" height="40" xmlns="http://www.w3.org/2000/svg" class="tour-mascot-svg" aria-hidden="true" focusable="false">
+<svg viewBox="0 0 160 160" width="112" height="112" xmlns="http://www.w3.org/2000/svg" class="tour-mascot-svg" aria-hidden="true" focusable="false">
   <g class="tour-mascot-body">
-    ${SHELL_TOP}
+    ${SHELL}
     ${FACE}
     ${inner}
   </g>
@@ -30,34 +43,34 @@ const svg = (inner) => `
 
 const POSES = {
   wave: svg(`
-    <g class="tour-arm tour-arm-wave" style="transform-origin:15px 35px">
-      <path d="M15 35 Q8 31 8 22" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
-      <circle cx="8" cy="20" r="3.2" fill="#f0ede8" stroke="#1a1a2e" stroke-width="2.5" />
+    <g class="tour-arm tour-arm-wave" style="transform-origin:28px 106px">
+      <path d="M28 106 Q14 100 12 84" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
+      <circle cx="10" cy="80" r="7.5" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />
     </g>
-    ${ARM_REST}
-    <path d="M27 39 Q32 44 37 39" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />`),
+    ${ARM_REST_RIGHT}
+    <path d="M62 120 Q80 134 98 120" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />`),
 
   point: svg(`
-    <path d="M15 35 Q10 37 9 40" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
-    <g class="tour-arm tour-arm-point" style="transform-origin:49px 32px">
-      <path d="M49 32 L57 32" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
-      <circle cx="59" cy="32" r="3.2" fill="#f0ede8" stroke="#1a1a2e" stroke-width="2.5" />
+    ${ARM_REST_LEFT}
+    <g class="tour-arm tour-arm-point" style="transform-origin:132px 106px">
+      <path d="M132 106 L146 106" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
+      <circle cx="149" cy="106" r="7.5" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />
     </g>
-    <path d="M28 40 Q32 42 36 40" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />`),
+    <path d="M64 121 Q80 130 96 121" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />`),
 
   celebrate: svg(`
-    <g class="tour-arm tour-arm-wave" style="transform-origin:16px 24px">
-      <path d="M16 24 Q10 16 7 12" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
-      <circle cx="6" cy="10" r="3.2" fill="#f0ede8" stroke="#1a1a2e" stroke-width="2.5" />
+    <g class="tour-arm tour-arm-wave" style="transform-origin:28px 106px">
+      <path d="M28 106 Q14 96 12 78" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
+      <circle cx="10" cy="74" r="7.5" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />
     </g>
-    <g class="tour-arm tour-arm-wave" style="transform-origin:48px 24px">
-      <path d="M48 24 Q54 16 57 12" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
-      <circle cx="58" cy="10" r="3.2" fill="#f0ede8" stroke="#1a1a2e" stroke-width="2.5" />
+    <g class="tour-arm tour-arm-wave" style="transform-origin:132px 106px">
+      <path d="M132 106 Q146 96 148 78" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
+      <circle cx="150" cy="74" r="7.5" fill="#f0ede8" stroke="#1a1a2e" stroke-width="4" />
     </g>
-    <path d="M27 39 Q32 46 37 39" fill="none" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M62 118 Q80 138 98 118" fill="none" stroke="#1a1a2e" stroke-width="4" stroke-linecap="round" />
     <g class="tour-sparkle" fill="#f59e0b">
-      <path d="M12 6 L13.4 9.6 L17 11 L13.4 12.4 L12 16 L10.6 12.4 L7 11 L10.6 9.6 Z" stroke="none" />
-      <path d="M53 3 L54 5.6 L56.6 6.6 L54 7.6 L53 10.2 L52 7.6 L49.4 6.6 L52 5.6 Z" stroke="none" />
+      <path d="M22 34 L24 41 L31 43 L24 45 L22 52 L20 45 L13 43 L20 41 Z" />
+      <path d="M138 30 L139.6 34.4 L144 36 L139.6 37.6 L138 42 L136.4 37.6 L132 36 L136.4 34.4 Z" />
     </g>`),
 };
 

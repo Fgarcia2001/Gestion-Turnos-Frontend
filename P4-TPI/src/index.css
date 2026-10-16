@@ -103,16 +103,18 @@
   color: #1a1a2e;
 }
 
-/* ── Mascota del tutorial (SVG inyectado por useProductTour) ────────────────── */
-.driver-popover.app-tour .tour-mascot {
-  position: absolute;
-  left: -16px;
-  bottom: -20px;
-  width: 46px;
-  height: 46px;
+/* ── Mascota del tutorial (SVG flotante inyectado por useProductTour) ──────── */
+.tour-mascot-float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 112px;
+  height: 112px;
   pointer-events: none;
-  filter: drop-shadow(0 4px 6px rgba(26, 26, 46, 0.18));
-  z-index: 1;
+  z-index: 2147483000;
+  perspective: 500px;
+  transition: left 0.25s ease, top 0.25s ease;
+  animation: tour-mascot-pop 0.28s ease-out;
 }
 
 .tour-mascot-svg {
@@ -120,15 +122,17 @@
   width: 100%;
   height: 100%;
   overflow: visible;
+  transform-style: preserve-3d;
+  animation: tour-mascot-sway 4s ease-in-out infinite;
 }
 
 .tour-mascot-body {
-  transform-origin: 32px 52px;
+  transform-origin: 80px 150px;
   animation: tour-mascot-bob 2.6s ease-in-out infinite;
 }
 
 .tour-eye {
-  transform-origin: 32px 30px;
+  transform-origin: 80px 106px;
   animation: tour-mascot-blink 4s ease-in-out infinite;
 }
 
@@ -141,13 +145,23 @@
 }
 
 .tour-sparkle {
-  transform-origin: 32px 8px;
+  transform-origin: 80px 40px;
   animation: tour-mascot-twinkle 1.3s ease-in-out infinite;
+}
+
+@keyframes tour-mascot-pop {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tour-mascot-sway {
+  0%, 100% { transform: rotateY(-9deg); }
+  50% { transform: rotateY(9deg); }
 }
 
 @keyframes tour-mascot-bob {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2.5px); }
+  50% { transform: translateY(-3px); }
 }
 
 @keyframes tour-mascot-blink {
@@ -156,13 +170,13 @@
 }
 
 @keyframes tour-mascot-wave {
-  from { transform: rotate(-12deg); }
-  to { transform: rotate(12deg); }
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
 }
 
 @keyframes tour-mascot-point {
   0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(2px); }
+  50% { transform: translateX(3px); }
 }
 
 @keyframes tour-mascot-twinkle {
@@ -170,8 +184,17 @@
   50% { opacity: 0.4; transform: scale(0.75); }
 }
 
+/* Espacio insuficiente en mobile: se oculta. */
+@media (max-width: 639px) {
+  .tour-mascot-float {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .driver-popover.app-tour .tour-mascot * {
+  .tour-mascot-float,
+  .tour-mascot-float * {
     animation: none !important;
+    transition: none !important;
   }
 }
