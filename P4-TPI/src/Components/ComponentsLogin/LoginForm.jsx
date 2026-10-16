@@ -88,7 +88,10 @@ const Divider = ({ label }) => (
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^\+?[\d\s\-()]{7,20}$/;
+// El backend exige el formato internacional argentino: +5493415551234
+const PHONE_RE = /^\+549\d{10}$/;
+
+const normalizePhone = (value) => (value || "").replace(/[\s\-()]/g, "");
 
 const validateLogin = (fields, t) => {
   const errors = {};
@@ -101,15 +104,27 @@ const validateLogin = (fields, t) => {
 
 const validateSignup = (fields, t) => {
   const errors = validateLogin(fields, t);
-  if (!fields.name.trim())                          errors.name             = t("nameRequired");
-  if (!fields.adminPhone.trim())                    errors.adminPhone       = t("phoneRequired");
-  else if (!PHONE_RE.test(fields.adminPhone))       errors.adminPhone       = t("phoneInvalid");
-  if (!fields.businessCategory.trim())              errors.businessCategory = t("categoryRequired");
-  if (!fields.city.trim())                          errors.city             = t("cityRequired");
-  if (!fields.address.trim())                       errors.address          = t("addressRequired");
-  if (!fields.branchPhone.trim())                   errors.branchPhone      = t("branchPhoneRequired");
-  else if (!PHONE_RE.test(fields.branchPhone))      errors.branchPhone      = t("phoneInvalid");
+  if (!fields.name.trim())                                        errors.name             = t("nameRequired");
+  if (!normalizePhone(fields.adminPhone))                         errors.adminPhone       = t("phoneRequired");
+  else if (!PHONE_RE.test(normalizePhone(fields.adminPhone)))     errors.adminPhone       = t("phoneInvalidFormat");
+  if (!fields.businessCategory.trim())                            errors.businessCategory = t("categoryRequired");
+  if (!fields.city.trim())                                        errors.city             = t("cityRequired");
+  if (!fields.address.trim())                                     errors.address          = t("addressRequired");
+  if (!normalizePhone(fields.branchPhone))                        errors.branchPhone      = t("branchPhoneRequired");
+  else if (!PHONE_RE.test(normalizePhone(fields.branchPhone)))    errors.branchPhone      = t("phoneInvalidFormat");
   return errors;
+};
+
+// Los endpoints devuelven problemas con { status, title, detail } y también
+// ValidationProblemDetails con { errors: { Campo: ["mensaje"] } }.
+const extractApiError = (err, fallback) => {
+  if (!err) return fallback;
+  if (typeof err === "string") return err;
+  if (err.errors && typeof err.errors === "object") {
+    const first = Object.values(err.errors).flat().find(Boolean);
+    if (first) return first;
+  }
+  return err.detail || err.title || err.message || fallback;
 };
 
 // ── API calls ─────────────────────────────────────────────────────────────────
@@ -126,7 +141,7 @@ const signIn = async (credentials, t) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || t("invalidCredentials"));
+    throw new Error(extractApiError(err, t("invalidCredentials")));
   }
   return res.json();
 };
@@ -139,7 +154,7 @@ const signUp = async (payload, t) => {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || t("registrationFailed"));
+    throw new Error(extractApiError(err, t("registrationFailed")));
   }
   return res.json();
 };
@@ -179,6 +194,13 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
     setServerError("");
   };
 
+  // Al salir del campo se quitan espacios, guiones y paréntesis para dejar el
+  // teléfono en el formato que espera el backend (+5493415551234).
+  const handlePhoneBlur = (e) => {
+    const { name, value } = e.target;
+    setSignupFields((prev) => ({ ...prev, [name]: normalizePhone(value) }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
@@ -201,6 +223,8 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
           ...signupFields,
           email: loginFields.email,
           password: loginFields.password,
+          adminPhone: normalizePhone(signupFields.adminPhone),
+          branchPhone: normalizePhone(signupFields.branchPhone),
         };
         const data = await signUp(payload, t);
         login(data.token);
@@ -328,10 +352,12 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
                     placeholder={t("adminPhonePlaceholder")}
                     value={signupFields.adminPhone}
                     onChange={handleSignupChange}
+                    onBlur={handlePhoneBlur}
                     className={inputWithIconCls + (errors.adminPhone ? inputErrorCls : "")}
                   />
                 </InputIcon>
                 <FieldError msg={errors.adminPhone} />
+                <p className="text-[11px] text-[#9a9a9a] mt-1 pl-1">{t("phoneFormatHint") || "Format: +5493415551234"}</p>
               </div>
 
               <div className="space-y-1.5">
@@ -393,10 +419,12 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
                     placeholder={t("branchPhonePlaceholder")}
                     value={signupFields.branchPhone}
                     onChange={handleSignupChange}
+                    onBlur={handlePhoneBlur}
                     className={inputWithIconCls + (errors.branchPhone ? inputErrorCls : "")}
                   />
                 </InputIcon>
                 <FieldError msg={errors.branchPhone} />
+                <p className="text-[11px] text-[#9a9a9a] mt-1 pl-1">{t("phoneFormatHint") || "Format: +5493415551234"}</p>
               </div>
 
             </div>
