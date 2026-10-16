@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../CustomHooks/AuthContext";
 
@@ -70,9 +69,16 @@ const NavButton = ({ id, label, Icon, active, onClick }) => (
 );
 
 const isProfessional = (role) => role === "2" || role === "Profesional" || role === "Professional";
+const isReceptionist = (role) => role === "Recepcionista" || role === "Receptionist";
 
-const Navbar = ({ onSelectSection, role }) => {
-  const [active, setActive] = useState("home");
+// Secciones visibles en el sidebar según el rol.
+const canSeeNav = (role, id) => {
+  if (isProfessional(role)) return id === "appointments";
+  if (isReceptionist(role)) return id === "appointments" || id === "managmentBusiness" || id === "schedule";
+  return true;
+};
+
+const Navbar = ({ onSelectSection, role, active }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -82,7 +88,6 @@ const Navbar = ({ onSelectSection, role }) => {
       navigate("/");
       return;
     }
-    setActive(id);
     if (onSelectSection) onSelectSection(id);
   };
 
@@ -93,7 +98,7 @@ const Navbar = ({ onSelectSection, role }) => {
       </div>
       <div className="flex flex-col items-center gap-1 flex-1">
         {navItems
-          .filter(({ id }) => !isProfessional(role) || id === "appointments")
+          .filter(({ id }) => canSeeNav(role, id))
           .map(({ id, label, Icon }) => (
             <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
           ))}

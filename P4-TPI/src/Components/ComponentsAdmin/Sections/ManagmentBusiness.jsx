@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
+import { useAuth } from "../../../../CustomHooks/AuthContext";
 import {
   IconUsers, IconCalendar, IconTrendUp, IconBuilding, IconActivity, IconPlus
 } from "./ManagmentBusinessComponents/Icons";
@@ -121,11 +122,18 @@ const EmptyState = ({ tab, t }) => (
 );
 
 // ── Main component ────────────────────────────────────────────────────────────
+const isReceptionist = (role) => role === "Recepcionista" || role === "Receptionist";
+
 const ManagmentBusiness = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const receptionist = isReceptionist(user?.role);
+
+  // El recepcionista solo puede ver el listado de clientes.
+  const visibleTabs = receptionist ? TABS.filter(({ id }) => id === "client") : TABS;
 
   // ── State ──────────────────────────────────────────────────────────────────
-  const [tab, setTab] = useState("staff");
+  const [tab, setTab] = useState(() => (receptionist ? "client" : "staff"));
   const [isLoading, setIsLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
   const [createTarget, setCreateTarget] = useState(false);
@@ -150,6 +158,11 @@ const ManagmentBusiness = () => {
   const loadCoreData = useCallback(async () => {
     setIsLoading(true);
     try {
+      if (receptionist) {
+        const clients = await fetchClientData();
+        setData((prev) => ({ ...prev, clients, staff: [], branches: [], services: [] }));
+        return;
+      }
       const [staff, clients, branches, services] = await Promise.all([
         fetchStaffData(),
         fetchClientData(),
@@ -162,7 +175,7 @@ const ManagmentBusiness = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [receptionist]);
 
   const loadAppointmentStats = useCallback(async () => {
     setStatsLoading(true);
@@ -375,7 +388,7 @@ const ManagmentBusiness = () => {
           {/* Card header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 pt-5 pb-0">
             <TabSelector
-              tabs={TABS}
+              tabs={visibleTabs}
               activeTab={tab}
               onTabChange={setTab}
               t={t}
