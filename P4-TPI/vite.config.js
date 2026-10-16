@@ -7,5 +7,8 @@ export default defineConfig({
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] })
-  ],
+    ],
+    server: {
+      allowedHosts: ['turnify.lat', '.turnify.lat'],
+    },
 })
