@@ -27,13 +27,24 @@ const isMpPaymentReturn = () => {
 // una vez que ya abrió el checkout de ese plan.
 const getPendingPlanId = () => sessionStorage.getItem(PENDING_PLAN_KEY);
 
+const isReceptionist = (role) => role === "Recepcionista" || role === "Receptionist";
+
+// El recepcionista no ve Home ni Settings en el sidebar: aterriza en Appointments.
+const RECEPTIONIST_HOME = "appointments";
+
 const Admin = () => {
   const { user } = useAuth();
   const isProfessional = user?.role === "2" || user?.role === "Profesional" || user?.role === "Professional";
+  const receptionist = isReceptionist(user?.role);
   const mpReturn = isMpPaymentReturn();
   const pendingPlanId = getPendingPlanId();
-  const [section, setSection] = useState(() => (mpReturn || pendingPlanId ? "settings" : isProfessional ? "appointments" : "home"));
-  const [settingsTab, setSettingsTab] = useState(() => (mpReturn || pendingPlanId ? "subscription" : "business"));
+  // Settings solo se abre por el flujo de MercadoPago/plan, que no aplica a un
+  // recepcionista; para el resto, la sección inicial depende del rol.
+  const openSettings = (mpReturn || pendingPlanId) && !receptionist;
+  const [section, setSection] = useState(() =>
+    openSettings ? "settings" : isProfessional ? "appointments" : receptionist ? RECEPTIONIST_HOME : "home"
+  );
+  const [settingsTab, setSettingsTab] = useState(() => (openSettings ? "subscription" : "business"));
 
   // Día al que debe abrir Appointments cuando se llega desde una notificación.
   // El nonce fuerza el remount aunque ya se esté en Appointments.
@@ -47,9 +58,15 @@ const Admin = () => {
     enabled: !mpReturn && !pendingPlanId,
   });
 
+  // Secciones habilitadas por rol (el navbar ya las filtra; esto es el guard).
+  const allowedSections = isProfessional
+    ? ["appointments", "help"]
+    : receptionist
+      ? ["appointments", "managmentBusiness", "schedule", "help"]
+      : null;
+
   const handleSelectSection = (id) => {
-    // Los profesionales solo ven Appointments y Help en el navbar.
-    if (isProfessional && id !== "help" && id !== "appointments") return;
+    if (allowedSections && !allowedSections.includes(id)) return;
     setAppointmentsTarget(null);
     setSection(id);
   };
@@ -65,6 +82,8 @@ const Admin = () => {
 
   const renderSection = () => {
     if (isProfessional && section !== "help") return renderAppointments();
+    // El recepcionista no puede ver Settings ni Home, sin importar de dónde venga el estado.
+    if (receptionist && (section === "settings" || section === "home")) return renderAppointments();
     switch (section) {
       case "home": return (
         <Home onUpgradePlan={() => { setSettingsTab("subscription"); setSection("settings"); }} />
@@ -83,14 +102,18 @@ const Admin = () => {
     <div className="flex w-full h-screen overflow-hidden bg-[#f0ede8]">
 
       {/* Sidebar — ocupa toda la altura, NO es fixed */}
-      <Navbar onSelectSection={handleSelectSection} role={user?.role} />
+      <Navbar onSelectSection={handleSelectSection} role={user?.role} active={section} />
 
       {/* Right side: header + content */}
       <NotificationProvider>
         <div className="flex flex-col flex-1 overflow-hidden">
 
           {/* Header */}
-          <Header username={user?.name} onNavigateToAppointments={handleNotificationNavigate} />
+          <Header
+            username={user?.name}
+            onNavigateToAppointments={handleNotificationNavigate}
+            onNavigateToSettings={() => handleSelectSection("settings")}
+          />
 
           {/* Scrollable content */}
           <div data-tour="section-content" className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">
