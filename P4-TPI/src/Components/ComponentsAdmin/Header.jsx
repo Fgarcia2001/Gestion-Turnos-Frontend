@@ -54,7 +54,7 @@ const getInitials = (name) => {
     .slice(0, 2);
 };
 
-const Header = ({ username, onNavigateToAppointments }) => {
+const Header = ({ username, onNavigateToAppointments, onNavigateToSettings }) => {
   const { t } = useTranslation();
   const { appointments, unreadCount, refresh, markAllRead } =
     useNotifications();
@@ -168,8 +168,10 @@ const Header = ({ username, onNavigateToAppointments }) => {
           )}
         </div>
         <button
+          type="button"
           aria-label="Profile"
           data-tour="profile"
+          onClick={onNavigateToSettings}
           className="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#e2ddd8] cursor-pointer hover:border-[#1a1a2e] transition-all duration-200 shrink-0"
         >
           <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-sm font-semibold">

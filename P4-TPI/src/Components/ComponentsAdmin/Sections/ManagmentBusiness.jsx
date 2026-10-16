@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { useAuth } from "../../../../CustomHooks/AuthContext";
 import {
-  IconUsers, IconCalendar, IconTrendUp, IconBuilding, IconActivity, IconPlus
+  IconUsers, IconBuilding, IconActivity, IconPlus, IconSearch
 } from "./ManagmentBusinessComponents/Icons";
 import { StatCard } from "./ManagmentBusinessComponents/Shared";
 import {
@@ -11,40 +11,17 @@ import {
 import { createStaff, updateStaff, deleteStaff } from "../../../services/staffService";
 import { createBranch, updateBranch, deleteBranch } from "../../../services/branchService";
 import { createService, updateService, deleteService } from "../../../services/servicesService";
-import { fetchAppointmentStats } from "../../../services/api";
 import { EditModal, CreateModal, SchedulesModal, DeleteModal } from "./ManagmentBusinessComponents/Modals";
 import { TableRow } from "./ManagmentBusinessComponents/TableComponents";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-const average = (total, count) => (count ? (total / count).toFixed(1) : 0);
-
-// Las métricas de turnos (Total/Avg Appointments, Active Clients) vienen de
-// GET /api/Appointment/stats, un endpoint liviano que ya calcula esos 2
-// numeros en el backend en vez de traer el historial completo al frontend
-// — se pide en un fetch aparte que no bloquea la tabla principal, y
-// mientras tanto muestran "…" en vez de 0.
-const STATS_CONFIG = {
-  staff: (data, t, statsLoading) => [
-    { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: statsLoading ? "…" : data.appointmentStats.totalAppointments },
-    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: statsLoading ? "…" : average(data.appointmentStats.totalAppointments, data.staff.length) },
-  ],
-  client: (data, t, statsLoading) => [
-    { icon: IconUsers, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Clients"), value: data.clients.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: statsLoading ? "…" : data.appointmentStats.totalAppointments },
-    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: statsLoading ? "…" : data.appointmentStats.activeClients },
-  ],
-  service: (data, t, statsLoading) => [
-    { icon: IconActivity, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Total Services"), value: data.services.length },
-    { icon: IconCalendar, iconBg: "#dbeafe", iconColor: "#2563eb", label: t("Total Appointments"), value: statsLoading ? "…" : data.appointmentStats.totalAppointments },
-    { icon: IconUsers, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Active Clients"), value: statsLoading ? "…" : data.appointmentStats.activeClients },
-  ],
-  branch: (data, t, statsLoading) => [
-    { icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Total Branches"), value: data.branches.length },
-    { icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Total Staff"), value: data.staff.length },
-    { icon: IconTrendUp, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Avg. Appointments"), value: statsLoading ? "…" : average(data.appointmentStats.totalAppointments, data.branches.length) },
-  ],
-};
+// Resumen fijo de totales por entidad (no depende del tab activo).
+const buildSummary = (data, t) => [
+  { key: "staff", icon: IconUsers, iconBg: "#eef2ff", iconColor: "#3b82f6", label: t("Staff"), value: data.staff.length },
+  { key: "client", icon: IconUsers, iconBg: "#fce7f3", iconColor: "#db2777", label: t("Clients"), value: data.clients.length },
+  { key: "service", icon: IconActivity, iconBg: "#dcfce7", iconColor: "#16a34a", label: t("Services"), value: data.services.length },
+  { key: "branch", icon: IconBuilding, iconBg: "#fef3c7", iconColor: "#d97706", label: t("Branches"), value: data.branches.length },
+];
 
 const TAB_HEADERS = {
   staff: ["Name", "Email", "Phone", "Role", "Branch"],
@@ -135,7 +112,7 @@ const ManagmentBusiness = () => {
   // ── State ──────────────────────────────────────────────────────────────────
   const [tab, setTab] = useState(() => (receptionist ? "client" : "staff"));
   const [isLoading, setIsLoading] = useState(true);
-  const [statsLoading, setStatsLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [createTarget, setCreateTarget] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -146,15 +123,9 @@ const ManagmentBusiness = () => {
     clients: [],
     branches: [],
     services: [],
-    appointmentStats: { totalAppointments: 0, activeClients: 0 },
   });
 
   // ── Data fetching ──────────────────────────────────────────────────────────
-  // fetchAllAppointments trae TODO el historial de turnos del negocio (sin
-  // paginar del lado del backend), así que puede tardar bastante más que el
-  // resto — se pide aparte para no bloquear la tabla principal con eso. Solo
-  // alimenta 3 números de las stat cards (Total/Avg Appointments, Active
-  // Clients), que mientras tanto muestran "…".
   const loadCoreData = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -177,26 +148,9 @@ const ManagmentBusiness = () => {
     }
   }, [receptionist]);
 
-  const loadAppointmentStats = useCallback(async () => {
-    setStatsLoading(true);
-    try {
-      const appointmentStats = await fetchAppointmentStats();
-      setData((prev) => ({ ...prev, appointmentStats }));
-    } catch (e) {
-      console.error("Error loading appointment stats:", e);
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
-
-  const loadData = useCallback(
-    () => Promise.all([loadCoreData(), loadAppointmentStats()]),
-    [loadCoreData, loadAppointmentStats]
-  );
-
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadCoreData();
+  }, [loadCoreData]);
 
   const showToast = (message) => {
     setToast(message);
@@ -204,15 +158,27 @@ const ManagmentBusiness = () => {
   };
 
   // ── Derived data ───────────────────────────────────────────────────────────
-  const tableData = {
-    staff: data.staff,
-    client: data.clients,
-    branch: data.branches,
-    service: data.services,
-  }[tab] ?? [];
-
-  const stats = STATS_CONFIG[tab]?.(data, t, statsLoading) ?? [];
+  const summaryCards = buildSummary(data, t).filter(({ key }) => !receptionist || key === "client");
   const addLabel = t(ADD_LABELS[tab]);
+
+  const query = search.trim().toLowerCase();
+  const filteredData = useMemo(() => {
+    const rows = {
+      staff: data.staff,
+      client: data.clients,
+      branch: data.branches,
+      service: data.services,
+    }[tab] ?? [];
+    if (!query) return rows;
+    return rows.filter((row) =>
+      Object.values(row).some((v) => typeof v === "string" && v.toLowerCase().includes(query))
+    );
+  }, [data, tab, query]);
+
+  const handleTabChange = (id) => {
+    setTab(id);
+    setSearch("");
+  };
 
   // ── Handlers ───────────────────────────────────────────────────────────────
   const handleCreate = async (newRecord) => {
@@ -237,7 +203,7 @@ const ManagmentBusiness = () => {
         phone: newRecord.phone,
         City: newRecord.city,
       });
-      await loadData();
+      await loadCoreData();
       showToast(t("Branch created successfully") || "Branch created successfully");
       return;
     }
@@ -249,7 +215,7 @@ const ManagmentBusiness = () => {
         duration: Number(newRecord.duration),
         price: Number(newRecord.price),
       });
-      await loadData();
+      await loadCoreData();
       showToast(t("Service created successfully") || "Service created successfully");
       return;
     }
@@ -269,7 +235,7 @@ const ManagmentBusiness = () => {
         rol: Number(updated.rol),
         branchId: updated.branchId,
       });
-      await loadData();
+      await loadCoreData();
       showToast(t("Staff updated successfully") || "Staff updated successfully");
       return;
     }
@@ -377,22 +343,34 @@ const ManagmentBusiness = () => {
 
       <div className="flex flex-col gap-6">
 
-        {/* Stat cards */}
+        {/* Resumen de totales */}
         <div data-tour="business-stats" className="flex flex-col sm:flex-row gap-4">
-          {stats.map((s) => <StatCard key={s.label} {...s} />)}
+          {summaryCards.map((s) => <StatCard key={s.key} {...s} />)}
         </div>
 
         {/* Table card */}
         <div data-tour="business-table" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
 
           {/* Card header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 pt-5 pb-0">
-            <TabSelector
-              tabs={visibleTabs}
-              activeTab={tab}
-              onTabChange={setTab}
-              t={t}
-            />
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-6 pt-5 pb-0">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9a9a9a]"><IconSearch /></span>
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={t("searchPlaceholder") || "Search..."}
+                  className="w-full sm:w-56 border border-[#e2ddd8] rounded-xl pl-9 pr-3 py-2 text-sm text-[#1a1a2e] bg-[#faf9f7] outline-none focus:border-[#1a1a2e] transition-colors"
+                />
+              </div>
+              <TabSelector
+                tabs={visibleTabs}
+                activeTab={tab}
+                onTabChange={handleTabChange}
+                t={t}
+              />
+            </div>
             <button
               onClick={() => setCreateTarget(true)}
               className="flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors"
@@ -410,10 +388,10 @@ const ManagmentBusiness = () => {
               <table className="w-full">
                 <TableHeader tab={tab} t={t} />
                 <tbody>
-                  {tableData.length === 0 ? (
+                  {filteredData.length === 0 ? (
                     <EmptyState tab={tab} t={t} />
                   ) : (
-                    tableData.map((row) => (
+                    filteredData.map((row) => (
                       <TableRow
                         key={row.id ?? row.name}
                         row={row}

@@ -109,7 +109,11 @@ const Admin = () => {
         <div className="flex flex-col flex-1 overflow-hidden">
 
           {/* Header */}
-          <Header username={user?.name} onNavigateToAppointments={handleNotificationNavigate} />
+          <Header
+            username={user?.name}
+            onNavigateToAppointments={handleNotificationNavigate}
+            onNavigateToSettings={() => handleSelectSection("settings")}
+          />
 
           {/* Scrollable content */}
           <div data-tour="section-content" className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">
