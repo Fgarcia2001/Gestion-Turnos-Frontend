@@ -15,6 +15,8 @@ const PlansSection = () => {
     (language === "en" ? content?.plansTitleEn : content?.plansTitleEs) || t("plansTitle");
   const plansSubtitle =
     (language === "en" ? content?.plansSubtitleEn : content?.plansSubtitleEs) || t("plansSubtitle");
+  const primaryColor = content?.primaryColor || "#1a1a2e";
+  const accentColor = content?.accentColor || "#e2ddd8";
 
   useEffect(() => {
     fetchPlans()
@@ -32,7 +34,7 @@ const PlansSection = () => {
   return (
     <section id="plans" className="pb-20">
       <div className="text-center mb-10">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a2e]">{plansTitle}</h2>
+        <h2 className="text-2xl md:text-3xl font-bold" style={{ color: primaryColor }}>{plansTitle}</h2>
         <p className="text-[#6b6b6b] mt-2 max-w-xl mx-auto">{plansSubtitle}</p>
       </div>
 
@@ -51,19 +53,21 @@ const PlansSection = () => {
               return (
                 <div
                   key={id ?? name}
-                  className="w-full sm:w-[300px] bg-white rounded-2xl shadow-sm border border-[#e2ddd8] p-6 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  className="w-full sm:w-[300px] bg-white rounded-2xl shadow-sm border p-6 flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                  style={{ borderColor: accentColor }}
                 >
-                  <h3 className="font-bold text-lg text-[#1a1a2e]">{name}</h3>
+                  <h3 className="font-bold text-lg" style={{ color: primaryColor }}>{name}</h3>
                   {description && <p className="text-sm text-[#6b6b6b] mt-1 mb-6 flex-1">{description}</p>}
                   <div className="mb-6">
-                    <span className="text-3xl font-bold text-[#1a1a2e]">${price}</span>
+                    <span className="text-3xl font-bold" style={{ color: primaryColor }}>${price}</span>
                     {durationDays ? (
                       <span className="text-sm text-[#9a9a9a]"> / {durationDays} {t("daysSuffix")}</span>
                     ) : null}
                   </div>
                   <button
                     onClick={() => choosePlan(id)}
-                    className="w-full py-2.5 bg-[#1a1a2e] text-white rounded-xl text-sm font-semibold hover:bg-[#2d2d44] transition-colors mt-auto"
+                    className="w-full py-2.5 text-white rounded-xl text-sm font-semibold transition-colors mt-auto"
+                    style={{ backgroundColor: primaryColor }}
                   >
                     {t("choosePlanCta")}
                   </button>
