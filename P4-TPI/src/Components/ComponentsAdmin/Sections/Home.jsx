@@ -260,6 +260,7 @@ const Home = ({ onUpgradePlan }) => {
       <div className="flex justify-end">
         <button
           onClick={() => setShowPlanUsage(true)}
+          data-tour="plan-usage"
           className="flex items-center gap-1.5 text-md font-semibold text-[#6b7280] hover:text-[#1a1a2e] hover:bg-[#f0ede8] rounded-lg px-3 py-1.5 transition-colors"
         >
           <IconInfo />
@@ -268,7 +269,7 @@ const Home = ({ onUpgradePlan }) => {
       </div>
 
       {/* Top row: 3 cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 py-6 sm:py-8 xl:py-10">
+      <div data-tour="home-stats" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 py-6 sm:py-8 xl:py-10">
 
         {/* Monthly revenue */}
         <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
@@ -311,7 +312,7 @@ const Home = ({ onUpgradePlan }) => {
       </div>
 
       {/* Branches summary */}
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
+      <div data-tour="home-branches" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
         <div className="px-5 py-4 border-b border-[#f0ede8]">
           <p className="text-sm font-semibold text-[#1a1a2e]">{t("Branches") || "Branches"}</p>
         </div>

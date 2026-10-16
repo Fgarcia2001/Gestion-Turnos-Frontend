@@ -63,8 +63,8 @@ const Schedule = () => {
 
   return (
     <div className="pt-8">
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-[#1a1a2e]">{t("Schedule") || "Schedule"}</h1>
+      <div data-tour="schedule-filters" className="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h1 data-tour="schedule-title" className="text-2xl font-bold text-[#1a1a2e]">{t("Schedule") || "Schedule"}</h1>
 
         <div className="flex items-center gap-3 flex-wrap">
           {admin && branches.length > 1 && (

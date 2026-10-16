@@ -96,7 +96,7 @@ const ContactRow = ({ icon, label, value }) => (
 );
 
 // ── Help ──────────────────────────────────────────────────────────────────────
-const Help = () => {
+const Help = ({ onStartTour }) => {
   const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState(0);
   const [bugType, setBugType] = useState("bug");
@@ -177,11 +177,28 @@ const Help = () => {
   ) : null;
 
   return (
-    <div className="flex flex-col w-full max-w-6xl mx-auto">
+    <div data-tour="help-content" className="flex flex-col w-full max-w-6xl mx-auto">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#1a1a2e]">{t("helpTitle") || "Help & Support"}</h1>
         <p className="text-sm text-[#9a9a9a] mt-1">{t("helpSubtitle") || "Find answers, contact us or report a problem."}</p>
       </div>
+
+      {onStartTour && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white rounded-2xl border border-[#e2ddd8] px-5 py-4 mb-6">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[#1a1a2e]">{t("tourReplayTitle") || "Take the tour"}</p>
+            <p className="text-xs text-[#9a9a9a] mt-0.5">{t("tourReplaySubtitle") || "A quick guided walkthrough of the platform."}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onStartTour}
+            className="inline-flex items-center justify-center gap-2 shrink-0 px-4 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors cursor-pointer"
+          >
+            <IconHelpCircle className="w-4 h-4" />
+            {t("tourReplay") || "Start the tutorial"}
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* 1 · Preguntas frecuentes */}

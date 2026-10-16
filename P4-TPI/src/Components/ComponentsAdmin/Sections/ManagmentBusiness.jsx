@@ -68,7 +68,7 @@ const CSS_ANIMATIONS = `
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const TabSelector = ({ tabs, activeTab, onTabChange, t }) => (
-  <div className="flex items-center gap-1 bg-[#f0ede8] rounded-xl p-1">
+  <div data-tour="business-tabs" className="flex items-center gap-1 bg-[#f0ede8] rounded-xl p-1">
     {tabs.map(({ id, labelKey }) => (
       <button
         key={id}
@@ -365,12 +365,12 @@ const ManagmentBusiness = () => {
       <div className="flex flex-col gap-6">
 
         {/* Stat cards */}
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div data-tour="business-stats" className="flex flex-col sm:flex-row gap-4">
           {stats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
 
         {/* Table card */}
-        <div className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
+        <div data-tour="business-table" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
 
           {/* Card header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-6 pt-5 pb-0">

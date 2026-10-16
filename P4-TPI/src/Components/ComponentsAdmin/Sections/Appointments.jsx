@@ -517,11 +517,12 @@ const Appointments = ({ initialDate }) => {
 
       <div className="flex flex-col lg:flex-row gap-5 items-start">
 
-        <div className="w-full lg:w-[300px] lg:shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
+        <div data-tour="appointments-calendar" className="w-full lg:w-[300px] lg:shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-base font-bold text-[#1a1a2e]">{t("Calendar") || "Calendar"}</h2>
             <button
               onClick={() => setShowNewAppointment(true)}
+              data-tour="appointments-new"
               className="flex items-center gap-1.5 bg-[#1a1a2e] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors"
             >
               <IconPlus />
@@ -548,7 +549,7 @@ const Appointments = ({ initialDate }) => {
           <Calendar selected={selectedDay} onSelect={setSelectedDay} appointments={appointments} viewDate={viewDate} onViewDateChange={setViewDate} />
         </div>
 
-        <div className="flex-1 flex flex-col gap-3">
+        <div data-tour="appointments-list" className="flex-1 flex flex-col gap-3">
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />

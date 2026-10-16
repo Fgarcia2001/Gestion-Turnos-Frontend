@@ -86,7 +86,7 @@ const Header = ({ username, onNavigateToAppointments }) => {
 
   return (
     <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[#f0ede8]">
-      <div className="min-w-0">
+      <div className="min-w-0" data-tour="greeting">
         <h1 className="text-lg sm:text-2xl font-bold text-[#1a1a2e] leading-tight truncate">
           Hello, <span className="font-bold">{displayName || "there"}</span>
         </h1>
@@ -98,6 +98,7 @@ const Header = ({ username, onNavigateToAppointments }) => {
         <div className="relative">
           <button
             aria-label="Notifications"
+            data-tour="notifications"
             onClick={handleToggle}
             className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-[#e2ddd8] text-[#8a8a8a] hover:bg-[#e4e0da] hover:text-[#1a1a2e] transition-all duration-200 cursor-pointer"
           >
@@ -168,6 +169,7 @@ const Header = ({ username, onNavigateToAppointments }) => {
         </div>
         <button
           aria-label="Profile"
+          data-tour="profile"
           className="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#e2ddd8] cursor-pointer hover:border-[#1a1a2e] transition-all duration-200 shrink-0"
         >
           <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-sm font-semibold">

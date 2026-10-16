@@ -7,10 +7,10 @@ import Home from "../src/Components/ComponentsAdmin/Sections/Home";
 import ManagmentBusiness from "../src/Components/ComponentsAdmin/Sections/ManagmentBusiness";
 import Appointments from "../src/Components/ComponentsAdmin/Sections/Appointments";
 import Settings from "../src/Components/ComponentsAdmin/Sections/Settings";
-import Calendar from "../src/Components/ComponentsAdmin/Sections/Calendar";
 import Schedule from "../src/Components/ComponentsAdmin/Sections/Schedule";
 import Help from "../src/Components/ComponentsAdmin/Sections/Help";
 import { PENDING_PLAN_KEY } from "../src/services/api";
+import { useProductTour } from "../CustomHooks/useProductTour";
 
 // MercadoPago (Checkout Pro) redirige a /admin?payment_id=...&external_reference=<orderId>.
 // Se resuelve en el initializer de useState para que Settings/SubscriptionTab
@@ -39,6 +39,14 @@ const Admin = () => {
   // El nonce fuerza el remount aunque ya se esté en Appointments.
   const [appointmentsTarget, setAppointmentsTarget] = useState(null);
 
+  // Tutorial de bienvenida (Driver.js). Auto-arranca en la primera visita y se
+  // puede repetir desde Help. No arranca si el usuario ya viene de MercadoPago
+  // o con un plan pendiente (esos flujos abren directo en Settings).
+  const { startTour } = useProductTour({
+    onNavigate: setSection,
+    enabled: !mpReturn && !pendingPlanId,
+  });
+
   const handleSelectSection = (id) => {
     // Los profesionales solo ven Appointments y Help en el navbar.
     if (isProfessional && id !== "help" && id !== "appointments") return;
@@ -63,10 +71,9 @@ const Admin = () => {
       );
       case "managmentBusiness": return <ManagmentBusiness />;
       case "appointments": return renderAppointments();
-      case "calendar": return <Calendar />;
       case "schedule": return <Schedule />;
       case "settings": return <Settings key={settingsTab} initialTab={settingsTab} autoOpenPlanId={pendingPlanId} />;
-      case "help": return <Help />;
+      case "help": return <Help onStartTour={startTour} />;
 
       default: return <Home />;
     }
@@ -86,7 +93,7 @@ const Admin = () => {
           <Header username={user?.name} onNavigateToAppointments={handleNotificationNavigate} />
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">
+          <div data-tour="section-content" className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">
             {renderSection()}
           </div>
 
