@@ -3,6 +3,7 @@ import { useTranslation } from "../CustomHooks/TraslateHook";
 import { useLandingContent } from "../CustomHooks/useLandingContent";
 import HeroSection from "../src/Components/ComponentsHome/HeroSection";
 import OptionCard from "../src/Components/ComponentsHome/OptionCard";
+import BusinessTypesSection from "../src/Components/ComponentsHome/BusinessTypesSection";
 import PlansSection from "../src/Components/ComponentsHome/PlansSection";
 import AboutSection from "../src/Components/ComponentsHome/AboutSection";
 import Footer from "../src/Components/ComponentsHome/Footer";
@@ -96,6 +97,8 @@ const Home = () => {
             onAction={goToRegister}
           />
         </section>
+
+        <BusinessTypesSection />
 
         <PlansSection />
 
