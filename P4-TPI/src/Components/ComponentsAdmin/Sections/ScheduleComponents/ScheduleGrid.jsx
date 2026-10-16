@@ -201,7 +201,7 @@ const ScheduleGrid = ({ staff, schedule, isToday, selectedDate }) => {
   const handleSelect = (appt, staffName) => setSelected({ appt, staffName });
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
+    <div data-tour="schedule-grid" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
       <div className="flex items-center justify-end px-4 py-2.5 border-b border-[#e2ddd8] bg-[#fcfbf9]">
         <button
           type="button"

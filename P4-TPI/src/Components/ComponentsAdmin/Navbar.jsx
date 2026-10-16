@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../CustomHooks/AuthContext";
 
@@ -15,11 +14,6 @@ const IconUsers = () => (
 const IconCalendarEvent = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
     <rect x="4" y="5" width="16" height="16" rx="2" /><line x1="16" y1="3" x2="16" y2="7" /><line x1="8" y1="3" x2="8" y2="7" /><line x1="4" y1="11" x2="20" y2="11" /><rect x="8" y="15" width="2" height="2" />
-  </svg>
-);
-const IconCalendar = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="4" y="5" width="16" height="16" rx="2" /><line x1="16" y1="3" x2="16" y2="7" /><line x1="8" y1="3" x2="8" y2="7" /><line x1="4" y1="11" x2="20" y2="11" />
   </svg>
 );
 const IconClock = () => (
@@ -53,7 +47,6 @@ const navItems = [
   { id: "home",         label: "Home",         Icon: IconHome },
   { id: "managmentBusiness",      label: "Managment Business",      Icon: IconUsers },
   { id: "appointments", label: "Appointments", Icon: IconCalendarEvent },
-  { id: "calendar",     label: "Calendar",     Icon: IconCalendar },
   { id: "schedule",     label: "Schedule",     Icon: IconClock },
   { id: "settings",     label: "Settings",     Icon: IconSettings },
 ];
@@ -67,6 +60,7 @@ const NavButton = ({ id, label, Icon, active, onClick }) => (
     onClick={() => onClick(id)}
     title={label}
     aria-label={label}
+    data-tour={`nav-${id}`}
     className={`flex items-center justify-center w-[42px] h-[42px] rounded-xl border-none cursor-pointer transition-all duration-200
       ${active ? "bg-[#1a1a2e] text-white" : "bg-transparent text-[#8a8a8a] hover:bg-[#e4e0da] hover:text-[#1a1a2e]"}`}
   >
@@ -75,9 +69,16 @@ const NavButton = ({ id, label, Icon, active, onClick }) => (
 );
 
 const isProfessional = (role) => role === "2" || role === "Profesional" || role === "Professional";
+const isReceptionist = (role) => role === "Recepcionista" || role === "Receptionist";
 
-const Navbar = ({ onSelectSection, role }) => {
-  const [active, setActive] = useState("home");
+// Secciones visibles en el sidebar según el rol.
+const canSeeNav = (role, id) => {
+  if (isProfessional(role)) return id === "appointments";
+  if (isReceptionist(role)) return id === "appointments" || id === "managmentBusiness" || id === "schedule";
+  return true;
+};
+
+const Navbar = ({ onSelectSection, role, active }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -87,18 +88,17 @@ const Navbar = ({ onSelectSection, role }) => {
       navigate("/");
       return;
     }
-    setActive(id);
     if (onSelectSection) onSelectSection(id);
   };
 
   return (
-    <nav className="flex flex-col items-center w-[68px] h-full bg-[#f0ede8] border-r border-[#e2ddd8] py-5">
+    <nav data-tour="sidebar" className="flex flex-col items-center w-[68px] h-full bg-[#f0ede8] border-r border-[#e2ddd8] py-5">
       <div className="flex items-center justify-center w-[42px] h-[42px] bg-[#1a1a2e] rounded-xl mb-7 text-white shrink-0">
         <IconLogo />
       </div>
       <div className="flex flex-col items-center gap-1 flex-1">
         {navItems
-          .filter(({ id }) => !isProfessional(role) || id === "appointments")
+          .filter(({ id }) => canSeeNav(role, id))
           .map(({ id, label, Icon }) => (
             <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
           ))}

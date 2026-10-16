@@ -38,3 +38,163 @@
 .brand-icon:hover {
   animation: brand-icon-shake 0.5s ease-in-out;
 }
+
+/* ── Tutorial (Driver.js) ─────────────────────────────────────────────────────
+   El popover de driver.js trae la clase "app-tour" (popoverClass). Se estiliza
+   con la paleta de la app en vez de los valores por defecto. */
+.driver-popover.app-tour {
+  --driver-popover-font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #ffffff;
+  border: 1px solid #e2ddd8;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(26, 26, 46, 0.18);
+  color: #1a1a2e;
+}
+
+.driver-popover.app-tour .driver-popover-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.driver-popover.app-tour .driver-popover-description {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.driver-popover.app-tour .driver-popover-progress-text {
+  font-size: 11px;
+  color: #9a9a9a;
+}
+
+.driver-popover.app-tour .driver-popover-footer button {
+  border-radius: 10px;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.driver-popover.app-tour .driver-popover-next-btn {
+  background-color: #1a1a2e;
+  color: #ffffff;
+  border: 1px solid #1a1a2e;
+}
+
+.driver-popover.app-tour .driver-popover-next-btn:hover {
+  background-color: #2d2d44;
+  border-color: #2d2d44;
+}
+
+.driver-popover.app-tour .driver-popover-prev-btn {
+  background-color: transparent;
+  color: #1a1a2e;
+  border: 1px solid #e2ddd8;
+}
+
+.driver-popover.app-tour .driver-popover-prev-btn:hover {
+  background-color: #f0ede8;
+}
+
+.driver-popover.app-tour .driver-popover-close-btn {
+  color: #9a9a9a;
+}
+
+.driver-popover.app-tour .driver-popover-close-btn:hover {
+  color: #1a1a2e;
+}
+
+/* ── Mascota del tutorial (SVG flotante inyectado por useProductTour) ──────── */
+.tour-mascot-float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 112px;
+  height: 112px;
+  pointer-events: none;
+  z-index: 2147483000;
+  perspective: 500px;
+  transition: left 0.25s ease, top 0.25s ease;
+  animation: tour-mascot-pop 0.28s ease-out;
+}
+
+.tour-mascot-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-style: preserve-3d;
+  animation: tour-mascot-sway 4s ease-in-out infinite;
+}
+
+.tour-mascot-body {
+  transform-origin: 80px 150px;
+  animation: tour-mascot-bob 2.6s ease-in-out infinite;
+}
+
+.tour-eye {
+  transform-origin: 80px 106px;
+  animation: tour-mascot-blink 4s ease-in-out infinite;
+}
+
+.tour-arm-wave {
+  animation: tour-mascot-wave 0.7s ease-in-out infinite alternate;
+}
+
+.tour-arm-point {
+  animation: tour-mascot-point 1.4s ease-in-out infinite;
+}
+
+.tour-sparkle {
+  transform-origin: 80px 40px;
+  animation: tour-mascot-twinkle 1.3s ease-in-out infinite;
+}
+
+@keyframes tour-mascot-pop {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes tour-mascot-sway {
+  0%, 100% { transform: rotateY(-9deg); }
+  50% { transform: rotateY(9deg); }
+}
+
+@keyframes tour-mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes tour-mascot-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes tour-mascot-wave {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+
+@keyframes tour-mascot-point {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(3px); }
+}
+
+@keyframes tour-mascot-twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* Espacio insuficiente en mobile: se oculta. */
+@media (max-width: 639px) {
+  .tour-mascot-float {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-mascot-float,
+  .tour-mascot-float * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
