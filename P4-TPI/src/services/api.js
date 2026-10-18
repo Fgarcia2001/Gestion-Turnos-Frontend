@@ -61,10 +61,14 @@ const parseApiError = async (res) => {
   return body?.detail || body?.title || body?.message || `Error ${res.status}`;
 };
 
-const requestJson = async (url, method) => {
+const requestJson = async (url, method, body) => {
   let res;
   try {
-    res = await fetch(url, { method, headers: getAuthHeaders() });
+    res = await fetch(url, {
+      method,
+      headers: getAuthHeaders(),
+      ...(body !== undefined && { body: JSON.stringify(body) }),
+    });
   } catch {
     throw new ApiError("No se pudo conectar con el servidor", 0);
   }
@@ -77,6 +81,12 @@ const requestJson = async (url, method) => {
 
 export const getJson = (url) => requestJson(url, "GET");
 export const postJson = (url) => requestJson(url, "POST");
+export const putJson = (url, body) => requestJson(url, "PUT", body);
+
+// Perfil del usuario logueado (cualquier rol).
+export const fetchMyProfile = () => getJson(`${BASE_URL}/Staff/me`);
+// Solo actualiza los campos que vengan con valor; devuelve el perfil actualizado.
+export const updateMyProfile = (payload) => putJson(`${BASE_URL}/Staff/me`, payload);
 
 // ── Suscripción y pagos (MercadoPago Checkout Pro) ─────────────────────────────
 export const fetchMySubscription = () => getJson(`${BASE_URL}/BusinessSubscription/my`);
@@ -142,6 +152,13 @@ export const PENDING_PLAN_KEY = "pending_plan_id";
 
 export const fetchAllAppointments = () => fetchJson(`${BASE_URL}/Appointment`);
 export const fetchMyBranchAppointments = () => fetchJson(`${BASE_URL}/Appointment/my-branch`);
+
+// Turnos futuros de profesionales cuyo rol o sucursal cambió: quedan pendientes de reasignar.
+export const fetchPendingReassignmentAppointments = () =>
+  fetchJson(`${BASE_URL}/Appointment/pending-reassignment`);
+
+export const reassignAppointment = (id, staffId) =>
+  putJson(`${BASE_URL}/Appointment/${id}/reassign`, { staffId });
 
 // Version liviana de las stats de turnos del negocio (2 numeros) en vez de
 // traer el historial completo via fetchAllAppointments.

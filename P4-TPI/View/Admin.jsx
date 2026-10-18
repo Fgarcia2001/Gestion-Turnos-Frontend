@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../CustomHooks/AuthContext";
 import { NotificationProvider } from "../CustomHooks/NotificationContext";
 import Navbar from "../src/Components/ComponentsAdmin/Navbar";
@@ -9,7 +9,8 @@ import Appointments from "../src/Components/ComponentsAdmin/Sections/Appointment
 import Settings from "../src/Components/ComponentsAdmin/Sections/Settings";
 import Schedule from "../src/Components/ComponentsAdmin/Sections/Schedule";
 import Help from "../src/Components/ComponentsAdmin/Sections/Help";
-import { PENDING_PLAN_KEY } from "../src/services/api";
+import PendingReassignment from "../src/Components/ComponentsAdmin/Sections/PendingReassignment";
+import { PENDING_PLAN_KEY, fetchPendingReassignmentAppointments } from "../src/services/api";
 import { useProductTour } from "../CustomHooks/useProductTour";
 
 // MercadoPago (Checkout Pro) redirige a /admin?payment_id=...&external_reference=<orderId>.
@@ -46,6 +47,18 @@ const Admin = () => {
   );
   const [settingsTab, setSettingsTab] = useState(() => (openSettings ? "subscription" : "business"));
 
+  // Turnos que quedaron pendientes de reasignar (cambio de rol/sucursal de un
+  // profesional). Se re-consulta al cambiar de sección para mantener el botón al día.
+  const [pendingReassignmentCount, setPendingReassignmentCount] = useState(0);
+  useEffect(() => {
+    if (isProfessional) return;
+    let cancelled = false;
+    fetchPendingReassignmentAppointments().then((list) => {
+      if (!cancelled) setPendingReassignmentCount(Array.isArray(list) ? list.length : 0);
+    });
+    return () => { cancelled = true; };
+  }, [section, isProfessional]);
+
   // Día al que debe abrir Appointments cuando se llega desde una notificación.
   // El nonce fuerza el remount aunque ya se esté en Appointments.
   const [appointmentsTarget, setAppointmentsTarget] = useState(null);
@@ -60,9 +73,9 @@ const Admin = () => {
 
   // Secciones habilitadas por rol (el navbar ya las filtra; esto es el guard).
   const allowedSections = isProfessional
-    ? ["appointments", "help"]
+    ? ["appointments", "profile", "help"]
     : receptionist
-      ? ["appointments", "managmentBusiness", "schedule", "help"]
+      ? ["appointments", "managmentBusiness", "schedule", "pendingReassignment", "profile", "help"]
       : null;
 
   const handleSelectSection = (id) => {
@@ -81,7 +94,7 @@ const Admin = () => {
   );
 
   const renderSection = () => {
-    if (isProfessional && section !== "help") return renderAppointments();
+    if (isProfessional && section !== "help" && section !== "profile") return renderAppointments();
     // El recepcionista no puede ver Settings ni Home, sin importar de dónde venga el estado.
     if (receptionist && (section === "settings" || section === "home")) return renderAppointments();
     switch (section) {
@@ -92,7 +105,9 @@ const Admin = () => {
       case "appointments": return renderAppointments();
       case "schedule": return <Schedule />;
       case "settings": return <Settings key={settingsTab} initialTab={settingsTab} autoOpenPlanId={pendingPlanId} />;
+      case "profile": return <Settings profileOnly />;
       case "help": return <Help onStartTour={startTour} />;
+      case "pendingReassignment": return <PendingReassignment onChange={setPendingReassignmentCount} />;
 
       default: return <Home />;
     }
@@ -112,7 +127,9 @@ const Admin = () => {
           <Header
             username={user?.name}
             onNavigateToAppointments={handleNotificationNavigate}
-            onNavigateToSettings={() => handleSelectSection("settings")}
+            pendingReassignmentCount={isProfessional ? 0 : pendingReassignmentCount}
+            onNavigateToPendingReassignment={() => handleSelectSection("pendingReassignment")}
+            onNavigateToSettings={() => handleSelectSection(isProfessional || receptionist ? "profile" : "settings")}
           />
 
           {/* Scrollable content */}
