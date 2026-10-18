@@ -19,6 +19,24 @@ const IconBell = () => (
   </svg>
 );
 
+const IconAlert = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 3L22 20H2L12 3Z" />
+    <path d="M12 10V14" />
+    <path d="M12 17V17.01" />
+  </svg>
+);
+
 const IconClock = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +72,13 @@ const getInitials = (name) => {
     .slice(0, 2);
 };
 
-const Header = ({ username, onNavigateToAppointments, onNavigateToSettings }) => {
+const Header = ({
+  username,
+  onNavigateToAppointments,
+  onNavigateToSettings,
+  pendingReassignmentCount = 0,
+  onNavigateToPendingReassignment,
+}) => {
   const { t } = useTranslation();
   const { appointments, unreadCount, refresh, markAllRead } =
     useNotifications();
@@ -95,6 +119,18 @@ const Header = ({ username, onNavigateToAppointments, onNavigateToSettings }) =>
         </p>
       </div>
       <div className="flex items-center gap-3">
+        {pendingReassignmentCount > 0 && (
+          <button
+            type="button"
+            onClick={onNavigateToPendingReassignment}
+            className="flex items-center gap-2 h-10 px-3 rounded-xl bg-[#fef3c7] border border-[#fde68a] text-[#b45309] text-sm font-semibold hover:bg-[#fde68a] transition-all duration-200 cursor-pointer"
+          >
+            <IconAlert />
+            <span className="hidden sm:inline">
+              {t("Pending reassignment appointments") || "Tienes turnos pendiente de reasignar"}
+            </span>
+          </button>
+        )}
         <div className="relative">
           <button
             aria-label="Notifications"

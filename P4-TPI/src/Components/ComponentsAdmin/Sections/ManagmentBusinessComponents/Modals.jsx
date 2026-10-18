@@ -8,6 +8,49 @@ import { fetchBranchWeeklySchedule, updateBranchWeeklySchedule } from '../../../
 // but the create/update payload expects the numeric id used by the <select> options.
 const ROLE_NAME_TO_ID = { Recepcionista: 1, Profesional: 2 };
 
+// ── Demote confirmation ───────────────────────────────────────────────────────
+// Se muestra al pasar un Profesional a Recepcionista: un recepcionista no atiende
+// clientes, así que sus turnos pasan a pendiente de reasignar.
+const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
+  <ModalOverlay onClose={onCancel}>
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+      <button type="button" onClick={onCancel}
+        className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+        <IconX />
+      </button>
+
+      <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4 text-amber-500">
+        <IconWarning />
+      </div>
+
+      <h2 className="text-lg font-bold text-[#1a1a2e] mb-2">Change role to Receptionist?</h2>
+      <p className="text-sm text-[#6b7280] mb-6">
+        Receptionists can't attend clients. Any upcoming appointments assigned to{" "}
+        <span className="font-semibold text-[#1a1a2e]">{row.staffName}</span> will be marked as pending reassignment.
+      </p>
+
+      <div className="flex items-center gap-3 p-3 bg-[#faf9f7] rounded-xl border border-[#f0ede8] mb-6 text-left">
+        <Avatar initials={row.staffName?.charAt(0) || "U"} color={row.color} photo={row.staffLinkPhoto || null} />
+        <div>
+          <p className="font-semibold text-sm text-[#1a1a2e]">{row.staffName}</p>
+          <p className="text-xs text-[#9a9a9a]">{row.staffEmail}</p>
+        </div>
+      </div>
+
+      <div className="flex gap-3">
+        <button type="button" onClick={onCancel} disabled={submitting}
+          className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50">
+          Cancel
+        </button>
+        <button type="button" onClick={onConfirm} disabled={submitting}
+          className="flex-1 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50">
+          {submitting ? "Saving..." : "Confirm"}
+        </button>
+      </div>
+    </div>
+  </ModalOverlay>
+);
+
 // ── Edit Modal ────────────────────────────────────────────────────────────────
 export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
   const [form, setForm] = useState(() => {
@@ -30,25 +73,50 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [confirmDemote, setConfirmDemote] = useState(false);
+
+  // Profesional (2) → Recepcionista (1): sus turnos pasan a pendiente de reasignar.
+  const originalRol = typeof row.rol === "number" ? row.rol : ROLE_NAME_TO_ID[row.rol];
+  const demoting = tab === "staff" && originalRol === 2 && Number(form.rol) === 1;
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const doSave = async () => {
     setError("");
     setSubmitting(true);
     try {
       await onSave(form);
       onClose();
     } catch (err) {
+      setConfirmDemote(false);
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (demoting) {
+      setConfirmDemote(true);
+      return;
+    }
+    doSave();
+  };
+
   const tabLabel = tab === "staff" ? "Staff" : tab === "client" ? "Client" : tab === "branch" ? "Branch" : "Service";
+
+  if (confirmDemote) {
+    return (
+      <DemoteConfirmModal
+        row={form}
+        submitting={submitting}
+        onCancel={() => setConfirmDemote(false)}
+        onConfirm={doSave}
+      />
+    );
+  }
 
   return (
     <ModalOverlay onClose={onClose}>

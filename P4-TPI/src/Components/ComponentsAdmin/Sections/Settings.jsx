@@ -4,8 +4,17 @@ import BusinessTab from './SettingsComponents/BusinessTab';
 import SubscriptionTab from './SettingsComponents/SubscriptionTab';
 import AdminTab from './SettingsComponents/AdminTab';
 
-const Settings = ({ initialTab, autoOpenPlanId }) => {
+const Settings = ({ initialTab, autoOpenPlanId, profileOnly = false }) => {
   const [activeTab, setActiveTab] = useState(initialTab || 'business');
+
+  // Recepcionista/Profesional: solo su perfil, sin datos de la empresa.
+  if (profileOnly) {
+    return (
+      <div data-tour="settings-content" className="w-full max-w-6xl mx-auto pb-10">
+        <AdminTab self />
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'business', label: 'Business', icon: IconBuilding },

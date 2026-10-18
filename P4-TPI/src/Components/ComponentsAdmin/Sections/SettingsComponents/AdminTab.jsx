@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BASE_URL, getAuthHeaders } from "../../../../services/api";
+import { BASE_URL, getAuthHeaders, fetchMyProfile, updateMyProfile } from "../../../../services/api";
 import { IconCamera, IconMail, IconPhone as IconPhoneIcon } from './SettingsIcons';
 
 const IconUpload = () => (
@@ -8,7 +8,16 @@ const IconUpload = () => (
   </svg>
 );
 
-const AdminTab = () => {
+// /Staff/me responde con name/email/phone/linkPhoto; /Staff/Business/Admin con prefijo staff*.
+const toFormData = (data) => ({
+  staffName: data.name ?? data.staffName ?? "",
+  staffEmail: data.email ?? data.staffEmail ?? "",
+  staffLinkPhoto: data.linkPhoto ?? data.staffLinkPhoto ?? "",
+  staffPhone: data.phone ?? data.staffPhone ?? "",
+});
+
+// self=true: el usuario logueado edita su propio perfil (/Staff/me), sin datos de empresa.
+const AdminTab = ({ self = false }) => {
   const [formData, setFormData] = useState({ staffName: "", staffEmail: "", staffLinkPhoto: "", staffPhone: "" });
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,18 +29,18 @@ const AdminTab = () => {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${BASE_URL}/Staff/Business/Admin`, { headers: getAuthHeaders() });
-        if (!res.ok) throw new Error("Failed to load admin data");
-        const data = await res.json();
-        const initial = {
-          staffName: data.staffName || "",
-          staffEmail: data.staffEmail || "",
-          staffLinkPhoto: data.staffLinkPhoto || "",
-          staffPhone: data.staffPhone || "",
-        };
+        let data;
+        if (self) {
+          data = await fetchMyProfile();
+        } else {
+          const res = await fetch(`${BASE_URL}/Staff/Business/Admin`, { headers: getAuthHeaders() });
+          if (!res.ok) throw new Error("Failed to load admin data");
+          data = await res.json();
+        }
+        const initial = toFormData(data || {});
         setFormData(initial);
         setOriginalData(initial);
-        setPhotoPreview(data.staffLinkPhoto || "");
+        setPhotoPreview(initial.staffLinkPhoto);
       } catch {
         // API not available yet
       } finally {
@@ -39,7 +48,7 @@ const AdminTab = () => {
       }
     }
     load();
-  }, []);
+  }, [self]);
 
   const hasChanges = originalData && JSON.stringify(formData) !== JSON.stringify(originalData);
 
@@ -76,14 +85,28 @@ const AdminTab = () => {
     setSaving(true);
     setError("");
     try {
-      const res = await fetch(`${BASE_URL}/Staff/email`, {
-        method: "PUT",
-        headers: getAuthHeaders(),
-        body: JSON.stringify(formData),
-      });
-      if (!res.ok) throw new Error("Failed to save changes");
-      const updated = { ...formData };
-      setOriginalData(updated);
+      if (self) {
+        // El backend solo actualiza los campos que vienen con valor.
+        const payload = {};
+        if (formData.staffName.trim()) payload.name = formData.staffName.trim();
+        if (formData.staffEmail.trim()) payload.email = formData.staffEmail.trim();
+        if (formData.staffPhone.trim()) payload.phone = formData.staffPhone.trim();
+        if (formData.staffLinkPhoto) payload.linkPhoto = formData.staffLinkPhoto;
+        const saved = await updateMyProfile(payload);
+        const updated = saved ? toFormData(saved) : { ...formData };
+        setFormData(updated);
+        setOriginalData(updated);
+        setPhotoPreview(updated.staffLinkPhoto);
+      } else {
+        const res = await fetch(`${BASE_URL}/Staff/email`, {
+          method: "PUT",
+          headers: getAuthHeaders(),
+          body: JSON.stringify(formData),
+        });
+        if (!res.ok) throw new Error("Failed to save changes");
+        const updated = { ...formData };
+        setOriginalData(updated);
+      }
     } catch {
       setError("Could not save changes. Please try again.");
     } finally {
@@ -103,7 +126,7 @@ const AdminTab = () => {
     <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto">
       {/* Profile */}
       <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
-        <h2 className="text-lg font-semibold text-[#1a1a2e]">Administrator Profile</h2>
+        <h2 className="text-lg font-semibold text-[#1a1a2e]">{self ? "My Profile" : "Administrator Profile"}</h2>
         <p className="text-sm text-[#9a9a9a] mb-6 mt-1">Manage your personal account data.</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
@@ -173,8 +196,9 @@ const AdminTab = () => {
             <input
               type="email"
               value={formData.staffEmail}
-              readOnly
-              className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#9a9a9a] focus:outline-none bg-transparent cursor-not-allowed"
+              readOnly={!self}
+              onChange={self ? handleChange("staffEmail") : undefined}
+              className={`w-full border-b border-[#e2ddd8] pb-2 text-sm focus:outline-none bg-transparent ${self ? "text-[#1a1a2e] focus:border-[#1a1a2e] transition-colors" : "text-[#9a9a9a] cursor-not-allowed"}`}
             />
           </div>
 
@@ -215,6 +239,7 @@ const AdminTab = () => {
       </div>
 
       {/* Danger Zone */}
+      {!self && (
       <div className="bg-white rounded-2xl border border-red-200 p-6">
         <h2 className="text-sm font-semibold text-red-600 mb-1">Danger Zone</h2>
         <p className="text-xs text-[#9a9a9a] mb-4">Irreversible actions for your account.</p>
@@ -228,6 +253,7 @@ const AdminTab = () => {
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 };

@@ -32,6 +32,11 @@ const IconHelp = () => (
     <circle cx="12" cy="12" r="9" /><path d="M12 17V17.01" /><path d="M12 13.5A1.5 1.5 0 0 1 13.5 12C14.33 11.17 14.5 10 14 9.27A3 3 0 0 0 9.17 9" />
   </svg>
 );
+const IconProfile = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4" /><path d="M4 21V20A6 6 0 0 1 10 14H14A6 6 0 0 1 20 20V21" />
+  </svg>
+);
 const IconLogout = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 8V6A2 2 0 0 0 12 4H6A2 2 0 0 0 4 6V18A2 2 0 0 0 6 20H12A2 2 0 0 0 14 18V16" /><path d="M9 12H21M21 12L18 9M21 12L18 15" />
@@ -52,6 +57,7 @@ const navItems = [
 ];
 const bottomItems = [
   { id: "help",   label: "Help",    Icon: IconHelp },
+  { id: "profile", label: "Profile", Icon: IconProfile },
   { id: "logout", label: "Log out", Icon: IconLogout },
 ];
 
@@ -77,6 +83,10 @@ const canSeeNav = (role, id) => {
   if (isReceptionist(role)) return id === "appointments" || id === "managmentBusiness" || id === "schedule";
   return true;
 };
+
+// "Profile" solo para recepcionista/profesional; el admin accede desde Settings.
+const canSeeBottom = (role, id) =>
+  id !== "profile" || isProfessional(role) || isReceptionist(role);
 
 const Navbar = ({ onSelectSection, role, active }) => {
   const { logout } = useAuth();
@@ -104,9 +114,11 @@ const Navbar = ({ onSelectSection, role, active }) => {
           ))}
       </div>
       <div className="flex flex-col items-center gap-1">
-        {bottomItems.map(({ id, label, Icon }) => (
-          <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
-        ))}
+        {bottomItems
+          .filter(({ id }) => canSeeBottom(role, id))
+          .map(({ id, label, Icon }) => (
+            <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
+          ))}
       </div>
     </nav>
   );
