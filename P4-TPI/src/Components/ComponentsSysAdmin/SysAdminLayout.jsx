@@ -27,6 +27,11 @@ const IconLanding = () => (
     <rect x="3" y="4" width="18" height="16" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="7" y1="13" x2="13" y2="13" /><line x1="7" y1="16" x2="11" y2="16" />
   </svg>
 );
+const IconUser = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+  </svg>
+);
 const IconLogout = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
     <path d="M14 8V6A2 2 0 0 0 12 4H6A2 2 0 0 0 4 6V18A2 2 0 0 0 6 20H12A2 2 0 0 0 14 18V16" /><path d="M9 12H21M21 12L18 9M21 12L18 15" />
@@ -44,6 +49,7 @@ const navItems = [
   { to: "/sysadmin/plans", label: "Plans", Icon: IconLayers },
   { to: "/sysadmin/subscriptions", label: "Subscriptions", Icon: IconCreditCard },
   { to: "/sysadmin/landing", label: "Landing Page", Icon: IconLanding },
+  { to: "/sysadmin/profile", label: "Profile", Icon: IconUser },
 ];
 
 const getInitials = (name) => {
@@ -130,11 +136,15 @@ const SysAdminLayout = () => {
               <p className="text-xs sm:text-sm text-[#9a9a9a] mt-0.5 truncate">Manage businesses, plans and subscriptions.</p>
             </div>
           </div>
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border-2 border-[#e2ddd8] shrink-0">
+          <button
+            onClick={() => navigate("/sysadmin/profile")}
+            aria-label="Profile"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border-2 border-[#e2ddd8] shrink-0 hover:border-[#1a1a2e] transition-colors"
+          >
             <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-sm font-semibold">
               {getInitials(user?.name)}
             </div>
-          </div>
+          </button>
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">

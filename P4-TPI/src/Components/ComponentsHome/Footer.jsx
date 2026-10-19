@@ -20,9 +20,10 @@ const Footer = () => {
 
   const activeSocials = SOCIAL_LINKS.filter(({ key }) => content?.[key]);
   const hasContact = Boolean(content?.contactEmail || content?.contactPhone);
+  const primaryColor = content?.primaryColor || "#1a1a2e";
 
   return (
-    <footer className="bg-[#1a1a2e] text-white">
+    <footer className="text-white" style={{ backgroundColor: primaryColor }}>
       <div
         className={`max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 sm:grid-cols-2 gap-10 text-center ${
           hasContact ? "lg:grid-cols-3" : "lg:grid-cols-2"
