@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchLandingContent, updateLandingContent, applyBrandName } from "../../services/landingContentService";
+import { resolveLandingColor, resolveLandingTextColor } from "../../../CustomHooks/landingColors";
 import { translateText } from "../../services/translateService";
 import { fetchPlans } from "../../services/api";
 import { IconMail, IconPhone } from "../ComponentsHome/FooterIcons";
@@ -19,6 +20,18 @@ const SkeletonForm = () => (
 const IconTranslate = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 8h10M9 4v2m6 15 4-9 4 9m-7.3-2h6.6M4 21l5-11 5 11M6.1 15h5.8" />
+  </svg>
+);
+
+const IconSun = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </svg>
+);
+
+const IconMoon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
   </svg>
 );
 
@@ -75,24 +88,38 @@ const LivePreview = ({
   lang,
   onToggleLang,
   primaryColor,
+  primaryTextColor,
   backgroundColor,
   accentColor,
+  previewTheme,
+  onToggleTheme,
 }) => (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
       <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Live preview</p>
-      <button
-        onClick={onToggleLang}
-        className="bg-[var(--surface)] border border-[var(--border-subtle)] px-3 py-1 rounded-full shadow-sm hover:bg-[var(--surface-muted)] transition-all font-medium text-[11px] flex items-center gap-1.5"
-      >
-        <span className={lang === "es" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-faint)]"}>ES</span>
-        <span className="text-[var(--border-subtle)]">|</span>
-        <span className={lang === "en" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-faint)]"}>EN</span>
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          aria-label={previewTheme === "dark" ? "Preview in light mode" : "Preview in dark mode"}
+          title={previewTheme === "dark" ? "Light mode" : "Dark mode"}
+          className="flex items-center justify-center w-7 h-7 rounded-full bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--surface-muted)] transition-all"
+        >
+          {previewTheme === "dark" ? <IconSun /> : <IconMoon />}
+        </button>
+        <button
+          onClick={onToggleLang}
+          className="bg-[var(--surface)] border border-[var(--border-subtle)] px-3 py-1 rounded-full shadow-sm hover:bg-[var(--surface-muted)] transition-all font-medium text-[11px] flex items-center gap-1.5"
+        >
+          <span className={lang === "es" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-faint)]"}>ES</span>
+          <span className="text-[var(--border-subtle)]">|</span>
+          <span className={lang === "en" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-faint)]"}>EN</span>
+        </button>
+      </div>
     </div>
 
-    <div className="border rounded-2xl overflow-hidden" style={{ backgroundColor, borderColor: accentColor }}>
-      <div className="h-8 flex items-center gap-1.5 px-3 border-b" style={{ backgroundColor: "#eee9e2", borderColor: accentColor }}>
+    <div className={`border rounded-2xl overflow-hidden ${previewTheme === "dark" ? "dark" : ""}`} style={{ backgroundColor, borderColor: accentColor }}>
+      <div className="h-8 flex items-center gap-1.5 px-3 border-b" style={{ backgroundColor: "var(--surface-muted)", borderColor: accentColor }}>
         <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
         <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
         <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
@@ -105,12 +132,12 @@ const LivePreview = ({
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-[11px] font-semibold truncate max-w-[160px]" style={{ color: primaryColor }}>
+          <span className="text-[11px] font-semibold truncate max-w-[160px]" style={{ color: primaryTextColor }}>
             {brandName || "Turnify FMC"}
           </span>
         </div>
 
-        <h1 className="text-xl font-bold leading-tight max-w-xs mx-auto break-words" style={{ color: primaryColor }}>
+        <h1 className="text-xl font-bold leading-tight max-w-xs mx-auto break-words" style={{ color: primaryTextColor }}>
           {title || "..."}
         </h1>
 
@@ -120,7 +147,7 @@ const LivePreview = ({
       </div>
 
       <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
-        <h2 className="text-sm font-bold break-words" style={{ color: primaryColor }}>{plansTitle || "..."}</h2>
+        <h2 className="text-sm font-bold break-words" style={{ color: primaryTextColor }}>{plansTitle || "..."}</h2>
         <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
           {plansSubtitle || "..."}
         </p>
@@ -136,7 +163,7 @@ const LivePreview = ({
                   className="w-[68px] h-14 rounded-lg bg-[var(--surface)] border flex flex-col items-center justify-center px-1"
                   style={{ borderColor: accentColor }}
                 >
-                  <span className="text-[9px] font-semibold truncate w-full text-center" style={{ color: primaryColor }}>{name}</span>
+                  <span className="text-[9px] font-semibold truncate w-full text-center" style={{ color: primaryTextColor }}>{name}</span>
                   <span className="text-[9px] text-[var(--text-muted)]">${price}</span>
                 </div>
               );
@@ -152,7 +179,7 @@ const LivePreview = ({
       </div>
 
       <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
-        <h2 className="text-sm font-bold break-words" style={{ color: primaryColor }}>{aboutTitle || "..."}</h2>
+        <h2 className="text-sm font-bold break-words" style={{ color: primaryTextColor }}>{aboutTitle || "..."}</h2>
         <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
           {aboutDesc || "..."}
         </p>
@@ -254,6 +281,7 @@ const SysAdminLanding = () => {
   const [toast, setToast] = useState(null);
   const [previewPlans, setPreviewPlans] = useState([]);
   const [previewLang, setPreviewLang] = useState("es");
+  const [previewTheme, setPreviewTheme] = useState("light");
   const [translating, setTranslating] = useState({});
   const [form, setForm] = useState({
     brandName: "",
@@ -373,6 +401,13 @@ const SysAdminLanding = () => {
   const previewPlansTitle = previewLang === "en" ? form.plansTitleEn : form.plansTitleEs;
   const previewPlansSubtitle = previewLang === "en" ? form.plansSubtitleEn : form.plansSubtitleEs;
   const previewFooterDesc = previewLang === "en" ? form.footerDescriptionEn : form.footerDescriptionEs;
+  // Mismo criterio que la landing real (useLandingColors): si el color sigue
+  // en el valor semilla, la preview usa la variable de tema para reaccionar
+  // al toggle claro/oscuro de aca abajo; si lo personalizaste, se respeta.
+  const previewPrimaryColor = resolveLandingColor(form, "primaryColor");
+  const previewPrimaryTextColor = resolveLandingTextColor(form, "primaryColor");
+  const previewBackgroundColor = resolveLandingColor(form, "backgroundColor");
+  const previewAccentColor = resolveLandingColor(form, "accentColor");
   const previewSocials = {
     instagramUrl: form.instagramUrl,
     facebookUrl: form.facebookUrl,
@@ -567,9 +602,12 @@ const SysAdminLanding = () => {
             footerDesc={previewFooterDesc}
             contactEmail={form.contactEmail}
             contactPhone={form.contactPhone}
-            primaryColor={form.primaryColor}
-            backgroundColor={form.backgroundColor}
-            accentColor={form.accentColor}
+            primaryColor={previewPrimaryColor}
+            primaryTextColor={previewPrimaryTextColor}
+            backgroundColor={previewBackgroundColor}
+            accentColor={previewAccentColor}
+            previewTheme={previewTheme}
+            onToggleTheme={() => setPreviewTheme((prev) => (prev === "dark" ? "light" : "dark"))}
             socials={previewSocials}
             lang={previewLang}
             onToggleLang={() => setPreviewLang((prev) => (prev === "es" ? "en" : "es"))}
