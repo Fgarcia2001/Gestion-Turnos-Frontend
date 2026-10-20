@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { ModalOverlay, inputClass, labelClass, Avatar } from './Shared';
 import { IconPhoto, IconX, IconWarning, IconClock } from './Icons';
 import { fetchBranchWeeklySchedule, updateBranchWeeklySchedule } from '../../../../services/scheduleService';
+import PhoneField from '../../../Shared/PhoneField';
+import AddressAutocomplete from '../../../Shared/AddressAutocomplete';
+import CityAutocomplete from '../../../Shared/CityAutocomplete';
 
 // ── Role label ↔ id mapping ────────────────────────────────────────────────────
 // The staff list endpoint returns rol as a text label (e.g. "Recepcionista"),
@@ -81,6 +84,15 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  // Al elegir una sugerencia de Nominatim se completan direccion y ciudad
+  // juntas (la ciudad se puede seguir editando a mano si hace falta).
+  const handleAddressSelect = ({ address, city }) =>
+    setForm((prev) => ({
+      ...prev,
+      address: address || prev.address,
+      city: city || prev.city,
+    }));
 
   const doSave = async () => {
     setError("");
@@ -172,7 +184,7 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
               </div>
               <div>
                 <label className={labelClass}>Staff Phone</label>
-                <input name="staffPhone" value={form.staffPhone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
+                <PhoneField name="staffPhone" value={form.staffPhone} onChange={handleChange} />
               </div>
               <div>
                 <label className={labelClass}>Photo URL</label>
@@ -222,7 +234,7 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
               </div>
               <div>
                 <label className={labelClass}>Phone</label>
-                <input name="phone" value={form.phone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
+                <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
               <div>
                 <label className={labelClass}>Birthday</label>
@@ -238,17 +250,17 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
                 <label className={labelClass}>Branch Name</label>
                 <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Branch name" />
               </div>
-              <div>
+              <div className="relative">
                 <label className={labelClass}>Address</label>
-                <input name="address" value={form.address || ""} onChange={handleChange} className={inputClass} placeholder="Street address" />
+                <AddressAutocomplete name="address" value={form.address || ""} onChange={handleChange} onSelect={handleAddressSelect} className={inputClass} placeholder="Street address" />
               </div>
               <div>
                 <label className={labelClass}>Phone</label>
-                <input name="phone" value={form.phone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
+                <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
-              <div>
+              <div className="relative">
                 <label className={labelClass}>City</label>
-                <input name="city" value={form.city || ""} onChange={handleChange} className={inputClass} placeholder="City" />
+                <CityAutocomplete name="city" value={form.city || ""} onChange={handleChange} onSelect={(city) => setForm((prev) => ({ ...prev, city }))} className={inputClass} placeholder="City" />
               </div>
             </>
           )}
@@ -306,6 +318,15 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  // Al elegir una sugerencia de Nominatim se completan direccion y ciudad
+  // juntas (la ciudad se puede seguir editando a mano si hace falta).
+  const handleAddressSelect = ({ address, city }) =>
+    setForm((prev) => ({
+      ...prev,
+      address: address || prev.address,
+      city: city || prev.city,
+    }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -367,7 +388,7 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
               </div>
               <div>
                 <label className={labelClass}>Staff Phone</label>
-                <input name="staffPhone" value={form.staffPhone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
+                <PhoneField name="staffPhone" value={form.staffPhone} onChange={handleChange} />
               </div>
               <div>
                 <label className={labelClass}>Photo URL</label>
@@ -410,7 +431,7 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
               </div>
               <div>
                 <label className={labelClass}>Phone</label>
-                <input name="phone" value={form.phone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
+                <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
               <div>
                 <label className={labelClass}>Birthday</label>
@@ -426,17 +447,17 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
                 <label className={labelClass}>Branch Name</label>
                 <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Branch name" />
               </div>
-              <div>
+              <div className="relative">
                 <label className={labelClass}>Address</label>
-                <input name="address" value={form.address || ""} onChange={handleChange} className={inputClass} placeholder="Street address" />
+                <AddressAutocomplete name="address" value={form.address || ""} onChange={handleChange} onSelect={handleAddressSelect} className={inputClass} placeholder="Street address" />
               </div>
               <div>
                 <label className={labelClass}>Phone</label>
-                <input name="phone" value={form.phone || ""} onChange={handleChange} className={inputClass} placeholder="+1 (555) 000-0000" />
+                <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
-              <div>
+              <div className="relative">
                 <label className={labelClass}>City</label>
-                <input name="city" value={form.city || ""} onChange={handleChange} className={inputClass} placeholder="City" />
+                <CityAutocomplete name="city" value={form.city || ""} onChange={handleChange} onSelect={(city) => setForm((prev) => ({ ...prev, city }))} className={inputClass} placeholder="City" />
               </div>
             </>
           )}

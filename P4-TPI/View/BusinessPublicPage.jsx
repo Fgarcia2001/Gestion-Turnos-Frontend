@@ -21,13 +21,14 @@ const CATEGORY_LABELS = {
 
 const formatTime = (value) => (typeof value === "string" ? value.slice(0, 5) : "");
 
-const BranchCard = ({ branch, onBook }) => (
+const BranchCard = ({ branch, onBook, brandColor }) => (
   <div className="bg-white rounded-2xl shadow-sm border border-[#e2ddd8] p-6">
     <div className="flex items-start justify-between gap-4">
-      <h3 className="text-lg font-bold text-[#1a1a2e]">{branch.name}</h3>
+      <h3 className="text-lg font-bold" style={{ color: brandColor }}>{branch.name}</h3>
       <button
         onClick={() => onBook(branch)}
-        className="shrink-0 px-4 py-2 rounded-lg bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors"
+        className="shrink-0 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-colors"
+        style={{ backgroundColor: brandColor }}
       >
         Reservar acá
       </button>
@@ -153,10 +154,12 @@ const BusinessPublicPage = () => {
     );
   }
 
+  const brandColor = business.color || "#1a1a2e";
+
   return (
     <main className="min-h-screen w-full bg-[#F8F5F0]">
       {/* Header: stays on screen the whole time, through the booking flow too. */}
-      <header className="bg-[#1a1a2e] text-white">
+      <header className="text-white" style={{ backgroundColor: brandColor }}>
         <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col sm:flex-row sm:items-center gap-5">
           <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center overflow-hidden shrink-0">
             {business.logoUrl ? (
@@ -181,7 +184,8 @@ const BusinessPublicPage = () => {
           ) : (
             <button
               onClick={() => startBooking(null)}
-              className="px-6 py-2.5 bg-white text-[#1a1a2e] rounded-xl text-sm font-semibold hover:bg-white/90 transition-colors text-center"
+              className="px-6 py-2.5 bg-white rounded-xl text-sm font-semibold hover:bg-white/90 transition-colors text-center"
+              style={{ color: brandColor }}
             >
               Reservar turno
             </button>
@@ -199,7 +203,7 @@ const BusinessPublicPage = () => {
             {business.branches?.length ? (
               <div className="grid gap-6">
                 {business.branches.map((branch) => (
-                  <BranchCard key={branch.id} branch={branch} onBook={startBooking} />
+                  <BranchCard key={branch.id} branch={branch} onBook={startBooking} brandColor={brandColor} />
                 ))}
               </div>
             ) : (

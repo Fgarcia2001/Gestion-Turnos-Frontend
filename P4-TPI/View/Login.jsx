@@ -12,11 +12,13 @@ const Login = () => {
   const heroDesc = (language === "en" ? content?.heroDescriptionEn : content?.heroDescriptionEs) || t("heroDesc");
   const location = useLocation();
   const navigate = useNavigate();
-  const initialRegister = Boolean(location.state?.register);
-  const [isRegister, setIsRegister] = useState(initialRegister);
+  // La ruta es la fuente de verdad: /register siempre arranca en modo
+  // registro; location.state?.register queda como fallback para quien
+  // todavia navegue a /login con ese state.
+  const isRegister = location.pathname === "/register" || Boolean(location.state?.register);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const handleRegister = () => {
-    setIsRegister(!isRegister);
+    navigate(isRegister ? "/login" : "/register");
     setIsForgotPassword(false);
   }
   return (
@@ -145,7 +147,7 @@ const Login = () => {
             handleRegister={handleRegister}
             isForgotPassword={isForgotPassword}
             setIsForgotPassword={setIsForgotPassword}
-            initialRegister={initialRegister}
+            isRegister={isRegister}
           />
         </div>
       </section>

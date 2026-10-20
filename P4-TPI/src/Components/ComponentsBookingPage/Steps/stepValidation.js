@@ -1,5 +1,6 @@
+import { isValidPhone } from "../../Shared/phoneValidation";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_RE = /^[0-9+\-\s()]{6,20}$/;
 
 // IDs can legitimately be 0, so completion checks must use != null rather than
 // Boolean(), which treats 0 as falsy/incomplete.
@@ -14,7 +15,7 @@ export const validateClientInfo = (booking, t) => {
   if (!booking.clientEmail?.trim()) errors.clientEmail = t("emailRequired") || "Email is required.";
   else if (!EMAIL_RE.test(booking.clientEmail)) errors.clientEmail = t("emailInvalid") || "Enter a valid email.";
   if (!booking.clientPhone?.trim()) errors.clientPhone = t("phoneRequired") || "Phone is required.";
-  else if (!PHONE_RE.test(booking.clientPhone)) errors.clientPhone = t("phoneInvalid") || "Enter a valid phone number.";
+  else if (!isValidPhone(booking.clientPhone)) errors.clientPhone = t("phoneInvalid") || "Enter a valid phone number.";
   if (!booking.clientBirthDay) errors.clientBirthDay = t("birthDayRequired") || "Date of birth is required.";
   return errors;
 };
