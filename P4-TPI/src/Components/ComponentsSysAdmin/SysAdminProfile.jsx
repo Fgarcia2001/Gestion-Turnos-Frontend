@@ -97,7 +97,7 @@ const SysAdminProfile = () => {
   if (loading) {
     return (
       <div className="pt-8 flex justify-center py-12">
-        <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
       </div>
     );
   }
@@ -105,19 +105,19 @@ const SysAdminProfile = () => {
   return (
     <div className="pt-8 flex flex-col gap-6 max-w-3xl mx-auto w-full">
       <div>
-        <h2 className="text-2xl font-bold text-[#1a1a2e] mb-1">Profile</h2>
-        <p className="text-sm text-[#9a9a9a]">Manage your personal SysAdmin account data.</p>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Profile</h2>
+        <p className="text-sm text-[var(--text-muted)]">Manage your personal SysAdmin account data.</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
           {/* Photo */}
-          <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start pb-6 border-b border-[#e2ddd8]">
-            <div className="w-20 h-20 rounded-full border border-[#e2ddd8] bg-[#fcfbf9] flex items-center justify-center overflow-hidden shrink-0">
+          <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start pb-6 border-b border-[var(--border-subtle)]">
+            <div className="w-20 h-20 rounded-full border border-[var(--border-subtle)] bg-[var(--surface-faint-2)] flex items-center justify-center overflow-hidden shrink-0">
               {photoPreview ? (
                 <img src={photoPreview} alt="Admin" className="w-full h-full object-cover" />
               ) : (
-                <div className="text-[#9a9a9a] flex flex-col items-center gap-1">
+                <div className="text-[var(--text-muted)] flex flex-col items-center gap-1">
                   <IconCamera />
                   <span className="text-[10px] font-medium">No photo</span>
                 </div>
@@ -128,14 +128,14 @@ const SysAdminProfile = () => {
                 <button
                   type="button"
                   onClick={() => { setPhotoInputMode("url"); setPhotoPreview(formData.linkPhoto); }}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${photoInputMode === "url" ? "bg-[#1a1a2e] text-white" : "bg-[#f0ede8] text-[#5a5a6e] hover:bg-[#e2ddd8]"}`}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${photoInputMode === "url" ? "bg-[var(--brand)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] hover:bg-[var(--border-subtle)]"}`}
                 >
                   URL
                 </button>
                 <button
                   type="button"
                   onClick={() => setPhotoInputMode("upload")}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${photoInputMode === "upload" ? "bg-[#1a1a2e] text-white" : "bg-[#f0ede8] text-[#5a5a6e] hover:bg-[#e2ddd8]"}`}
+                  className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${photoInputMode === "upload" ? "bg-[var(--brand)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] hover:bg-[var(--border-subtle)]"}`}
                 >
                   Upload
                 </button>
@@ -150,10 +150,10 @@ const SysAdminProfile = () => {
                       ? "Imagen cargada desde archivo — escribe una URL para reemplazarla"
                       : "https://example.com/photo.jpg"
                   }
-                  className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+                  className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] transition-colors bg-transparent"
                 />
               ) : (
-                <label className="flex items-center gap-2 cursor-pointer text-sm text-[#1a1a2e] font-medium bg-[#f0ede8] hover:bg-[#e2ddd8] transition-colors rounded-xl px-4 py-2.5 self-start">
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-primary)] font-medium bg-[var(--surface-muted)] hover:bg-[var(--border-subtle)] transition-colors rounded-xl px-4 py-2.5 self-start">
                   <IconUpload />
                   Choose file
                   <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
@@ -164,38 +164,38 @@ const SysAdminProfile = () => {
 
           {/* Name */}
           <div className="col-span-2">
-            <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Full name</label>
+            <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Full name</label>
             <input
               type="text"
               value={formData.name}
               onChange={handleChange("name")}
-              className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+              className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] transition-colors bg-transparent"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="flex items-center gap-1.5 text-xs font-semibold text-[#1a1a2e] mb-2">
+            <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-primary)] mb-2">
               <IconMail /> Email
             </label>
             <input
               type="email"
               value={formData.email}
               readOnly
-              className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#9a9a9a] focus:outline-none bg-transparent cursor-not-allowed"
+              className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-muted)] focus:outline-none bg-transparent cursor-not-allowed"
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className="flex items-center gap-1.5 text-xs font-semibold text-[#1a1a2e] mb-2">
+            <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-primary)] mb-2">
               <IconPhoneIcon /> Phone
             </label>
             <input
               type="text"
               value={formData.phone}
               onChange={handleChange("phone")}
-              className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+              className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] transition-colors bg-transparent"
             />
           </div>
         </div>
@@ -208,14 +208,14 @@ const SysAdminProfile = () => {
           <button
             onClick={handleCancel}
             disabled={!hasChanges}
-            className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges ? "bg-[#f0ede8] text-[#1a1a2e] hover:bg-[#e2ddd8]" : "bg-[#f0ede8] text-[#c5c0b8] cursor-not-allowed"}`}
+            className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges ? "bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]" : "bg-[var(--surface-muted)] text-[var(--text-faint)] cursor-not-allowed"}`}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={!hasChanges || saving}
-            className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges && !saving ? "bg-[#1a1a2e] text-white hover:bg-[#2d2d44]" : "bg-[#9a9a9a] text-[#d5d5d5] cursor-not-allowed"}`}
+            className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges && !saving ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[#9a9a9a] text-[var(--text-faint)] cursor-not-allowed"}`}
           >
             {saving ? "Saving..." : "Save changes"}
           </button>

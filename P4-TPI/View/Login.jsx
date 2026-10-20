@@ -1,4 +1,5 @@
 import LoginForm from "../src/Components/ComponentsLogin/LoginForm";
+import ThemeToggle from "../src/Components/Shared/ThemeToggle";
 import { useTranslation } from "../CustomHooks/TraslateHook";
 import { useLandingContent } from "../CustomHooks/useLandingContent";
 import { useState } from "react";
@@ -22,37 +23,40 @@ const Login = () => {
     setIsForgotPassword(false);
   }
   return (
-    <main className="flex min-h-screen w-full bg-[#F8F5F0] relative">
-      {/* Selector de Idioma Flotante */}
-      <button
-        onClick={toggleLanguage}
-        className="absolute top-6 right-6 z-10 bg-white border border-gray-200 px-4 py-2 rounded-full shadow-sm hover:bg-gray-50 transition-all font-medium text-sm flex items-center gap-2"
-      >
-        <span
-          className={
-            language === "es" ? "font-bold text-black" : "text-gray-400"
-          }
+    <main className="flex min-h-screen w-full bg-[var(--page-bg)] relative">
+      {/* Selector de Idioma y modo claro/oscuro, flotantes */}
+      <div className="absolute top-6 right-6 z-10 flex items-center gap-2">
+        <ThemeToggle />
+        <button
+          onClick={toggleLanguage}
+          className="bg-[var(--surface)] border border-[var(--border-subtle)] px-4 py-2 rounded-full shadow-sm hover:bg-[var(--surface-muted)] transition-all font-medium text-sm flex items-center gap-2"
         >
-          ES
-        </span>
-        <span className="text-gray-300">|</span>
-        <span
-          className={
-            language === "en" ? "font-bold text-black" : "text-gray-400"
-          }
-        >
-          EN
-        </span>
-      </button>
+          <span
+            className={
+              language === "es" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-muted)]"
+            }
+          >
+            ES
+          </span>
+          <span className="text-[var(--text-faint)]">|</span>
+          <span
+            className={
+              language === "en" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-muted)]"
+            }
+          >
+            EN
+          </span>
+        </button>
+      </div>
 
       {/* SECCIÓN IZQUIERDA: Hero / Info */}
-      <section className="hidden lg:flex w-1/2 bg-[#1A1A1A] text-white p-12 flex-col justify-center">
+      <section className="hidden lg:flex w-1/2 bg-[var(--brand)] text-white p-12 flex-col justify-center">
         <div className="max-w-xl mx-auto">
           <button
             onClick={() => navigate("/")}
             className="flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity"
           >
-            <div className="brand-icon bg-white/10 p-2 rounded-lg">
+            <div className="brand-icon bg-[var(--surface)]/10 p-2 rounded-lg">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -77,20 +81,20 @@ const Login = () => {
             {heroTitle}
           </h1>
 
-          <p className="text-gray-400 text-lg mb-12">{heroDesc}</p>
+          <p className="text-[var(--text-muted)] text-lg mb-12">{heroDesc}</p>
 
           <div className="grid grid-cols-3 gap-8 pt-8 border-t border-white/10">
             <div>
               <div className="text-2xl font-bold">10M+</div>
-              <div className="text-sm text-gray-500">{t("activeUsers")}</div>
+              <div className="text-sm text-[var(--text-muted)]">{t("activeUsers")}</div>
             </div>
             <div>
               <div className="text-2xl font-bold">50M+</div>
-              <div className="text-sm text-gray-500">{t("meetings")}</div>
+              <div className="text-sm text-[var(--text-muted)]">{t("meetings")}</div>
             </div>
             <div>
               <div className="text-2xl font-bold">99.9%</div>
-              <div className="text-sm text-gray-500">Uptime</div>
+              <div className="text-sm text-[var(--text-muted)]">Uptime</div>
             </div>
           </div>
         </div>
@@ -102,7 +106,7 @@ const Login = () => {
           onClick={() => navigate("/")}
           className="lg:hidden flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity"
         >
-          <div className="brand-icon bg-[#1a1a2e] p-2 rounded-lg text-white">
+          <div className="brand-icon bg-[var(--brand)] p-2 rounded-lg text-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -120,25 +124,25 @@ const Login = () => {
               <line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-xl font-bold text-gray-900">{brandName}</span>
+          <span className="text-xl font-bold text-[var(--text-primary)]">{brandName}</span>
         </button>
 
-        <div className="w-full max-w-md bg-white p-10 rounded-2xl shadow-sm border border-gray-100">
+        <div className="w-full max-w-md bg-[var(--surface)] p-10 rounded-2xl shadow-sm border border-[var(--border-faint)]">
           <div className="text-center mb-8">
             {isForgotPassword ? (
               <>
-                <h2 className="text-3xl font-bold text-gray-900">{t("forgotTitle") ?? "Reset password"}</h2>
-                <p className="text-gray-500 mt-2">{t("forgotSubtitle") ?? "Enter your email and we\'ll send you a reset link."}</p>
+                <h2 className="text-3xl font-bold text-[var(--text-primary)]">{t("forgotTitle") ?? "Reset password"}</h2>
+                <p className="text-[var(--text-muted)] mt-2">{t("forgotSubtitle") ?? "Enter your email and we\'ll send you a reset link."}</p>
               </>
             ) : isRegister ? (
               <>
-                <h2 className="text-3xl font-bold text-gray-900">{t("registerTitle")}</h2>
-                <p className="text-gray-500 mt-2">{t("registerSubtitle")}</p>
+                <h2 className="text-3xl font-bold text-[var(--text-primary)]">{t("registerTitle")}</h2>
+                <p className="text-[var(--text-muted)] mt-2">{t("registerSubtitle")}</p>
               </>
             ) : (
               <>
-                <h2 className="text-3xl font-bold text-gray-900">{t("welcome")}</h2>
-                <p className="text-gray-500 mt-2">{t("subtitle")}</p>
+                <h2 className="text-3xl font-bold text-[var(--text-primary)]">{t("welcome")}</h2>
+                <p className="text-[var(--text-muted)] mt-2">{t("subtitle")}</p>
               </>
             )}
           </div>

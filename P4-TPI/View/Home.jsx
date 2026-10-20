@@ -1,12 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../CustomHooks/TraslateHook";
 import { useLandingContent } from "../CustomHooks/useLandingContent";
+import { resolveLandingColor, resolveLandingTextColor } from "../CustomHooks/landingColors";
 import HeroSection from "../src/Components/ComponentsHome/HeroSection";
 import OptionCard from "../src/Components/ComponentsHome/OptionCard";
 import BusinessTypesSection from "../src/Components/ComponentsHome/BusinessTypesSection";
 import PlansSection from "../src/Components/ComponentsHome/PlansSection";
 import AboutSection from "../src/Components/ComponentsHome/AboutSection";
 import Footer from "../src/Components/ComponentsHome/Footer";
+import ThemeToggle from "../src/Components/Shared/ThemeToggle";
 
 const BuildingIcon = () => (
   <svg
@@ -39,9 +41,10 @@ const Home = () => {
   const { t, toggleLanguage, language } = useTranslation();
   const content = useLandingContent();
   const brandName = content?.brandName || t("brandName");
-  const primaryColor = content?.primaryColor || "#1a1a2e";
-  const backgroundColor = content?.backgroundColor || "#F8F5F0";
-  const accentColor = content?.accentColor || "#e2ddd8";
+  const primaryColor = resolveLandingColor(content, "primaryColor");
+  const primaryTextColor = resolveLandingTextColor(content, "primaryColor");
+  const backgroundColor = resolveLandingColor(content, "backgroundColor");
+  const accentColor = resolveLandingColor(content, "accentColor");
 
   const goToRegister = () => navigate("/register");
   const scrollToAbout = () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
@@ -63,30 +66,31 @@ const Home = () => {
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
           </div>
-          <span className="text-lg font-bold" style={{ color: primaryColor }}>{brandName}</span>
+          <span className="text-lg font-bold" style={{ color: primaryTextColor }}>{brandName}</span>
           <button
             onClick={scrollToAbout}
-            className="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#F0EDE8] transition-colors"
-            style={{ color: primaryColor }}
+            className="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--surface-muted)] transition-colors"
+            style={{ color: primaryTextColor }}
           >
             {t("navAbout")}
           </button>
         </div>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <button
             onClick={toggleLanguage}
-            className="bg-white border px-3 py-1.5 rounded-full shadow-sm hover:bg-[#F0EDE8] transition-all font-medium text-xs flex items-center gap-1.5"
+            className="bg-[var(--surface)] border px-3 py-1.5 rounded-full shadow-sm hover:bg-[var(--surface-muted)] transition-all font-medium text-xs flex items-center gap-1.5"
             style={{ borderColor: accentColor }}
           >
-            <span style={language === "es" ? { fontWeight: "bold", color: primaryColor } : { color: "#b3aca3" }}>ES</span>
+            <span style={language === "es" ? { fontWeight: "bold", color: primaryTextColor } : { color: "var(--text-faint)" }}>ES</span>
             <span style={{ color: accentColor }}>|</span>
-            <span style={language === "en" ? { fontWeight: "bold", color: primaryColor } : { color: "#b3aca3" }}>EN</span>
+            <span style={language === "en" ? { fontWeight: "bold", color: primaryTextColor } : { color: "var(--text-faint)" }}>EN</span>
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#F0EDE8] transition-colors"
-            style={{ color: primaryColor }}
+            className="px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--surface-muted)] transition-colors"
+            style={{ color: primaryTextColor }}
           >
             {t("signIn")}
           </button>

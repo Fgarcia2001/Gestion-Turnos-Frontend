@@ -75,9 +75,9 @@ const makeMinutesToX = (scheduleStart, widths, cumX) => {
 };
 
 const TimeHeader = ({ slots, widths }) => (
-  <div className="flex sticky top-0 z-20 bg-white border-b border-[#e2ddd8]">
+  <div className="flex sticky top-0 z-20 bg-[var(--surface)] border-b border-[var(--border-subtle)]">
     <div
-      className="shrink-0 sticky left-0 z-30 bg-white border-r border-[#e2ddd8]"
+      className="shrink-0 sticky left-0 z-30 bg-[var(--surface)] border-r border-[var(--border-subtle)]"
       style={{ width: LABEL_WIDTH, height: 44 }}
     />
     {slots.map((slot, i) => {
@@ -87,8 +87,8 @@ const TimeHeader = ({ slots, widths }) => (
           key={slot}
           className={
             collapsed
-              ? "shrink-0 border-r border-[#f0ede8] bg-[#f9f8f6]"
-              : "shrink-0 flex items-center justify-center border-r border-[#f0ede8] text-[12px] font-semibold text-[#5a5a6e] tracking-wide"
+              ? "shrink-0 border-r border-[var(--border-faint)] bg-[var(--surface-muted-3)]"
+              : "shrink-0 flex items-center justify-center border-r border-[var(--border-faint)] text-[12px] font-semibold text-[var(--text-tertiary)] tracking-wide"
           }
           style={{ width: widths[i], height: 44 }}
         >
@@ -164,21 +164,21 @@ const AppointmentBlock = ({ appt, onSelect, minutesToX }) => {
 };
 
 const StaffRow = ({ staff, widths, totalWidth, onSelect, minutesToX }) => (
-  <div className="flex border-b border-[#e2ddd8]" style={{ height: ROW_HEIGHT }}>
+  <div className="flex border-b border-[var(--border-subtle)]" style={{ height: ROW_HEIGHT }}>
     <div
-      className="shrink-0 sticky left-0 z-10 bg-white border-r border-[#e2ddd8] flex items-center gap-2.5 px-3.5"
+      className="shrink-0 sticky left-0 z-10 bg-[var(--surface)] border-r border-[var(--border-subtle)] flex items-center gap-2.5 px-3.5"
       style={{ width: LABEL_WIDTH }}
     >
-      <div className="w-9 h-9 shrink-0 rounded-full bg-[#f0ede8] text-[#1a1a2e] flex items-center justify-center text-[12px] font-bold">
+      <div className="w-9 h-9 shrink-0 rounded-full bg-[var(--surface-muted)] text-[var(--text-primary)] flex items-center justify-center text-[12px] font-bold">
         {getInitials(staff.staffName)}
       </div>
-      <span className="text-sm font-semibold text-[#1a1a2e] truncate">{staff.staffName}</span>
+      <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{staff.staffName}</span>
     </div>
 
     <div className="relative" style={{ width: totalWidth }}>
       <div className="absolute inset-0 flex">
         {widths.map((w, i) => (
-          <div key={i} className="shrink-0 border-r border-[#f0ede8]" style={{ width: w }} />
+          <div key={i} className="shrink-0 border-r border-[var(--border-faint)]" style={{ width: w }} />
         ))}
       </div>
       {(staff.appointments || []).map((appt) => (
@@ -201,12 +201,12 @@ const ScheduleGrid = ({ staff, schedule, isToday, selectedDate }) => {
   const handleSelect = (appt, staffName) => setSelected({ appt, staffName });
 
   return (
-    <div data-tour="schedule-grid" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
-      <div className="flex items-center justify-end px-4 py-2.5 border-b border-[#e2ddd8] bg-[#fcfbf9]">
+    <div data-tour="schedule-grid" className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
+      <div className="flex items-center justify-end px-4 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-faint-2)]">
         <button
           type="button"
           onClick={() => setCompact((c) => !c)}
-          className="text-xs font-semibold bg-white border border-[#e2ddd8] text-[#1a1a2e] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+          className="text-xs font-semibold bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
         >
           {compact ? "Show full day" : "Hide empty slots"}
         </button>

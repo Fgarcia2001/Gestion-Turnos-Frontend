@@ -46,14 +46,14 @@ const CSS_ANIMATIONS = `
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 const TabSelector = ({ tabs, activeTab, onTabChange, t }) => (
-  <div data-tour="business-tabs" className="flex items-center gap-1 bg-[#f0ede8] rounded-xl p-1">
+  <div data-tour="business-tabs" className="flex items-center gap-1 bg-[var(--surface-muted)] rounded-xl p-1">
     {tabs.map(({ id, labelKey }) => (
       <button
         key={id}
         onClick={() => onTabChange(id)}
         className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === id
-          ? "bg-[#1a1a2e] text-white shadow-sm"
-          : "text-[#9a9a9a] hover:text-[#1a1a2e]"
+          ? "bg-[var(--brand)] text-white shadow-sm"
+          : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
           }`}
       >
         {t(labelKey)}
@@ -64,11 +64,11 @@ const TabSelector = ({ tabs, activeTab, onTabChange, t }) => (
 
 const TableHeader = ({ tab, t }) => (
   <thead>
-    <tr className="border-b border-[#e2ddd8]">
+    <tr className="border-b border-[var(--border-subtle)]">
       {TAB_HEADERS[tab]?.map((header) => (
         <th
           key={header}
-          className="text-left text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide pb-3 pr-6"
+          className="text-left text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide pb-3 pr-6"
         >
           {t(header)}
         </th>
@@ -81,8 +81,8 @@ const TableHeader = ({ tab, t }) => (
 const LoadingState = () => (
   <div className="flex items-center justify-center py-12">
     <div className="flex flex-col items-center gap-3">
-      <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
-      <span className="text-sm text-[#9a9a9a]">Loading...</span>
+      <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
+      <span className="text-sm text-[var(--text-muted)]">Loading...</span>
     </div>
   </div>
 );
@@ -91,7 +91,7 @@ const EmptyState = ({ tab, t }) => (
   <tr>
     <td
       colSpan={TAB_HEADERS[tab]?.length + 1}
-      className="py-12 text-center text-sm text-[#9a9a9a]"
+      className="py-12 text-center text-sm text-[var(--text-muted)]"
     >
       {t(`No ${tab} found`)}
     </td>
@@ -333,7 +333,7 @@ const ManagmentBusiness = () => {
       <style>{CSS_ANIMATIONS}</style>
 
       {toast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[var(--brand)] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
@@ -349,19 +349,19 @@ const ManagmentBusiness = () => {
         </div>
 
         {/* Table card */}
-        <div data-tour="business-table" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
+        <div data-tour="business-table" className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
 
           {/* Card header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-6 pt-5 pb-0">
             <div className="flex items-center gap-3 flex-wrap">
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9a9a9a]"><IconSearch /></span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"><IconSearch /></span>
                 <input
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder={t("searchPlaceholder") || "Search..."}
-                  className="w-full sm:w-56 border border-[#e2ddd8] rounded-xl pl-9 pr-3 py-2 text-sm text-[#1a1a2e] bg-[#faf9f7] outline-none focus:border-[#1a1a2e] transition-colors"
+                  className="w-full sm:w-56 border border-[var(--border-subtle)] rounded-xl pl-9 pr-3 py-2 text-sm text-[var(--text-primary)] bg-[var(--surface-faint)] outline-none focus:border-[var(--brand)] transition-colors"
                 />
               </div>
               <TabSelector
@@ -373,7 +373,7 @@ const ManagmentBusiness = () => {
             </div>
             <button
               onClick={() => setCreateTarget(true)}
-              className="flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors"
+              className="flex items-center gap-2 bg-[var(--brand)] text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors"
             >
               <IconPlus />
               {addLabel}

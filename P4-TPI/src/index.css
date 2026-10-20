@@ -1,5 +1,74 @@
 @import "tailwindcss";
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Theme tokens (modo claro/oscuro). Mismos colores de la app: los valores
+   de modo oscuro son variantes de la paleta navy/crema existente, no una
+   paleta nueva. Se referencian desde las clases de Tailwind como
+   bg-[var(--surface)], text-[var(--text-primary)], etc.
+   Alcance: Admin, SysAdmin, Login/Register y el wizard de reserva. La
+   landing publica y la pagina publica del negocio quedan afuera a
+   proposito (tienen su propio color de marca por negocio).
+   ────────────────────────────────────────────────────────────────────── */
+:root {
+  --page-bg: #F8F5F0;
+  --surface: #ffffff;
+  --surface-faint: #faf9f7;
+  --surface-faint-2: #fcfbf9;
+  --surface-muted: #f0ede8;
+  --surface-muted-2: #e4e0da;
+  --surface-muted-3: #f9f8f6;
+  --surface-accent: #d8d2c9;
+
+  --brand: #1a1a2e;
+  --brand-hover: #2d2d44;
+
+  --border-subtle: #e2ddd8;
+  --border-faint: #f0ede8;
+  --border-accent: #b3aca3;
+
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-secondary-alt: #6b6b6b;
+  --text-tertiary: #5a5a6e;
+  --text-muted: #9a9a9a;
+  --text-faint: #b3aca3;
+  --text-dim: #4a4a4a;
+}
+
+.dark {
+  --page-bg: #13131f;
+  --surface: #1c1c2b;
+  --surface-faint: #1f1f30;
+  --surface-faint-2: #222234;
+  --surface-muted: #26263a;
+  --surface-muted-2: #2c2c42;
+  --surface-muted-3: #20202f;
+  --surface-accent: #3a3a52;
+
+  --brand: #2d2d44;
+  --brand-hover: #3d3d5c;
+
+  --border-subtle: #33334a;
+  --border-faint: #2a2a3e;
+  --border-accent: #4a4a64;
+
+  --text-primary: #f0ede8;
+  --text-secondary: #a8acb8;
+  --text-secondary-alt: #a0a0ac;
+  --text-tertiary: #b0b3c0;
+  --text-muted: #9a9aac;
+  --text-faint: #7a7a90;
+  --text-dim: #c5c5d0;
+}
+
+body {
+  background-color: var(--page-bg);
+  color-scheme: light;
+}
+.dark body {
+  color-scheme: dark;
+}
+
 @keyframes step-in {
   from {
     opacity: 0;

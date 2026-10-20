@@ -48,14 +48,14 @@ const CityAutocomplete = ({
         className={className}
       />
       {showPanel && (
-        <div className="absolute z-20 left-0 right-0 top-full mt-1 bg-white border border-[#e2ddd8] rounded-xl shadow-lg max-h-56 overflow-y-auto">
-          {loading && <p className="px-3 py-2 text-xs text-[#9a9a9a]">Buscando...</p>}
+        <div className="absolute z-20 left-0 right-0 top-full mt-1 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-xl shadow-lg max-h-56 overflow-y-auto">
+          {loading && <p className="px-3 py-2 text-xs text-[var(--text-muted)]">Buscando...</p>}
           {cities.map((city) => (
             <button
               key={city}
               type="button"
               onMouseDown={() => pick(city)}
-              className="w-full text-left px-3 py-2 text-sm text-[#1a1a2e] hover:bg-[#f0ede8] transition-colors"
+              className="w-full text-left px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
             >
               {city}
             </button>

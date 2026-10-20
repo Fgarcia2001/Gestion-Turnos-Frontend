@@ -29,24 +29,24 @@ const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
     <>
       <style>{CSS_ANIMATIONS}</style>
       <ModalOverlay onClose={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+        <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]"
+            className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]"
           >
             <IconX />
           </button>
 
-          <div className="w-14 h-14 rounded-full bg-[#f0ede8] flex items-center justify-center mx-auto mb-4 text-[#1a1a2e]">
+          <div className="w-14 h-14 rounded-full bg-[var(--surface-muted)] flex items-center justify-center mx-auto mb-4 text-[var(--text-primary)]">
             <IconSparkles />
           </div>
 
-          <h2 className="text-lg font-bold text-[#1a1a2e] mb-1">Change plan?</h2>
-          <p className="text-sm text-[#6b7280] mb-2">
-            You are about to switch to <span className="font-semibold text-[#1a1a2e]">{name}</span>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Change plan?</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-2">
+            You are about to switch to <span className="font-semibold text-[var(--text-primary)]">{name}</span>
             {price != null ? <> (${price}{durationDays ? ` / ${durationDays} days` : ""})</> : null}.
           </p>
-          <p className="text-xs text-[#9a9a9a] mb-6">
+          <p className="text-xs text-[var(--text-muted)] mb-6">
             You&apos;ll be redirected to MercadoPago to complete the payment. Free plans are applied instantly.
           </p>
 
@@ -54,14 +54,14 @@ const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
             <button
               onClick={onClose}
               disabled={confirming}
-              className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={confirming}
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
             >
               {confirming ? "Redirecting…" : "Confirm"}
             </button>

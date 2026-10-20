@@ -68,7 +68,7 @@ const NavButton = ({ id, label, Icon, active, onClick }) => (
     aria-label={label}
     data-tour={`nav-${id}`}
     className={`flex items-center justify-center w-[42px] h-[42px] rounded-xl border-none cursor-pointer transition-all duration-200
-      ${active ? "bg-[#1a1a2e] text-white" : "bg-transparent text-[#8a8a8a] hover:bg-[#e4e0da] hover:text-[#1a1a2e]"}`}
+      ${active ? "bg-[var(--brand)] text-white" : "bg-transparent text-[var(--text-muted)] hover:bg-[var(--surface-muted-2)] hover:text-[var(--text-primary)]"}`}
   >
     <Icon />
   </button>
@@ -102,8 +102,8 @@ const Navbar = ({ onSelectSection, role, active }) => {
   };
 
   return (
-    <nav data-tour="sidebar" className="flex flex-col items-center w-[68px] h-full bg-[#f0ede8] border-r border-[#e2ddd8] py-5">
-      <div className="flex items-center justify-center w-[42px] h-[42px] bg-[#1a1a2e] rounded-xl mb-7 text-white shrink-0">
+    <nav data-tour="sidebar" className="flex flex-col items-center w-[68px] h-full bg-[var(--surface-muted)] border-r border-[var(--border-subtle)] py-5">
+      <div className="flex items-center justify-center w-[42px] h-[42px] bg-[var(--brand)] rounded-xl mb-7 text-white shrink-0">
         <IconLogo />
       </div>
       <div className="flex flex-col items-center gap-1 flex-1">

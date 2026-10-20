@@ -6,9 +6,9 @@ const money = (value) =>
   Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const StatCard = ({ label, value }) => (
-  <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-    <p className="text-sm text-[#9a9a9a] font-medium">{label}</p>
-    <p className="text-3xl font-bold text-[#1a1a2e] mt-1">{value}</p>
+  <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+    <p className="text-sm text-[var(--text-muted)] font-medium">{label}</p>
+    <p className="text-3xl font-bold text-[var(--text-primary)] mt-1">{value}</p>
   </div>
 );
 
@@ -52,18 +52,18 @@ const SysAdminDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center mt-8">
-        <p className="text-sm text-[#9a9a9a] mb-4">Couldn't load the dashboard</p>
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center mt-8">
+        <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the dashboard</p>
         <button
           onClick={load}
-          className="bg-[#1a1a2e] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors cursor-pointer"
+          className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
         >
           Retry
         </button>
@@ -82,8 +82,8 @@ const SysAdminDashboard = () => {
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[#1a1a2e] mb-1">Dashboard</h2>
-        <p className="text-sm text-[#9a9a9a]">Platform-wide overview across all businesses.</p>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Dashboard</h2>
+        <p className="text-sm text-[var(--text-muted)]">Platform-wide overview across all businesses.</p>
       </div>
 
       {/* Overview */}
@@ -103,35 +103,35 @@ const SysAdminDashboard = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm font-semibold text-[#1a1a2e]">Revenue Evolution</p>
+        <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">Revenue Evolution</p>
           <BarChart data={revenue.evolution} valueKey="revenue" formatValue={(v) => `$${money(v)}`} emptyLabel="No revenue data" />
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm font-semibold text-[#1a1a2e]">Business Growth</p>
+        <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">Business Growth</p>
           <BarChart data={businessGrowth} valueKey="count" emptyLabel="No business growth data" />
         </div>
       </div>
 
       {/* Appointment trend */}
-      <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-        <p className="text-sm font-semibold text-[#1a1a2e]">Appointment Trend</p>
+      <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+        <p className="text-sm font-semibold text-[var(--text-primary)]">Appointment Trend</p>
         <AppointmentTrendChart data={appointmentTrend} emptyLabel="No appointment data" />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Plan distribution */}
-        <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm font-semibold text-[#1a1a2e] mb-4">Plan Distribution</p>
+        <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+          <p className="text-sm font-semibold text-[var(--text-primary)] mb-4">Plan Distribution</p>
           {planDistribution.length === 0 ? (
-            <p className="text-xs text-[#9a9a9a] text-center py-4">No plan data</p>
+            <p className="text-xs text-[var(--text-muted)] text-center py-4">No plan data</p>
           ) : (
             <div className="flex flex-col gap-2.5">
               {planDistribution.map((plan, i) => (
                 <div key={plan.planName} className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: PLAN_DOT_COLORS[i % PLAN_DOT_COLORS.length] }} />
-                  <span className="text-xs text-[#6b7280]">{plan.planName}</span>
-                  <span className="text-sm font-bold text-[#1a1a2e] ml-auto">{plan.count}</span>
+                  <span className="text-xs text-[var(--text-secondary)]">{plan.planName}</span>
+                  <span className="text-sm font-bold text-[var(--text-primary)] ml-auto">{plan.count}</span>
                 </div>
               ))}
             </div>
@@ -139,28 +139,28 @@ const SysAdminDashboard = () => {
         </div>
 
         {/* Top businesses */}
-        <div className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[#f0ede8]">
-            <p className="text-sm font-semibold text-[#1a1a2e]">Top Businesses</p>
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--border-faint)]">
+            <p className="text-sm font-semibold text-[var(--text-primary)]">Top Businesses</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs text-[#9a9a9a] uppercase tracking-wide">
+                <tr className="text-left text-xs text-[var(--text-muted)] uppercase tracking-wide">
                   <th className="px-5 py-3 font-semibold">Business</th>
                   <th className="px-5 py-3 font-semibold text-right">Appointments</th>
                 </tr>
               </thead>
               <tbody>
                 {topBusinesses.map((b) => (
-                  <tr key={b.businessId} className="border-t border-[#f0ede8] hover:bg-[#f9f8f6] transition-colors">
-                    <td className="px-5 py-3 font-semibold text-[#1a1a2e]">{b.businessName || "—"}</td>
-                    <td className="px-5 py-3 text-right font-semibold text-[#1a1a2e]">{b.appointmentCount ?? 0}</td>
+                  <tr key={b.businessId} className="border-t border-[var(--border-faint)] hover:bg-[var(--surface-muted-3)] transition-colors">
+                    <td className="px-5 py-3 font-semibold text-[var(--text-primary)]">{b.businessName || "—"}</td>
+                    <td className="px-5 py-3 text-right font-semibold text-[var(--text-primary)]">{b.appointmentCount ?? 0}</td>
                   </tr>
                 ))}
                 {topBusinesses.length === 0 && (
-                  <tr className="border-t border-[#f0ede8]">
-                    <td colSpan={2} className="px-5 py-8 text-center text-sm text-[#9a9a9a]">No businesses found.</td>
+                  <tr className="border-t border-[var(--border-faint)]">
+                    <td colSpan={2} className="px-5 py-8 text-center text-sm text-[var(--text-muted)]">No businesses found.</td>
                   </tr>
                 )}
               </tbody>

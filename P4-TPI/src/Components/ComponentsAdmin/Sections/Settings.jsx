@@ -25,7 +25,7 @@ const Settings = ({ initialTab, autoOpenPlanId, profileOnly = false }) => {
   return (
     <div className="flex flex-col gap-6 w-full h-full pb-10 items-center">
       {/* Tabs */}
-      <div data-tour="settings-tabs" className="flex flex-wrap items-center justify-center gap-1 bg-[#f0ede8] rounded-xl p-1 mx-auto max-w-full">
+      <div data-tour="settings-tabs" className="flex flex-wrap items-center justify-center gap-1 bg-[var(--surface-muted)] rounded-xl p-1 mx-auto max-w-full">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -36,8 +36,8 @@ const Settings = ({ initialTab, autoOpenPlanId, profileOnly = false }) => {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap shrink-0 transition-all duration-200 ${
                 isActive
-                  ? "bg-[#1a1a2e] text-white shadow-sm"
-                  : "text-[#9a9a9a] hover:text-[#1a1a2e]"
+                  ? "bg-[var(--brand)] text-white shadow-sm"
+                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               }`}
             >
               <Icon />

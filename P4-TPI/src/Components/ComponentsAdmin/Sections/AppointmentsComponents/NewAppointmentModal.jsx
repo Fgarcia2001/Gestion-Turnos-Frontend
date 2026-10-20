@@ -249,7 +249,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
             {clientMode === "search" ? (
               <>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9a9a9a]"><IconSearch /></span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"><IconSearch /></span>
                   <input
                     autoFocus
                     value={clientQuery}
@@ -259,7 +259,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   />
                 </div>
 
-                {searchLoading && <p className="text-sm text-[#9a9a9a] text-center py-4">Buscando...</p>}
+                {searchLoading && <p className="text-sm text-[var(--text-muted)] text-center py-4">Buscando...</p>}
 
                 {!searchLoading && clientQuery.trim().length >= 2 && (
                   clientResults.length ? (
@@ -269,29 +269,29 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                           key={c.id}
                           type="button"
                           onClick={() => pickClient(c)}
-                          className="flex flex-col items-start text-left px-4 py-2.5 rounded-xl border border-[#e2ddd8] hover:border-[#1a1a2e] hover:bg-[#faf9f7] transition-colors"
+                          className="flex flex-col items-start text-left px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] hover:border-[var(--brand)] hover:bg-[var(--surface-faint)] transition-colors"
                         >
-                          <span className="text-sm font-semibold text-[#1a1a2e]">{c.name}</span>
-                          <span className="text-xs text-[#9a9a9a]">{c.email}</span>
+                          <span className="text-sm font-semibold text-[var(--text-primary)]">{c.name}</span>
+                          <span className="text-xs text-[var(--text-muted)]">{c.email}</span>
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-[#9a9a9a] text-center py-4">No se encontraron clientes.</p>
+                    <p className="text-sm text-[var(--text-muted)] text-center py-4">No se encontraron clientes.</p>
                   )
                 )}
 
                 <button
                   type="button"
                   onClick={startNewClient}
-                  className="text-sm font-semibold text-[#1a1a2e] hover:underline self-start"
+                  className="text-sm font-semibold text-[var(--text-primary)] hover:underline self-start"
                 >
                   + Nuevo cliente
                 </button>
               </>
             ) : (
               <>
-                <button type="button" onClick={backToSearch} className="flex items-center gap-1 text-sm font-semibold text-[#6b7280] hover:text-[#1a1a2e] self-start">
+                <button type="button" onClick={backToSearch} className="flex items-center gap-1 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] self-start">
                   <IconChevronLeft /> Buscar otro cliente
                 </button>
 
@@ -343,11 +343,11 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   type="button"
                   onClick={() => selectBranch(id)}
                   className={`flex items-center gap-3 text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected ? "border-[#1a1a2e] bg-[#faf9f7]" : "border-[#e2ddd8] hover:border-[#b3aca3]"
+                    selected ? "border-[var(--brand)] bg-[var(--surface-faint)]" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
                   }`}
                 >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#f0ede8] text-[#1a1a2e] shrink-0"><IconMapPin /></span>
-                  <span className="font-semibold text-[#1a1a2e]">{b.name ?? b.branchName}</span>
+                  <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] shrink-0"><IconMapPin /></span>
+                  <span className="font-semibold text-[var(--text-primary)]">{b.name ?? b.branchName}</span>
                 </button>
               );
             })}
@@ -365,13 +365,13 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   type="button"
                   onClick={() => setServiceId(s.id)}
                   className={`flex items-start gap-3 text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected ? "border-[#1a1a2e] bg-[#faf9f7]" : "border-[#e2ddd8] hover:border-[#b3aca3]"
+                    selected ? "border-[var(--brand)] bg-[var(--surface-faint)]" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
                   }`}
                 >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#f0ede8] text-[#1a1a2e] shrink-0"><IconClipboard /></span>
+                  <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] shrink-0"><IconClipboard /></span>
                   <div>
-                    <p className="font-semibold text-[#1a1a2e]">{s.name}</p>
-                    <p className="text-xs text-[#9a9a9a]">{s.durationMinutes} min · ${s.price}</p>
+                    <p className="font-semibold text-[var(--text-primary)]">{s.name}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{s.durationMinutes} min · ${s.price}</p>
                   </div>
                 </button>
               );
@@ -390,13 +390,13 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   type="button"
                   onClick={() => setStaffId(s.id)}
                   className={`flex items-center gap-3 text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected ? "border-[#1a1a2e] bg-[#faf9f7]" : "border-[#e2ddd8] hover:border-[#b3aca3]"
+                    selected ? "border-[var(--brand)] bg-[var(--surface-faint)]" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
                   }`}
                 >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#1a1a2e] text-white text-xs font-bold shrink-0">
+                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--brand)] text-white text-xs font-bold shrink-0">
                     {(s.name || "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
                   </span>
-                  <span className="font-semibold text-[#1a1a2e]">{s.name}</span>
+                  <span className="font-semibold text-[var(--text-primary)]">{s.name}</span>
                 </button>
               );
             })}
@@ -406,12 +406,12 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
       case "datetime":
         return (
           <div className="flex flex-col gap-5">
-            <div className="w-full max-w-sm mx-auto border border-[#e2ddd8] rounded-2xl p-5">
+            <div className="w-full max-w-sm mx-auto border border-[var(--border-subtle)] rounded-2xl p-5">
               <BookingCalendar selected={day} onSelect={selectDay} viewDate={viewDate} onViewDateChange={setViewDate} minDate={today} maxDate={maxBookingDate} />
             </div>
             {day && (
               slotsLoading ? (
-                <p className="text-sm text-[#9a9a9a] text-center">Cargando horarios...</p>
+                <p className="text-sm text-[var(--text-muted)] text-center">Cargando horarios...</p>
               ) : slots.length ? (
                 <div className="grid grid-cols-4 gap-2 max-w-md mx-auto">
                   {slots.map((slot) => (
@@ -420,7 +420,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                       type="button"
                       onClick={() => setStartTime(slot.startTime)}
                       className={`py-2 rounded-lg border-2 text-sm font-semibold transition-all ${
-                        startTime === slot.startTime ? "border-[#1a1a2e] bg-[#1a1a2e] text-white" : "border-[#e2ddd8] hover:border-[#b3aca3]"
+                        startTime === slot.startTime ? "border-[var(--brand)] bg-[var(--brand)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
                       }`}
                     >
                       {slot.startTime}
@@ -428,7 +428,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-[#9a9a9a] text-center">No hay horarios disponibles ese día.</p>
+                <p className="text-sm text-[var(--text-muted)] text-center">No hay horarios disponibles ese día.</p>
               )
             )}
           </div>
@@ -437,12 +437,12 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
       case "confirm":
         return (
           <div className="flex flex-col gap-4">
-            <div className="rounded-2xl border border-[#e2ddd8] p-4 flex flex-col gap-2">
-              <div className="flex justify-between text-sm"><span className="text-[#9a9a9a]">Cliente</span><span className="font-semibold text-[#1a1a2e]">{clientFields.clientName}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[#9a9a9a]">Sucursal</span><span className="font-semibold text-[#1a1a2e]">{branchName}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[#9a9a9a]">Servicio</span><span className="font-semibold text-[#1a1a2e]">{selectedService?.name}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[#9a9a9a]">Profesional</span><span className="font-semibold text-[#1a1a2e]">{effectiveStaffName}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[#9a9a9a]">Fecha</span><span className="font-semibold text-[#1a1a2e]">{day?.toLocaleDateString()} {startTime}</span></div>
+            <div className="rounded-2xl border border-[var(--border-subtle)] p-4 flex flex-col gap-2">
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Cliente</span><span className="font-semibold text-[var(--text-primary)]">{clientFields.clientName}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Sucursal</span><span className="font-semibold text-[var(--text-primary)]">{branchName}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Servicio</span><span className="font-semibold text-[var(--text-primary)]">{selectedService?.name}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Profesional</span><span className="font-semibold text-[var(--text-primary)]">{effectiveStaffName}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Fecha</span><span className="font-semibold text-[var(--text-primary)]">{day?.toLocaleDateString()} {startTime}</span></div>
             </div>
 
             <div>
@@ -459,7 +459,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                     type="button"
                     onClick={() => setPayment(opt.value)}
                     className={`py-2 rounded-xl border-2 text-sm font-semibold transition-all ${
-                      Number(payment) === opt.value ? "border-[#1a1a2e] bg-[#1a1a2e] text-white" : "border-[#e2ddd8] hover:border-[#b3aca3]"
+                      Number(payment) === opt.value ? "border-[var(--brand)] bg-[var(--brand)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
                     }`}
                   >
                     {opt.label}
@@ -479,27 +479,27 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative" style={{ maxHeight: "90vh", overflowY: "auto" }}>
+      <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative" style={{ maxHeight: "90vh", overflowY: "auto" }}>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-[#1a1a2e]">Nuevo turno</h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5 flex items-center gap-1.5">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Nuevo turno</h2>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5 flex items-center gap-1.5">
               <IconUser />
               {STEP_LABELS[currentStep]} · paso {stepIndex + 1} de {steps.length}
             </p>
           </div>
-          <button onClick={onClose} className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
           </button>
         </div>
 
         {renderStep()}
 
-        <div className="flex justify-between pt-5 mt-5 border-t border-[#f0ede8]">
+        <div className="flex justify-between pt-5 mt-5 border-t border-[var(--border-faint)]">
           <button
             onClick={goBack}
             disabled={submitting}
-            className="px-5 py-2 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+            className="px-5 py-2 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
           >
             {stepIndex === 0 ? "Cancelar" : "Atrás"}
           </button>
@@ -507,7 +507,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
             onClick={goNext}
             disabled={!canContinue || submitting}
             className={`px-6 py-2 rounded-xl text-sm font-semibold transition-colors ${
-              canContinue && !submitting ? "bg-[#1a1a2e] text-white hover:bg-[#2d2d44]" : "bg-[#e2ddd8] text-[#b3aca3] cursor-not-allowed"
+              canContinue && !submitting ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[var(--border-subtle)] text-[var(--text-faint)] cursor-not-allowed"
             }`}
           >
             {submitting ? "Creando..." : currentStep === "confirm" ? "Crear turno" : "Continuar"}

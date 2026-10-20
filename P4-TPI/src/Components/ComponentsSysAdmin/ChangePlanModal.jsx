@@ -26,22 +26,22 @@ const ChangePlanModal = ({ businessName, currentPlanId, plans, onClose, onConfir
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
+      <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]"
+          className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]"
         >
           <IconX />
         </button>
 
-        <h2 className="text-lg font-bold text-[#1a1a2e] mb-1">Change plan</h2>
-        <p className="text-sm text-[#6b7280] mb-5">
-          Change the plan for <span className="font-semibold text-[#1a1a2e]">"{businessName}"</span>.
+        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Change plan</h2>
+        <p className="text-sm text-[var(--text-secondary)] mb-5">
+          Change the plan for <span className="font-semibold text-[var(--text-primary)]">"{businessName}"</span>.
           This takes effect immediately, without going through checkout.
         </p>
 
         {otherPlans.length === 0 ? (
-          <p className="text-sm text-[#9a9a9a] mb-5">There are no other plans to switch to.</p>
+          <p className="text-sm text-[var(--text-muted)] mb-5">There are no other plans to switch to.</p>
         ) : (
           <div className="mb-5">
             <label className={labelClass}>New plan</label>
@@ -65,14 +65,14 @@ const ChangePlanModal = ({ businessName, currentPlanId, plans, onClose, onConfir
           <button
             onClick={onClose}
             disabled={submitting}
-            className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+            className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={submitting || otherPlans.length === 0}
-            className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50"
+            className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
           >
             {submitting ? "Changing..." : "Change plan"}
           </button>

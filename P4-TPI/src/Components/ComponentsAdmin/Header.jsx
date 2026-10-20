@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
 import { useNotifications } from "../../../CustomHooks/NotificationContext";
+import ThemeToggle from "../Shared/ThemeToggle";
 
 const IconBell = () => (
   <svg
@@ -109,12 +110,12 @@ const Header = ({
   };
 
   return (
-    <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[#f0ede8]">
+    <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[var(--surface-muted)]">
       <div className="min-w-0" data-tour="greeting">
-        <h1 className="text-lg sm:text-2xl font-bold text-[#1a1a2e] leading-tight truncate">
+        <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-primary)] leading-tight truncate">
           Hello, <span className="font-bold">{displayName || "there"}</span>
         </h1>
-        <p className="text-xs sm:text-sm text-[#9a9a9a] mt-0.5 truncate">
+        <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 truncate">
           View and control your appointments here!
         </p>
       </div>
@@ -131,12 +132,13 @@ const Header = ({
             </span>
           </button>
         )}
+        <ThemeToggle />
         <div className="relative">
           <button
             aria-label="Notifications"
             data-tour="notifications"
             onClick={handleToggle}
-            className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-[#e2ddd8] text-[#8a8a8a] hover:bg-[#e4e0da] hover:text-[#1a1a2e] transition-all duration-200 cursor-pointer"
+            className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:bg-[var(--surface-muted-2)] hover:text-[var(--text-primary)] transition-all duration-200 cursor-pointer"
           >
             <IconBell />
             {unreadCount > 0 && (
@@ -153,18 +155,18 @@ const Header = ({
                 className="fixed inset-0 z-20"
                 onClick={() => setOpen(false)}
               />
-              <div className="absolute right-0 top-full mt-2 w-[min(20rem,calc(100vw-2rem))] max-h-96 overflow-y-auto bg-white border border-[#e2ddd8] rounded-2xl shadow-xl z-30">
-                <div className="px-4 py-3 border-b border-[#f0ede8]">
-                  <h3 className="text-sm font-bold text-[#1a1a2e]">
+              <div className="absolute right-0 top-full mt-2 w-[min(20rem,calc(100vw-2rem))] max-h-96 overflow-y-auto bg-[var(--surface)] border border-[var(--border-subtle)] rounded-2xl shadow-xl z-30">
+                <div className="px-4 py-3 border-b border-[var(--border-faint)]">
+                  <h3 className="text-sm font-bold text-[var(--text-primary)]">
                     {t("New appointments") || "New appointments"}
                   </h3>
-                  <p className="text-xs text-[#9a9a9a]">
+                  <p className="text-xs text-[var(--text-muted)]">
                     {t("Live updates") || "Live updates"}
                   </p>
                 </div>
                 {appointments.length === 0 ? (
                   <div className="p-6 text-center">
-                    <p className="text-sm text-[#9a9a9a]">
+                    <p className="text-sm text-[var(--text-muted)]">
                       {t("No new appointments") || "No new appointments"}
                     </p>
                   </div>
@@ -173,19 +175,19 @@ const Header = ({
                     <button
                       key={appt.id}
                       onClick={() => handleSelect(appt)}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#f0ede8] transition-colors border-b border-[#f0ede8] last:border-b-0 cursor-pointer"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[var(--surface-muted)] transition-colors border-b border-[var(--border-faint)] last:border-b-0 cursor-pointer"
                     >
-                      <div className="w-8 h-8 rounded-full bg-[#dbeafe] flex items-center justify-center text-xs font-semibold text-[#1a1a2e] shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-[#dbeafe] flex items-center justify-center text-xs font-semibold text-[var(--text-primary)] shrink-0">
                         {getInitials(appt.clientName)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#1a1a2e] truncate">
+                        <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
                           {appt.clientName || "—"}
                         </p>
-                        <p className="text-xs text-[#9a9a9a] truncate">
+                        <p className="text-xs text-[var(--text-muted)] truncate">
                           {appt.serviceName || "—"}
                         </p>
-                        <div className="flex items-center gap-1 text-[#6b7280] mt-0.5">
+                        <div className="flex items-center gap-1 text-[var(--text-secondary)] mt-0.5">
                           <IconClock />
                           <span className="text-[11px]">
                             {toTime12(appt.startTime)} -{" "}
@@ -208,9 +210,9 @@ const Header = ({
           aria-label="Profile"
           data-tour="profile"
           onClick={onNavigateToSettings}
-          className="w-10 h-10 rounded-xl overflow-hidden border-2 border-[#e2ddd8] cursor-pointer hover:border-[#1a1a2e] transition-all duration-200 shrink-0"
+          className="w-10 h-10 rounded-xl overflow-hidden border-2 border-[var(--border-subtle)] cursor-pointer hover:border-[var(--brand)] transition-all duration-200 shrink-0"
         >
-          <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-sm font-semibold">
+          <div className="w-full h-full bg-[var(--brand)] flex items-center justify-center text-white text-sm font-semibold">
             {initials}
           </div>
         </button>

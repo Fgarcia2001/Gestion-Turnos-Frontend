@@ -16,9 +16,9 @@ const ROLE_NAME_TO_ID = { Recepcionista: 1, Profesional: 2 };
 // clientes, así que sus turnos pasan a pendiente de reasignar.
 const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
   <ModalOverlay onClose={onCancel}>
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+    <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
       <button type="button" onClick={onCancel}
-        className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+        className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
         <IconX />
       </button>
 
@@ -26,23 +26,23 @@ const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
         <IconWarning />
       </div>
 
-      <h2 className="text-lg font-bold text-[#1a1a2e] mb-2">Change role to Receptionist?</h2>
-      <p className="text-sm text-[#6b7280] mb-6">
+      <h2 className="text-lg font-bold text-[var(--text-primary)] mb-2">Change role to Receptionist?</h2>
+      <p className="text-sm text-[var(--text-secondary)] mb-6">
         Receptionists can't attend clients. Any upcoming appointments assigned to{" "}
-        <span className="font-semibold text-[#1a1a2e]">{row.staffName}</span> will be marked as pending reassignment.
+        <span className="font-semibold text-[var(--text-primary)]">{row.staffName}</span> will be marked as pending reassignment.
       </p>
 
-      <div className="flex items-center gap-3 p-3 bg-[#faf9f7] rounded-xl border border-[#f0ede8] mb-6 text-left">
+      <div className="flex items-center gap-3 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)] mb-6 text-left">
         <Avatar initials={row.staffName?.charAt(0) || "U"} color={row.color} photo={row.staffLinkPhoto || null} />
         <div>
-          <p className="font-semibold text-sm text-[#1a1a2e]">{row.staffName}</p>
-          <p className="text-xs text-[#9a9a9a]">{row.staffEmail}</p>
+          <p className="font-semibold text-sm text-[var(--text-primary)]">{row.staffName}</p>
+          <p className="text-xs text-[var(--text-muted)]">{row.staffEmail}</p>
         </div>
       </div>
 
       <div className="flex gap-3">
         <button type="button" onClick={onCancel} disabled={submitting}
-          className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50">
+          className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50">
           Cancel
         </button>
         <button type="button" onClick={onConfirm} disabled={submitting}
@@ -133,29 +133,29 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
   return (
     <ModalOverlay onClose={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
+        className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
         style={{ maxHeight: "90vh", overflowY: "auto" }}
       >
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
-            <h2 className="text-lg font-bold text-[#1a1a2e]">
-              Edit <span className="text-[#9a9a9a] font-semibold">{tabLabel}</span>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
+              Edit <span className="text-[var(--text-muted)] font-semibold">{tabLabel}</span>
             </h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">Update the information below</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Update the information below</p>
           </div>
-          <button onClick={onClose} className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
           </button>
         </div>
 
         {/* Preview card */}
-        <div className="flex items-center gap-3 mb-5 p-3 bg-[#faf9f7] rounded-xl border border-[#f0ede8]">
+        <div className="flex items-center gap-3 mb-5 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)]">
           <Avatar initials={form.initials || form.staffName?.charAt(0) || form.name?.charAt(0) || "U"} color={form.color} photo={form.photo || form.staffLinkPhoto || null} />
           <div>
-            <p className="font-semibold text-sm text-[#1a1a2e]">{form.name || form.staffName || "—"}</p>
-            <p className="text-xs text-[#9a9a9a]">{form.email || form.staffEmail || "—"}</p>
+            <p className="font-semibold text-sm text-[var(--text-primary)]">{form.name || form.staffName || "—"}</p>
+            <p className="text-xs text-[var(--text-muted)]">{form.email || form.staffEmail || "—"}</p>
           </div>
         </div>
 
@@ -190,13 +190,13 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
                 <label className={labelClass}>Photo URL</label>
                 <div className="relative">
                   <input name="staffLinkPhoto" value={form.staffLinkPhoto || ""} onChange={handleChange} className={inputClass + " pl-9"} placeholder="https://..." />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9a9a9a]"><IconPhoto /></span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"><IconPhoto /></span>
                 </div>
                 {form.staffLinkPhoto && (
                   <div className="mt-2 flex items-center gap-2">
-                    <img src={form.staffLinkPhoto} alt="preview" className="w-10 h-10 rounded-full object-cover border border-[#e2ddd8]"
+                    <img src={form.staffLinkPhoto} alt="preview" className="w-10 h-10 rounded-full object-cover border border-[var(--border-subtle)]"
                       onError={(e) => e.target.style.display = "none"} />
-                    <span className="text-xs text-[#9a9a9a]">Photo preview</span>
+                    <span className="text-xs text-[var(--text-muted)]">Photo preview</span>
                   </div>
                 )}
               </div>
@@ -296,11 +296,11 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
           {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors">
+              className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors">
               Cancel
             </button>
             <button type="submit" disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50">
+              className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50">
               {submitting ? "Saving..." : "Save changes"}
             </button>
           </div>
@@ -347,18 +347,18 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
   return (
     <ModalOverlay onClose={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
+        className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
         style={{ maxHeight: "90vh", overflowY: "auto" }}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
-            <h2 className="text-lg font-bold text-[#1a1a2e]">
-              Create <span className="text-[#9a9a9a] font-semibold">{tabLabel}</span>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
+              Create <span className="text-[var(--text-muted)] font-semibold">{tabLabel}</span>
             </h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">Fill in the details below</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Fill in the details below</p>
           </div>
-          <button type="button" onClick={onClose} className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+          <button type="button" onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
           </button>
         </div>
@@ -394,7 +394,7 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
                 <label className={labelClass}>Photo URL</label>
                 <div className="relative">
                   <input name="staffLinkPhoto" value={form.staffLinkPhoto || ""} onChange={handleChange} className={inputClass + " pl-9"} placeholder="https://..." />
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9a9a9a]"><IconPhoto /></span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"><IconPhoto /></span>
                 </div>
               </div>
               <div>
@@ -493,11 +493,11 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
           {/* Actions */}
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors">
+              className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors">
               Cancel
             </button>
             <button type="submit" disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50">
+              className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50">
               {submitting ? "Creating..." : "Create"}
             </button>
           </div>
@@ -596,21 +596,21 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
     }
   };
 
-  const timeInput = "border border-[#e2ddd8] rounded-lg px-2.5 py-1.5 text-sm text-[#1a1a2e] bg-[#faf9f7] focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 focus:border-[#1a1a2e] transition-all";
+  const timeInput = "border border-[var(--border-subtle)] rounded-lg px-2.5 py-1.5 text-sm text-[var(--text-primary)] bg-[var(--surface-faint)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/20 focus:border-[var(--brand)] transition-all";
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative" style={{ maxHeight: "90vh", overflowY: "auto" }}>
+      <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative" style={{ maxHeight: "90vh", overflowY: "auto" }}>
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-[#1a1a2e]">
-              Horarios <span className="text-[#9a9a9a] font-semibold">— {row.name}</span>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
+              Horarios <span className="text-[var(--text-muted)] font-semibold">— {row.name}</span>
             </h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">Activá los días y definí el horario de atención</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Activá los días y definí el horario de atención</p>
           </div>
-          <button onClick={onClose} className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+          <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
           </button>
         </div>
@@ -623,30 +623,30 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
 
         {loading ? (
           <div className="flex justify-center py-10">
-            <div className="size-7 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+            <div className="size-7 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
           </div>
         ) : (
           <div className="flex flex-col gap-3">
             {schedules.map((s, i) => (
               <div key={s.day}
-                className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${s.isActive ? "border-[#1a1a2e]/20 bg-[#faf9f7]" : "border-[#f0ede8] bg-white opacity-60"}`}>
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${s.isActive ? "border-[var(--brand)]/20 bg-[var(--surface-faint)]" : "border-[var(--border-faint)] bg-[var(--surface)] opacity-60"}`}>
 
                 {/* Toggle */}
                 <button
                   type="button"
                   onClick={() => toggle(i)}
-                  className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${s.isActive ? "bg-[#1a1a2e]" : "bg-[#e2ddd8]"}`}
+                  className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${s.isActive ? "bg-[var(--brand)]" : "bg-[var(--border-subtle)]"}`}
                 >
-                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${s.isActive ? "translate-x-5" : "translate-x-0"}`} />
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-[var(--surface)] rounded-full shadow transition-transform ${s.isActive ? "translate-x-5" : "translate-x-0"}`} />
                 </button>
 
                 {/* Day name */}
-                <span className="text-sm font-semibold text-[#1a1a2e] w-24 shrink-0">{s.day}</span>
+                <span className="text-sm font-semibold text-[var(--text-primary)] w-24 shrink-0">{s.day}</span>
 
                 {s.isActive ? (
                   <div className="flex items-center gap-2 flex-1 flex-wrap">
                     <input type="time" value={s.startTime} onChange={(e) => setField(i, "startTime", e.target.value)} className={timeInput} />
-                    <span className="text-xs text-[#9a9a9a] font-medium">a</span>
+                    <span className="text-xs text-[var(--text-muted)] font-medium">a</span>
                     <input type="time" value={s.endTime} onChange={(e) => setField(i, "endTime", e.target.value)} className={timeInput} />
                     <div className="flex items-center gap-1.5 ml-auto">
                       <IconClock />
@@ -658,11 +658,11 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
                         onChange={(e) => setField(i, "slotDurationMinutes", e.target.value)}
                         className={timeInput + " w-16"}
                       />
-                      <span className="text-xs text-[#9a9a9a]">min</span>
+                      <span className="text-xs text-[var(--text-muted)]">min</span>
                     </div>
                   </div>
                 ) : (
-                  <span className="text-xs text-[#9a9a9a] italic flex-1">Cerrado</span>
+                  <span className="text-xs text-[var(--text-muted)] italic flex-1">Cerrado</span>
                 )}
               </div>
             ))}
@@ -672,11 +672,11 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
         {/* Actions */}
         <div className="flex gap-3 mt-6">
           <button onClick={onClose} disabled={saving}
-            className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50">
+            className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50">
             Cancelar
           </button>
           <button onClick={handleSave} disabled={loading || saving}
-            className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50">
+            className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50">
             {saving ? "Guardando..." : "Guardar horario"}
           </button>
         </div>
@@ -688,9 +688,9 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
 // ── Delete Confirmation Modal ─────────────────────────────────────────────────
 export const DeleteModal = ({ row, onClose, onConfirm }) => (
   <ModalOverlay onClose={onClose}>
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+    <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
       <button onClick={onClose}
-        className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+        className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
         <IconX />
       </button>
 
@@ -698,22 +698,22 @@ export const DeleteModal = ({ row, onClose, onConfirm }) => (
         <IconWarning />
       </div>
 
-      <h2 className="text-lg font-bold text-[#1a1a2e] mb-1">Delete record?</h2>
-      <p className="text-sm text-[#6b7280] mb-2">You are about to permanently delete</p>
-      <p className="text-sm font-semibold text-[#1a1a2e] mb-2">"{row.name || row.staffName}"</p>
-      <p className="text-xs text-[#9a9a9a] mb-6">This action cannot be undone.</p>
+      <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Delete record?</h2>
+      <p className="text-sm text-[var(--text-secondary)] mb-2">You are about to permanently delete</p>
+      <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">"{row.name || row.staffName}"</p>
+      <p className="text-xs text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
 
-      <div className="flex items-center gap-3 p-3 bg-[#faf9f7] rounded-xl border border-[#f0ede8] mb-6 text-left">
+      <div className="flex items-center gap-3 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)] mb-6 text-left">
         <Avatar initials={row.initials || row.staffName?.charAt(0) || row.name?.charAt(0) || "U"} color={row.color} photo={row.photo || row.staffLinkPhoto || null} />
         <div>
-          <p className="font-semibold text-sm text-[#1a1a2e]">{row.name || row.staffName}</p>
-          <p className="text-xs text-[#9a9a9a]">{row.email || row.staffEmail}</p>
+          <p className="font-semibold text-sm text-[var(--text-primary)]">{row.name || row.staffName}</p>
+          <p className="text-xs text-[var(--text-muted)]">{row.email || row.staffEmail}</p>
         </div>
       </div>
 
       <div className="flex gap-3">
         <button onClick={onClose}
-          className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors">
+          className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors">
           Cancel
         </button>
         <button onClick={() => { onConfirm(row); onClose(); }}

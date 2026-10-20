@@ -103,22 +103,22 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
       <style>{CSS_ANIMATIONS}</style>
       <ModalOverlay onClose={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
+        className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
         style={{ maxHeight: "90vh", overflowY: "auto" }}
       >
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
-            <h2 className="text-lg font-bold text-[#1a1a2e]">
-              {mode === "edit" ? "Edit" : "Create"} <span className="text-[#9a9a9a] font-semibold">Plan</span>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
+              {mode === "edit" ? "Edit" : "Create"} <span className="text-[var(--text-muted)] font-semibold">Plan</span>
             </h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
               {mode === "edit" ? "Update the plan details below" : "Fill in the details below"}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]"
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]"
           >
             <IconX />
           </button>
@@ -190,7 +190,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
                 onChange={handleChange}
                 className={inputClass}
               />
-              <p className="text-[11px] text-[#9a9a9a] mt-1">Use -1 for unlimited.</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">Use -1 for unlimited.</p>
             </div>
             <div>
               <label className={labelClass}>Max Branches</label>
@@ -202,7 +202,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
                 onChange={handleChange}
                 className={inputClass}
               />
-              <p className="text-[11px] text-[#9a9a9a] mt-1">Use -1 for unlimited.</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">Use -1 for unlimited.</p>
             </div>
             <div>
               <label className={labelClass}>Max Services</label>
@@ -214,7 +214,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
                 onChange={handleChange}
                 className={inputClass}
               />
-              <p className="text-[11px] text-[#9a9a9a] mt-1">Use -1 for unlimited.</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">Use -1 for unlimited.</p>
             </div>
           </div>
 
@@ -224,23 +224,23 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
               type="checkbox"
               checked={!!form.isActive}
               onChange={handleChange}
-              className="w-4 h-4 rounded border-[#e2ddd8] accent-[#1a1a2e]"
+              className="w-4 h-4 rounded border-[var(--border-subtle)] accent-[var(--brand)]"
             />
-            <span className="text-sm font-medium text-[#1a1a2e]">Active</span>
+            <span className="text-sm font-medium text-[var(--text-primary)]">Active</span>
           </label>
 
           <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors"
+              className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
             >
               {submitting ? "Saving..." : mode === "edit" ? "Save changes" : "Create plan"}
             </button>
@@ -273,10 +273,10 @@ export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
     <>
       <style>{CSS_ANIMATIONS}</style>
       <ModalOverlay onClose={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+        <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]"
+            className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]"
           >
             <IconX />
           </button>
@@ -285,10 +285,10 @@ export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
             <IconWarning />
           </div>
 
-          <h2 className="text-lg font-bold text-[#1a1a2e] mb-1">Delete plan?</h2>
-          <p className="text-sm text-[#6b7280] mb-2">You are about to delete</p>
-          <p className="text-sm font-semibold text-[#1a1a2e] mb-2">"{plan?.name}"</p>
-          <p className="text-xs text-[#9a9a9a] mb-6">This action cannot be undone.</p>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Delete plan?</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-2">You are about to delete</p>
+          <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">"{plan?.name}"</p>
+          <p className="text-xs text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
 
           {error && (
             <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 text-left">
@@ -300,7 +300,7 @@ export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
             <button
               onClick={onClose}
               disabled={deleting}
-              className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
             >
               Cancel
             </button>

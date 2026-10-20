@@ -4,7 +4,7 @@ import "react-phone-number-input/style.css";
 // Selector de pais (bandera + prefijo) + input del numero. La validacion de
 // formato (no atada a un pais fijo) vive en ./phoneValidation.js.
 const containerCls =
-  "flex items-center h-12 w-full rounded-xl border bg-[#faf9f7] px-3 gap-2 focus-within:border-[#1a1a2e] focus-within:bg-white transition-all duration-200";
+  "flex items-center h-12 w-full rounded-xl border bg-[var(--surface-faint)] px-3 gap-2 focus-within:border-[var(--brand)] focus-within:bg-[var(--surface)] transition-all duration-200";
 
 const PhoneField = ({ name, value, onChange, onBlur, placeholder, hasError, defaultCountry = "AR" }) => (
   // react-phone-number-input no deja enganchar un onBlur propio (lo pisa
@@ -17,9 +17,9 @@ const PhoneField = ({ name, value, onChange, onBlur, placeholder, hasError, defa
       value={value || undefined}
       onChange={(val) => onChange({ target: { name, value: val || "" } })}
       placeholder={placeholder}
-      className={`${containerCls} ${hasError ? "border-red-400" : "border-[#e2ddd8]"}`}
+      className={`${containerCls} ${hasError ? "border-red-400" : "border-[var(--border-subtle)]"}`}
       numberInputProps={{
-        className: "flex-1 min-w-0 bg-transparent outline-none text-sm text-[#1a1a2e] placeholder-[#b0aba5]",
+        className: "flex-1 min-w-0 bg-transparent outline-none text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)]",
       }}
     />
   </div>

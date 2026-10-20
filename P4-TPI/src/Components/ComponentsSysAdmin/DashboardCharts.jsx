@@ -18,7 +18,7 @@ export const BarChart = ({ data, valueKey, formatValue = (v) => v, emptyLabel = 
   const max = Math.max(...values, 1);
 
   if (items.length === 0) {
-    return <p className="text-xs text-[#9a9a9a] mt-5 text-center">{emptyLabel}</p>;
+    return <p className="text-xs text-[var(--text-muted)] mt-5 text-center">{emptyLabel}</p>;
   }
 
   return (
@@ -34,11 +34,11 @@ export const BarChart = ({ data, valueKey, formatValue = (v) => v, emptyLabel = 
           >
             <div className="flex items-end w-full h-16">
               <div
-                className="w-full max-w-8 mx-auto rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
+                className="w-full max-w-8 mx-auto rounded-md bg-[var(--brand)] hover:bg-[#3b82f6] transition-colors"
                 style={{ height: `${barHeight}px` }}
               />
             </div>
-            <span className="text-[10px] text-[#9a9a9a]">{shortMonth(item.month)}</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{shortMonth(item.month)}</span>
           </div>
         );
       })}
@@ -53,7 +53,7 @@ export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
   const max = Math.max(...totals, 1);
 
   if (items.length === 0) {
-    return <p className="text-xs text-[#9a9a9a] mt-5 text-center">{emptyLabel}</p>;
+    return <p className="text-xs text-[var(--text-muted)] mt-5 text-center">{emptyLabel}</p>;
   }
 
   return (
@@ -73,7 +73,7 @@ export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
             >
               <div className="flex flex-col-reverse items-center w-full h-16 justify-start">
                 {total === 0 ? (
-                  <div className="w-full max-w-8 mx-auto rounded-md bg-[#f0ede8]" style={{ height: "3px" }} />
+                  <div className="w-full max-w-8 mx-auto rounded-md bg-[var(--surface-muted)]" style={{ height: "3px" }} />
                 ) : (
                   <div className="w-full max-w-8 mx-auto rounded-md overflow-hidden flex flex-col-reverse" style={{ height: `${Math.max(Math.round(total * scale), 3)}px` }}>
                     {pending > 0 && <div style={{ height: `${(pending / total) * 100}%`, background: STATUS_COLORS.pending }} />}
@@ -82,7 +82,7 @@ export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
                   </div>
                 )}
               </div>
-              <span className="text-[10px] text-[#9a9a9a]">{shortMonth(item.month)}</span>
+              <span className="text-[10px] text-[var(--text-muted)]">{shortMonth(item.month)}</span>
             </div>
           );
         })}
@@ -95,7 +95,7 @@ export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-            <span className="text-xs text-[#6b7280]">{label}</span>
+            <span className="text-xs text-[var(--text-secondary)]">{label}</span>
           </div>
         ))}
       </div>

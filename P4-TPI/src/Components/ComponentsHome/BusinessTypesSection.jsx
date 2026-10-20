@@ -60,23 +60,23 @@ const BusinessTypesSection = () => {
       <div className="text-center mb-12">
         <div className="flex items-center justify-center gap-3 mb-3">
           <span className="text-[#f59e0b]"><IconSpark /></span>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#1a1a2e]">{t("landingFreeTitle")}</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)]">{t("landingFreeTitle")}</h2>
         </div>
-        <p className="text-[#6b6b6b] max-w-2xl mx-auto">{subtitle}</p>
+        <p className="text-[var(--text-secondary-alt)] max-w-2xl mx-auto">{subtitle}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-14">
         {FEATURES.map(({ icon, key }) => (
           <div key={key} className="flex flex-col items-center text-center gap-3">
-            <div className="bg-[#f0ede8] p-3.5 rounded-2xl text-[#1a1a2e]">{icon}</div>
-            <span className="text-sm font-semibold text-[#1a1a2e]">{t(key)}</span>
+            <div className="bg-[var(--surface-muted)] p-3.5 rounded-2xl text-[var(--text-primary)]">{icon}</div>
+            <span className="text-sm font-semibold text-[var(--text-primary)]">{t(key)}</span>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
         {RUBROS.map((r) => (
-          <div key={r.key} className="aspect-[4/3] rounded-2xl overflow-hidden border border-[#e2ddd8] bg-[#f0ede8]">
+          <div key={r.key} className="aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-muted)]">
             <img
               src={r.img}
               alt={t(r.key)}

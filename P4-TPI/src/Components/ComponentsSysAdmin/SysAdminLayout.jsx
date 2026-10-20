@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../CustomHooks/AuthContext";
+import ThemeToggle from "../Shared/ThemeToggle";
 
 const IconDashboard = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -68,26 +69,26 @@ const SysAdminLayout = () => {
   };
 
   return (
-    <div className="flex w-full h-screen overflow-hidden bg-[#f0ede8]">
+    <div className="flex w-full h-screen overflow-hidden bg-[var(--surface-muted)]">
       {mobileNavOpen && (
         <div
           onClick={() => setMobileNavOpen(false)}
-          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          className="fixed inset-0 z-30 bg-[var(--brand)]/40 md:hidden"
         />
       )}
       <nav
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col w-[220px] h-full bg-[#f0ede8] border-r border-[#e2ddd8] py-5 px-3 shrink-0
+        className={`fixed inset-y-0 left-0 z-40 flex flex-col w-[220px] h-full bg-[var(--surface-muted)] border-r border-[var(--border-subtle)] py-5 px-3 shrink-0
           transition-transform duration-200 ease-in-out
           ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 md:static`}
       >
         <div className="flex items-center gap-2 px-2 mb-8">
-          <div className="flex items-center justify-center w-[38px] h-[38px] bg-[#1a1a2e] rounded-xl text-white shrink-0">
+          <div className="flex items-center justify-center w-[38px] h-[38px] bg-[var(--brand)] rounded-xl text-white shrink-0">
             <IconLayers />
           </div>
           <div>
-            <p className="text-sm font-bold text-[#1a1a2e] leading-tight">SysAdmin</p>
-            <p className="text-[11px] text-[#9a9a9a] leading-tight">Platform console</p>
+            <p className="text-sm font-bold text-[var(--text-primary)] leading-tight">SysAdmin</p>
+            <p className="text-[11px] text-[var(--text-muted)] leading-tight">Platform console</p>
           </div>
         </div>
 
@@ -100,7 +101,7 @@ const SysAdminLayout = () => {
               onClick={() => setMobileNavOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive ? "bg-[#1a1a2e] text-white" : "text-[#5a5a6e] hover:bg-[#e4e0da] hover:text-[#1a1a2e]"
+                  isActive ? "bg-[var(--brand)] text-white" : "text-[var(--text-tertiary)] hover:bg-[var(--surface-muted-2)] hover:text-[var(--text-primary)]"
                 }`
               }
             >
@@ -112,7 +113,7 @@ const SysAdminLayout = () => {
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#5a5a6e] hover:bg-[#e4e0da] hover:text-[#1a1a2e] transition-all duration-200"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-tertiary)] hover:bg-[var(--surface-muted-2)] hover:text-[var(--text-primary)] transition-all duration-200"
         >
           <IconLogout />
           Log out
@@ -120,31 +121,34 @@ const SysAdminLayout = () => {
       </nav>
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[#f0ede8]">
+        <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[var(--surface-muted)]">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setMobileNavOpen(true)}
               aria-label="Open menu"
-              className="md:hidden shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border border-[#e2ddd8] text-[#1a1a2e] hover:bg-[#e4e0da] transition-colors"
+              className="md:hidden shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border border-[var(--border-subtle)] text-[var(--text-primary)] hover:bg-[var(--surface-muted-2)] transition-colors"
             >
               <IconMenu />
             </button>
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold text-[#1a1a2e] leading-tight truncate">
+              <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-primary)] leading-tight truncate">
                 Hello, <span className="font-bold">{user?.name || "there"}</span>
               </h1>
-              <p className="text-xs sm:text-sm text-[#9a9a9a] mt-0.5 truncate">Manage businesses, plans and subscriptions.</p>
+              <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 truncate">Manage businesses, plans and subscriptions.</p>
             </div>
           </div>
-          <button
-            onClick={() => navigate("/sysadmin/profile")}
-            aria-label="Profile"
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border-2 border-[#e2ddd8] shrink-0 hover:border-[#1a1a2e] transition-colors"
-          >
-            <div className="w-full h-full bg-[#1a1a2e] flex items-center justify-center text-white text-sm font-semibold">
-              {getInitials(user?.name)}
-            </div>
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <ThemeToggle />
+            <button
+              onClick={() => navigate("/sysadmin/profile")}
+              aria-label="Profile"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden border-2 border-[var(--border-subtle)] shrink-0 hover:border-[var(--brand)] transition-colors"
+            >
+              <div className="w-full h-full bg-[var(--brand)] flex items-center justify-center text-white text-sm font-semibold">
+                {getInitials(user?.name)}
+              </div>
+            </button>
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto px-4 sm:px-8 pb-6 sm:pb-8">

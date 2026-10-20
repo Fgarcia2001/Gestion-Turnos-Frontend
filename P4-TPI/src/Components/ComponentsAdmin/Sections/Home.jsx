@@ -41,7 +41,7 @@ const BarChart = ({ data }) => {
 
   if (items.length === 0) {
     return (
-      <p className="text-xs text-[#9a9a9a] mt-5 text-center">
+      <p className="text-xs text-[var(--text-muted)] mt-5 text-center">
         {t("No revenue data") || "No revenue data"}
       </p>
     );
@@ -60,11 +60,11 @@ const BarChart = ({ data }) => {
           >
             <div className="flex items-end w-full h-16">
               <div
-                className="w-full max-w-8 mx-auto rounded-md bg-[#1a1a2e] hover:bg-[#3b82f6] transition-colors"
+                className="w-full max-w-8 mx-auto rounded-md bg-[var(--brand)] hover:bg-[#3b82f6] transition-colors"
                 style={{ height: `${barHeight}px` }}
               />
             </div>
-            <span className="text-[10px] text-[#9a9a9a]">{shortMonth(month)}</span>
+            <span className="text-[10px] text-[var(--text-muted)]">{shortMonth(month)}</span>
           </div>
         );
       })}
@@ -100,7 +100,7 @@ const DonutChart = ({ pending = 0, confirmed = 0, cancelled = 0 }) => {
         )}
       </svg>
       <div className="absolute flex flex-col items-center leading-none">
-        <span className="text-lg font-bold text-[#1a1a2e]">{total}</span>
+        <span className="text-lg font-bold text-[var(--text-primary)]">{total}</span>
       </div>
     </div>
   );
@@ -115,14 +115,14 @@ const UsageBar = ({ label, count, max }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs text-[#6b7280] font-medium">{label}</span>
-        <span className="text-xs font-semibold text-[#1a1a2e]">
+        <span className="text-xs text-[var(--text-secondary)] font-medium">{label}</span>
+        <span className="text-xs font-semibold text-[var(--text-primary)]">
           {count} / {unlimited ? (t("Unlimited") || "Unlimited") : max}
         </span>
       </div>
-      <div className="w-full h-2 rounded-full bg-[#f0ede8] overflow-hidden">
+      <div className="w-full h-2 rounded-full bg-[var(--surface-muted)] overflow-hidden">
         <div
-          className={`h-full rounded-full ${unlimited ? "bg-[#15803d]" : "bg-[#1a1a2e]"}`}
+          className={`h-full rounded-full ${unlimited ? "bg-[#15803d]" : "bg-[var(--brand)]"}`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -138,12 +138,12 @@ const PlanUsageModal = ({ planUsage, onClose, onUpgradePlan }) => {
     <>
       <style>{CSS_ANIMATIONS}</style>
       <ModalOverlay onClose={onClose}>
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+        <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
           <div className="flex items-start justify-between mb-5">
-            <h2 className="text-lg font-bold text-[#1a1a2e]">{t("Plan Usage") || "Plan Usage"}</h2>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">{t("Plan Usage") || "Plan Usage"}</h2>
             <button
               onClick={onClose}
-              className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8] shrink-0"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)] shrink-0"
             >
               <IconX />
             </button>
@@ -169,7 +169,7 @@ const PlanUsageModal = ({ planUsage, onClose, onUpgradePlan }) => {
 
           <button
             onClick={() => { onClose(); onUpgradePlan?.(); }}
-            className="w-full mt-5 pt-4 border-t border-[#f0ede8] text-center text-sm font-semibold text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
+            className="w-full mt-5 pt-4 border-t border-[var(--border-faint)] text-center text-sm font-semibold text-[#2563eb] hover:text-[#1d4ed8] transition-colors"
           >
             {t("Need more benefits? Try upgrade your plan") || "Need more benefits? Try upgrade your plan"}
           </button>
@@ -220,18 +220,18 @@ const Home = ({ onUpgradePlan }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center">
-        <p className="text-sm text-[#9a9a9a] mb-4">{t("Load dashboard error") || "Couldn't load the dashboard"}</p>
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
+        <p className="text-sm text-[var(--text-muted)] mb-4">{t("Load dashboard error") || "Couldn't load the dashboard"}</p>
         <button
           onClick={load}
-          className="bg-[#1a1a2e] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors cursor-pointer"
+          className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
         >
           {t("retry") || "Retry"}
         </button>
@@ -261,7 +261,7 @@ const Home = ({ onUpgradePlan }) => {
         <button
           onClick={() => setShowPlanUsage(true)}
           data-tour="plan-usage"
-          className="flex items-center gap-1.5 text-md font-semibold text-[#6b7280] hover:text-[#1a1a2e] hover:bg-[#f0ede8] rounded-lg px-3 py-1.5 transition-colors"
+          className="flex items-center gap-1.5 text-md font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] rounded-lg px-3 py-1.5 transition-colors"
         >
           <IconInfo />
           {t("Plan Usage") || "Plan Usage"}
@@ -272,11 +272,11 @@ const Home = ({ onUpgradePlan }) => {
       <div data-tour="home-stats" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 py-6 sm:py-8 xl:py-10">
 
         {/* Monthly revenue */}
-        <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm text-[#9a9a9a] font-medium">{t("Monthly revenue") || "Monthly revenue"}</p>
+        <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+          <p className="text-sm text-[var(--text-muted)] font-medium">{t("Monthly revenue") || "Monthly revenue"}</p>
           <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mt-1">
-            <span className="text-3xl xl:text-4xl font-bold text-[#1a1a2e]">${money(currentMonth.revenue)}</span>
-            <span className="text-sm text-[#9a9a9a]">{t("Total this month") || "Total this month"}</span>
+            <span className="text-3xl xl:text-4xl font-bold text-[var(--text-primary)]">${money(currentMonth.revenue)}</span>
+            <span className="text-sm text-[var(--text-muted)]">{t("Total this month") || "Total this month"}</span>
           </div>
           <BarChart data={series} />
         </div>
@@ -286,7 +286,7 @@ const Home = ({ onUpgradePlan }) => {
           <p className="text-xs font-semibold tracking-widest text-blue-200 uppercase">{t("Estimated earnings") || "Estimated earnings"}</p>
           <div className="mt-3 flex items-end justify-between gap-2">
             <span className="text-3xl xl:text-4xl font-bold text-white tracking-tight">${money(currentMonth.estimatedEarnings)}</span>
-            <span className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
+            <span className="w-9 h-9 rounded-xl bg-[var(--surface)]/20 flex items-center justify-center text-white shrink-0">
               <IconTrendUp />
             </span>
           </div>
@@ -294,15 +294,15 @@ const Home = ({ onUpgradePlan }) => {
         </div>
 
         {/* Totals by status */}
-        <div className="bg-white rounded-2xl p-5 border border-[#e2ddd8]">
-          <p className="text-sm text-[#9a9a9a] font-medium">{t("Appointment Statistics") || "Appointment Statistics"}</p>
+        <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
+          <p className="text-sm text-[var(--text-muted)] font-medium">{t("Appointment Statistics") || "Appointment Statistics"}</p>
           <div className="flex items-center justify-between mt-4">
             <div className="flex flex-col gap-2.5">
               {statusItems.map(({ color, label, count }) => (
                 <div key={label} className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                  <span className="text-xs text-[#6b7280]">{label}</span>
-                  <span className="text-sm font-bold text-[#1a1a2e] ml-auto">{count}</span>
+                  <span className="text-xs text-[var(--text-secondary)]">{label}</span>
+                  <span className="text-sm font-bold text-[var(--text-primary)] ml-auto">{count}</span>
                 </div>
               ))}
             </div>
@@ -312,14 +312,14 @@ const Home = ({ onUpgradePlan }) => {
       </div>
 
       {/* Branches summary */}
-      <div data-tour="home-branches" className="bg-white rounded-2xl border border-[#e2ddd8] overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#f0ede8]">
-          <p className="text-sm font-semibold text-[#1a1a2e]">{t("Branches") || "Branches"}</p>
+      <div data-tour="home-branches" className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
+        <div className="px-5 py-4 border-b border-[var(--border-faint)]">
+          <p className="text-sm font-semibold text-[var(--text-primary)]">{t("Branches") || "Branches"}</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs text-[#9a9a9a] uppercase tracking-wide">
+              <tr className="text-left text-xs text-[var(--text-muted)] uppercase tracking-wide">
                 <th className="px-5 py-3 font-semibold">{t("Branch") || "Branch"}</th>
                 <th className="px-3 py-3 font-semibold text-center">{t("Pending") || "Pending"}</th>
                 <th className="px-3 py-3 font-semibold text-center">{t("Accepted") || "Accepted"}</th>
@@ -329,17 +329,17 @@ const Home = ({ onUpgradePlan }) => {
             </thead>
             <tbody>
               {branches.map((b) => (
-                <tr key={b.branchId} className="border-t border-[#f0ede8] hover:bg-[#f9f8f6] transition-colors">
-                  <td className="px-5 py-3 font-semibold text-[#1a1a2e]">{b.name || "—"}</td>
+                <tr key={b.branchId} className="border-t border-[var(--border-faint)] hover:bg-[var(--surface-muted-3)] transition-colors">
+                  <td className="px-5 py-3 font-semibold text-[var(--text-primary)]">{b.name || "—"}</td>
                   <td className="px-3 py-3 text-center text-[#b45309] font-semibold">{Number(b.pending) || 0}</td>
                   <td className="px-3 py-3 text-center text-[#15803d] font-semibold">{Number(b.confirmed) || 0}</td>
                   <td className="px-3 py-3 text-center text-[#b91c1c] font-semibold">{Number(b.cancelled) || 0}</td>
-                  <td className="px-5 py-3 text-right font-semibold text-[#1a1a2e]">${money(b.monthRevenue)}</td>
+                  <td className="px-5 py-3 text-right font-semibold text-[var(--text-primary)]">${money(b.monthRevenue)}</td>
                 </tr>
               ))}
               {branches.length === 0 && (
-                <tr className="border-t border-[#f0ede8]">
-                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-[#9a9a9a]">{t("No branches found for this business.") || "No branches."}</td>
+                <tr className="border-t border-[var(--border-faint)]">
+                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-[var(--text-muted)]">{t("No branches found for this business.") || "No branches."}</td>
                 </tr>
               )}
             </tbody>

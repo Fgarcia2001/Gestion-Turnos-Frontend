@@ -223,7 +223,7 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
 
   const toastEl = toast ? (
     <div
-      className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out] ${toast.type === "error" ? "bg-[#b91c1c]" : "bg-[#1a1a2e]"}`}
+      className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out] ${toast.type === "error" ? "bg-[#b91c1c]" : "bg-[var(--brand)]"}`}
     >
       {toast.type === "error" ? (
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -242,7 +242,7 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
     return (
       <div className="flex flex-col w-full max-w-5xl mx-auto">
         <div className="flex justify-center py-12">
-          <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+          <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
         </div>
         {toastEl}
       </div>
@@ -251,35 +251,35 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
 
   return (
     <div className="flex flex-col w-full max-w-5xl mx-auto">
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 mb-8 w-full">
-        <h2 className="text-lg font-semibold text-[#1a1a2e]">Current Plan</h2>
-        <p className="text-sm text-[#9a9a9a] mb-6 mt-1">{plan?.businessName ? plan.businessName : "Your subscription plan details."}</p>
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 mb-8 w-full">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Current Plan</h2>
+        <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">{plan?.businessName ? plan.businessName : "Your subscription plan details."}</p>
 
-        <div className="bg-[#fcfbf9] border border-[#e2ddd8] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="bg-[var(--surface-faint-2)] border border-[var(--border-subtle)] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-[#f0ede8] rounded-xl flex items-center justify-center text-[#1a1a2e]">
+            <div className="w-12 h-12 bg-[var(--surface-muted)] rounded-xl flex items-center justify-center text-[var(--text-primary)]">
               <IconSparkles />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold text-[#1a1a2e]">{plan?.planName || "---"}</span>
+                <span className="font-semibold text-[var(--text-primary)]">{plan?.planName || "---"}</span>
                 {plan?.status && (
-                  <span className="text-[10px] font-bold bg-[#1a1a2e] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">{plan.status}</span>
+                  <span className="text-[10px] font-bold bg-[var(--brand)] text-white px-2 py-0.5 rounded-full uppercase tracking-wider">{plan.status}</span>
                 )}
               </div>
-              <p className="text-xs text-[#9a9a9a]">{plan?.businessName || "---"}</p>
+              <p className="text-xs text-[var(--text-muted)]">{plan?.businessName || "---"}</p>
             </div>
           </div>
           <div className="flex flex-col sm:items-end gap-3">
-            <div className="text-left sm:text-right text-xs text-[#9a9a9a]">
+            <div className="text-left sm:text-right text-xs text-[var(--text-muted)]">
               {plan?.startDate ? (
                 <>
-                  <span className="block font-medium text-[#1a1a2e]">{new Date(plan.startDate).toLocaleDateString()}</span>
+                  <span className="block font-medium text-[var(--text-primary)]">{new Date(plan.startDate).toLocaleDateString()}</span>
                   <span className="block text-[10px]">to</span>
-                  <span className="block font-medium text-[#1a1a2e]">{new Date(plan.endDate).toLocaleDateString()}</span>
+                  <span className="block font-medium text-[var(--text-primary)]">{new Date(plan.endDate).toLocaleDateString()}</span>
                 </>
               ) : (
-                <span className="text-xl font-bold text-[#1a1a2e]">--</span>
+                <span className="text-xl font-bold text-[var(--text-primary)]">--</span>
               )}
             </div>
 
@@ -288,7 +288,7 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
                 type="button"
                 onClick={handleRenew}
                 disabled={renewing}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#1a1a2e] text-white text-xs font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-60 disabled:cursor-not-allowed sm:ml-auto"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[var(--brand)] text-white text-xs font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-60 disabled:cursor-not-allowed sm:ml-auto"
               >
                 {renewing && (
                   <span className="size-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -301,9 +301,9 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-[#1a1a2e] mb-4">Upgrade your plan</h3>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Upgrade your plan</h3>
         {plans.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-[#e2ddd8] py-12 text-center text-sm text-[#9a9a9a]">
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-12 text-center text-sm text-[var(--text-muted)]">
             No plans available.
           </div>
         ) : (
@@ -318,19 +318,19 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
                 const durationDays = tier.durationDays ?? tier.DurationDays;
                 const isCurrent = planName && name && planName.toLowerCase() === name.toLowerCase();
                 return (
-                  <div key={id ?? name} className={`group bg-white rounded-2xl border p-6 flex flex-col relative ${isCurrent ? "border-2 border-[#1a1a2e] shadow-sm" : "border-[#e2ddd8]"}`}>
-                    {isCurrent && <div className="absolute top-4 right-4 bg-[#f0ede8] text-[#1a1a2e] text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Current</div>}
-                    <h4 className="font-semibold text-[#1a1a2e]">{name}</h4>
-                    <p className="text-xs text-[#9a9a9a] mt-1 mb-6">{description}</p>
+                  <div key={id ?? name} className={`group bg-[var(--surface)] rounded-2xl border p-6 flex flex-col relative ${isCurrent ? "border-2 border-[var(--brand)] shadow-sm" : "border-[var(--border-subtle)]"}`}>
+                    {isCurrent && <div className="absolute top-4 right-4 bg-[var(--surface-muted)] text-[var(--text-primary)] text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Current</div>}
+                    <h4 className="font-semibold text-[var(--text-primary)]">{name}</h4>
+                    <p className="text-xs text-[var(--text-muted)] mt-1 mb-6">{description}</p>
                     <div className="mb-10 flex-1">
-                      <span className="text-3xl font-bold text-[#1a1a2e]">${price}</span>
+                      <span className="text-3xl font-bold text-[var(--text-primary)]">${price}</span>
                       {durationDays ? (
-                        <span className="text-sm text-[#9a9a9a]"> / {durationDays} days</span>
+                        <span className="text-sm text-[var(--text-muted)]"> / {durationDays} days</span>
                       ) : null}
                     </div>
                     <button
                       onClick={() => setDetailsPlan(tier)}
-                      className="w-full py-2.5 bg-[#fcfbf9] text-[#1a1a2e] border border-[#e2ddd8] rounded-xl text-sm font-semibold hover:bg-[#f0ede8] transition-all mt-auto opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
+                      className="w-full py-2.5 bg-[var(--surface-faint-2)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-xl text-sm font-semibold hover:bg-[var(--surface-muted)] transition-all mt-auto opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"
                     >
                       Show details
                     </button>

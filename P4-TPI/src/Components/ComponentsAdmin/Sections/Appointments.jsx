@@ -93,17 +93,17 @@ const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <button onClick={() => onViewDateChange(new Date(year, month - 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors">
+        <button onClick={() => onViewDateChange(new Date(year, month - 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] transition-colors">
           <IconChevronLeft />
         </button>
-        <span className="text-sm font-semibold text-[#1a1a2e]">{MONTHS[month]} {year}</span>
-        <button onClick={() => onViewDateChange(new Date(year, month + 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors">
+        <span className="text-sm font-semibold text-[var(--text-primary)]">{MONTHS[month]} {year}</span>
+        <button onClick={() => onViewDateChange(new Date(year, month + 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] transition-colors">
           <IconChevronRight />
         </button>
       </div>
       <div className="grid grid-cols-7 mb-1">
         {DAYS.map(d => (
-          <div key={d} className="text-center text-[11px] font-semibold text-[#9a9a9a] py-1">{d}</div>
+          <div key={d} className="text-center text-[11px] font-semibold text-[var(--text-muted)] py-1">{d}</div>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-y-0.5">
@@ -115,8 +115,8 @@ const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange
               key={i}
               onClick={() => c.cur && onSelect(c.day)}
               className={`relative flex flex-col items-center justify-center h-9 w-full rounded-lg text-sm transition-all duration-150
-                ${!c.cur ? "text-[#c9c5bf] cursor-default" : "cursor-pointer hover:bg-[#f0ede8]"}
-                ${isSelected ? "!bg-[#1a1a2e] text-white font-semibold" : c.cur ? "text-[#1a1a2e]" : ""}
+                ${!c.cur ? "text-[var(--text-faint)] cursor-default" : "cursor-pointer hover:bg-[var(--surface-muted)]"}
+                ${isSelected ? "!bg-[var(--brand)] text-white font-semibold" : c.cur ? "text-[var(--text-primary)]" : ""}
               `}
             >
               {c.day}
@@ -167,13 +167,13 @@ const StatusMenu = ({ status, onChangeStatus, disabled }) => {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-1 w-32 bg-white border border-[#e2ddd8] rounded-xl shadow-lg overflow-hidden z-20">
+          <div className="absolute right-0 mt-1 w-32 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-xl shadow-lg overflow-hidden z-20">
             {APPOINTMENT_STATUS.map(s => (
               <button
                 key={s.value}
                 type="button"
                 onClick={() => { setOpen(false); if (s.value !== current) onChangeStatus(s.value); }}
-                className={`w-full text-left text-xs px-3 py-2 hover:bg-[#f0ede8] transition-colors ${s.value === current ? "font-semibold text-[#1a1a2e]" : "text-[#6b7280]"}`}
+                className={`w-full text-left text-xs px-3 py-2 hover:bg-[var(--surface-muted)] transition-colors ${s.value === current ? "font-semibold text-[var(--text-primary)]" : "text-[var(--text-secondary)]"}`}
               >
                 {s.label}
               </button>
@@ -244,30 +244,30 @@ const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
 
   return (
     <ModalOverlay onClose={close}>
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-[#e2ddd8] p-6">
+      <div className="w-full max-w-sm bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="w-11 h-11 rounded-full bg-[#fee2e2] flex items-center justify-center text-[#b91c1c] shrink-0">
             <IconWarning />
           </div>
-          <button onClick={close} disabled={submitting} aria-label="Close" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f0ede8] text-[#6b7280] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+          <button onClick={close} disabled={submitting} aria-label="Close" className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
             <IconX />
           </button>
         </div>
 
-        <h3 className="text-lg font-bold text-[#1a1a2e] mb-4">{t("Cancel appointment") || "Cancelar turno"}</h3>
+        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">{t("Cancel appointment") || "Cancelar turno"}</h3>
 
-        <div className="bg-[#f9f8f6] rounded-xl p-4 space-y-2 mb-4">
+        <div className="bg-[var(--surface-muted-3)] rounded-xl p-4 space-y-2 mb-4">
           <p className="text-sm">
-            <span className="font-semibold text-[#1a1a2e]">{t("Client") || "Cliente"}: </span>
-            <span className="text-[#6b7280]">{appt.clientName || "—"}</span>
+            <span className="font-semibold text-[var(--text-primary)]">{t("Client") || "Cliente"}: </span>
+            <span className="text-[var(--text-secondary)]">{appt.clientName || "—"}</span>
           </p>
           <p className="text-sm">
-            <span className="font-semibold text-[#1a1a2e]">{t("Service") || "Servicio"}: </span>
-            <span className="text-[#6b7280]">{appt.serviceName || "—"}</span>
+            <span className="font-semibold text-[var(--text-primary)]">{t("Service") || "Servicio"}: </span>
+            <span className="text-[var(--text-secondary)]">{appt.serviceName || "—"}</span>
           </p>
           <p className="text-sm">
-            <span className="font-semibold text-[#1a1a2e]">{t("Date and time") || "Fecha y hora"}: </span>
-            <span className="text-[#6b7280]">{dateLabel} {t("at") || "a las"} {timeLabel}</span>
+            <span className="font-semibold text-[var(--text-primary)]">{t("Date and time") || "Fecha y hora"}: </span>
+            <span className="text-[var(--text-secondary)]">{dateLabel} {t("at") || "a las"} {timeLabel}</span>
           </p>
         </div>
 
@@ -281,7 +281,7 @@ const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
           <button
             onClick={close}
             disabled={submitting}
-            className="px-4 py-2 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t("Back") || "Volver"}
           </button>
@@ -326,8 +326,8 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
 
   return (
     <div
-      className={`bg-white rounded-2xl border transition-all duration-200 cursor-pointer
-        ${isPending ? "border-l-4 border-l-[#f59e0b] border-[#e2ddd8]" : "border-[#e2ddd8]"}
+      className={`bg-[var(--surface)] rounded-2xl border transition-all duration-200 cursor-pointer
+        ${isPending ? "border-l-4 border-l-[#f59e0b] border-[var(--border-subtle)]" : "border-[var(--border-subtle)]"}
       `}
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
@@ -335,13 +335,13 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
       <div className="flex items-center gap-4 px-5 py-4">
         <Avatar initials={getInitials(appt.clientName)} color="#dbeafe" />
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-[#1a1a2e] text-sm">{appt.clientName || "—"}</p>
-          <p className="text-xs text-[#9a9a9a]">{appt.serviceName || "—"}</p>
+          <p className="font-semibold text-[var(--text-primary)] text-sm">{appt.clientName || "—"}</p>
+          <p className="text-xs text-[var(--text-muted)]">{appt.serviceName || "—"}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex items-center gap-1 text-[#22c55e]">
             <IconDollar />
-            <span className="text-sm font-semibold text-[#1a1a2e]">{Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className="text-sm font-semibold text-[var(--text-primary)]">{Number(appt.totalCost || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           {canChangeStatus && appt.status !== "Cancelled" ? (
             <StatusMenu status={appt.status || "Confirmed"} onChangeStatus={handleStatusChange} disabled={updating} />
@@ -353,18 +353,18 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
 
       <div className="flex items-center justify-between px-5 pb-4 gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-[#6b7280]">
+          <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
             <IconClock />
             <span className="text-xs">{timeRange}</span>
           </div>
           {appt.payment && (
-            <div className="flex items-center gap-1.5 text-[#6b7280]">
+            <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
               <IconDollar />
               <span className="text-xs">{appt.payment}</span>
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2 text-[#6b7280]">
+        <div className="flex items-center gap-2 text-[var(--text-secondary)]">
           <IconUser />
           <span className="text-xs">{appt.staffName || "--"}</span>
         </div>
@@ -372,8 +372,8 @@ const AppointmentCard = ({ appt, onStatusChange, canChangeStatus }) => {
 
       {appt.observation && (
         <div className={`overflow-hidden transition-all duration-500 ease-in-out ${expanded ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="px-5 pb-4 border-t border-[#f0ede8] pt-3">
-            <p className="text-xs text-[#6b7280] leading-relaxed">{appt.observation}</p>
+          <div className="px-5 pb-4 border-t border-[var(--border-faint)] pt-3">
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{appt.observation}</p>
           </div>
         </div>
       )}
@@ -493,7 +493,7 @@ const Appointments = ({ initialDate }) => {
       <style>{CSS_ANIMATIONS}</style>
 
       {toast && (
-        <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg ${toast.isError ? "bg-[#dc2626]" : "bg-[#1a1a2e]"}`}>
+        <div className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg ${toast.isError ? "bg-[#dc2626]" : "bg-[var(--brand)]"}`}>
           {toast.isError ? (
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -517,13 +517,13 @@ const Appointments = ({ initialDate }) => {
 
       <div className="flex flex-col lg:flex-row gap-5 items-start">
 
-        <div data-tour="appointments-calendar" className="w-full lg:w-[300px] lg:shrink-0 bg-white rounded-2xl border border-[#e2ddd8] p-5">
+        <div data-tour="appointments-calendar" className="w-full lg:w-[300px] lg:shrink-0 bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-base font-bold text-[#1a1a2e]">{t("Calendar") || "Calendar"}</h2>
+            <h2 className="text-base font-bold text-[var(--text-primary)]">{t("Calendar") || "Calendar"}</h2>
             <button
               onClick={() => setShowNewAppointment(true)}
               data-tour="appointments-new"
-              className="flex items-center gap-1.5 bg-[#1a1a2e] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors"
+              className="flex items-center gap-1.5 bg-[var(--brand)] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors"
             >
               <IconPlus />
               {t("New Appointment") || "New Appointment"}
@@ -531,11 +531,11 @@ const Appointments = ({ initialDate }) => {
           </div>
           {role === "Admin" && branches.length > 0 && (
             <div className="mb-4">
-              <label className="text-xs font-semibold text-[#6b7280] block mb-1.5">{t("Branch") || "Branch"}</label>
+              <label className="text-xs font-semibold text-[var(--text-secondary)] block mb-1.5">{t("Branch") || "Branch"}</label>
               <select
                 value={selectedBranchId || ""}
                 onChange={e => setSelectedBranchId(e.target.value || null)}
-                className="w-full text-sm bg-[#f9f8f6] border border-[#e2ddd8] rounded-xl px-3 py-2 text-[#1a1a2e] outline-none focus:border-[#1a1a2e] transition-colors"
+                className="w-full text-sm bg-[var(--surface-muted-3)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-[var(--text-primary)] outline-none focus:border-[var(--brand)] transition-colors"
               >
                 <option value="">{t("All branches") || "All branches"}</option>
                 {branches.map(b => (
@@ -552,17 +552,17 @@ const Appointments = ({ initialDate }) => {
         <div data-tour="appointments-list" className="flex-1 flex flex-col gap-3">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+              <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
             </div>
           ) : (
             <>
               <div className="mb-1">
-                <h2 className="text-lg font-bold text-[#1a1a2e]">{formatDate(selectedDay)}</h2>
-                <p className="text-sm text-[#9a9a9a]">{appointments.length} appointments scheduled</p>
+                <h2 className="text-lg font-bold text-[var(--text-primary)]">{formatDate(selectedDay)}</h2>
+                <p className="text-sm text-[var(--text-muted)]">{appointments.length} appointments scheduled</p>
               </div>
               {appointments.length === 0 ? (
-                <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center">
-                  <p className="text-sm text-[#9a9a9a]">{t("No appointments for this day") || "No appointments for this day"}</p>
+                <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
+                  <p className="text-sm text-[var(--text-muted)]">{t("No appointments for this day") || "No appointments for this day"}</p>
                 </div>
               ) : (
                 appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} canChangeStatus />)

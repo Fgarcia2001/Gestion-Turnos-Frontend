@@ -3,6 +3,7 @@ import Home from "../View/Home";
 import Login from "../View/Login";
 import { LanguageProvider } from "../CustomHooks/TraslateHook";
 import { AuthProvider } from "../CustomHooks/AuthContext";
+import { ThemeProvider } from "../CustomHooks/ThemeContext";
 import BusinessPublicPage from "../View/BusinessPublicPage";
 import Admin from "../View/Admin";
 import Unauthorized from "../View/Unauthorized";
@@ -19,42 +20,44 @@ import SysAdminProfile from "./Components/ComponentsSysAdmin/SysAdminProfile";
 function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Login />} />
-            <Route path="/:businessSlug" element={<BusinessPublicPage />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute>
-                  <Admin />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/sysadmin"
-              element={
-                <ProtectedRoute allowedRoles={["SysAdmin"]}>
-                  <SysAdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<SysAdminDashboard />} />
-              <Route path="businesses" element={<SysAdminBusinesses />} />
-              <Route path="plans" element={<SysAdminPlans />} />
-              <Route path="subscriptions" element={<SysAdminSubscriptions />} />
-              <Route path="landing" element={<SysAdminLanding />} />
-              <Route path="profile" element={<SysAdminProfile />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Login />} />
+              <Route path="/:businessSlug" element={<BusinessPublicPage />} />
+              <Route path="/unauthorized" element={<Unauthorized />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <Admin />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sysadmin"
+                element={
+                  <ProtectedRoute allowedRoles={["SysAdmin"]}>
+                    <SysAdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<SysAdminDashboard />} />
+                <Route path="businesses" element={<SysAdminBusinesses />} />
+                <Route path="plans" element={<SysAdminPlans />} />
+                <Route path="subscriptions" element={<SysAdminSubscriptions />} />
+                <Route path="landing" element={<SysAdminLanding />} />
+                <Route path="profile" element={<SysAdminProfile />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </LanguageProvider>
   );
 }
