@@ -43,7 +43,7 @@ const Home = () => {
   const backgroundColor = content?.backgroundColor || "#F8F5F0";
   const accentColor = content?.accentColor || "#e2ddd8";
 
-  const goToRegister = () => navigate("/login", { state: { register: true } });
+  const goToRegister = () => navigate("/register");
   const scrollToAbout = () => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" });
 
   return (

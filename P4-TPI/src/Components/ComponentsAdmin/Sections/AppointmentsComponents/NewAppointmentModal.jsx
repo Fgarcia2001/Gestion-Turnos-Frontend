@@ -11,6 +11,7 @@ import { fetchBranchInfo } from "../../../../services/branchService";
 import { fetchServiceData, searchClients } from "../ManagmentBusinessComponents/Data";
 import { ModalOverlay, inputClass, labelClass } from "../ManagmentBusinessComponents/Shared";
 import { IconX } from "../ManagmentBusinessComponents/Icons";
+import PhoneField from "../../../Shared/PhoneField";
 
 // ── Icons (self-contained, same convention as the rest of this section) ──────
 const IconSearch = () => (
@@ -312,7 +313,12 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                 </div>
                 <div>
                   <label className={labelClass}>Teléfono</label>
-                  <input value={clientFields.clientPhone} onChange={(e) => setClientFields((p) => ({ ...p, clientPhone: e.target.value }))} className={inputClass} placeholder="+54 9 ..." />
+                  <PhoneField
+                    name="clientPhone"
+                    value={clientFields.clientPhone}
+                    onChange={(e) => setClientFields((p) => ({ ...p, clientPhone: e.target.value }))}
+                    hasError={!!clientErrors.clientPhone}
+                  />
                   {clientErrors.clientPhone && <p className="text-xs text-[#dc2626] mt-1">{clientErrors.clientPhone}</p>}
                 </div>
                 <div>

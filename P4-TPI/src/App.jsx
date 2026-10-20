@@ -25,6 +25,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Login />} />
             <Route path="/:businessSlug" element={<BusinessPublicPage />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
             <Route

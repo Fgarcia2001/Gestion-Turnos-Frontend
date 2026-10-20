@@ -70,7 +70,7 @@ const Footer = () => {
             </li>
             <li>
               <button
-                onClick={() => navigate("/login", { state: { register: true } })}
+                onClick={() => navigate("/register")}
                 className="hover:text-white transition-colors cursor-pointer"
               >
                 {t("footerRegister")}

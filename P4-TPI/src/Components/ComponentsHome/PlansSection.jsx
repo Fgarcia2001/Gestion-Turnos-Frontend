@@ -26,7 +26,7 @@ const PlansSection = () => {
 
   const choosePlan = (planId) => {
     sessionStorage.setItem(PENDING_PLAN_KEY, planId);
-    navigate("/login", { state: { register: true } });
+    navigate("/register");
   };
 
   if (loading) return null;

@@ -4,6 +4,10 @@ import { useAuth, decodeJwt } from "../../../CustomHooks/AuthContext";
 import { dataLogin, DataLogup } from "./Datalogin/Login";
 import { useNavigate } from "react-router-dom";
 import { fetchBusinessTypes } from "../../services/businessService";
+import PhoneField from "../Shared/PhoneField";
+import { isValidPhone } from "../Shared/phoneValidation";
+import AddressAutocomplete from "../Shared/AddressAutocomplete";
+import CityAutocomplete from "../Shared/CityAutocomplete";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconMail = () => (
@@ -32,11 +36,6 @@ const IconEyeOff = () => (
 const IconUser = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7" />
-  </svg>
-);
-const IconPhone = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
   </svg>
 );
 const IconBriefcase = () => (
@@ -74,6 +73,7 @@ const InputIcon = ({ icon: Icon, children, className = "" }) => (
   </div>
 );
 
+
 const FieldError = ({ msg }) =>
   msg ? <p className="text-xs text-red-500 mt-1 pl-1">{msg}</p> : null;
 
@@ -88,10 +88,6 @@ const Divider = ({ label }) => (
 
 // ── Validation helpers ────────────────────────────────────────────────────────
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-// El backend exige el formato internacional argentino: +5493415551234
-const PHONE_RE = /^\+549\d{10}$/;
-
-const normalizePhone = (value) => (value || "").replace(/[\s\-()]/g, "");
 
 const validateLogin = (fields, t) => {
   const errors = {};
@@ -105,13 +101,13 @@ const validateLogin = (fields, t) => {
 const validateSignup = (fields, t) => {
   const errors = validateLogin(fields, t);
   if (!fields.name.trim())                                        errors.name             = t("nameRequired");
-  if (!normalizePhone(fields.adminPhone))                         errors.adminPhone       = t("phoneRequired");
-  else if (!PHONE_RE.test(normalizePhone(fields.adminPhone)))     errors.adminPhone       = t("phoneInvalidFormat");
+  if (!fields.adminPhone)                                         errors.adminPhone       = t("phoneRequired");
+  else if (!isValidPhone(fields.adminPhone))                      errors.adminPhone       = t("phoneInvalidFormat");
   if (!fields.businessCategory.trim())                            errors.businessCategory = t("categoryRequired");
   if (!fields.city.trim())                                        errors.city             = t("cityRequired");
   if (!fields.address.trim())                                     errors.address          = t("addressRequired");
-  if (!normalizePhone(fields.branchPhone))                        errors.branchPhone      = t("branchPhoneRequired");
-  else if (!PHONE_RE.test(normalizePhone(fields.branchPhone)))    errors.branchPhone      = t("phoneInvalidFormat");
+  if (!fields.branchPhone)                                        errors.branchPhone      = t("branchPhoneRequired");
+  else if (!isValidPhone(fields.branchPhone))                     errors.branchPhone      = t("phoneInvalidFormat");
   return errors;
 };
 
@@ -160,12 +156,11 @@ const signUp = async (payload, t) => {
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
-const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, initialRegister = false }) => {
+const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRegister }) => {
   const { t } = useTranslation();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading]       = useState(false);
-  const [register, setRegister]         = useState(initialRegister);
 
   const navigate = useNavigate();
   const [loginFields, setLoginFields]   = useState({ ...dataLogin });
@@ -194,18 +189,29 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
     setServerError("");
   };
 
-  // Al salir del campo se quitan espacios, guiones y paréntesis para dejar el
-  // teléfono en el formato que espera el backend (+5493415551234).
-  const handlePhoneBlur = (e) => {
-    const { name, value } = e.target;
-    setSignupFields((prev) => ({ ...prev, [name]: normalizePhone(value) }));
+  // Al elegir una sugerencia de Nominatim se completan direccion y ciudad
+  // juntas (la ciudad se puede seguir editando a mano si hace falta).
+  const handleAddressSelect = ({ address, city }) => {
+    setSignupFields((prev) => ({
+      ...prev,
+      address: address || prev.address,
+      city: city || prev.city,
+    }));
+    setErrors((prev) => ({ ...prev, address: undefined, city: undefined }));
+    setServerError("");
+  };
+
+  const handleCitySelect = (city) => {
+    setSignupFields((prev) => ({ ...prev, city }));
+    setErrors((prev) => ({ ...prev, city: undefined }));
+    setServerError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
 
-    const validationErrors = register
+    const validationErrors = isRegister
       ? validateSignup({ ...signupFields, ...loginFields }, t)
       : validateLogin(loginFields, t);
 
@@ -218,13 +224,11 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
     setIsLoading(true);
 
     try {
-      if (register) {
+      if (isRegister) {
         const payload = {
           ...signupFields,
           email: loginFields.email,
           password: loginFields.password,
-          adminPhone: normalizePhone(signupFields.adminPhone),
-          branchPhone: normalizePhone(signupFields.branchPhone),
         };
         const data = await signUp(payload, t);
         login(data.token);
@@ -245,7 +249,6 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
   };
 
   const handleToggleMode = () => {
-    setRegister((prev) => !prev);
     setErrors({});
     setServerError("");
     handleRegister();
@@ -289,7 +292,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
               <label htmlFor="password" className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
                 {t("passwordLabel")}
               </label>
-              {!register && (
+              {!isRegister && (
                 <button
                   type="button"
                   onClick={() => setIsForgotPassword(true)}
@@ -322,7 +325,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
         )}
 
         {/* ── Register extra fields (hidden in forgot-password mode) ── */}
-        {!isForgotPassword && register && (
+        {!isForgotPassword && isRegister && (
           <>
             <Divider label={t("businessInfo")} />
 
@@ -345,19 +348,13 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("adminPhone")}</label>
-                <InputIcon icon={IconPhone}>
-                  <input
-                    type="tel"
-                    name="adminPhone"
-                    placeholder={t("adminPhonePlaceholder")}
-                    value={signupFields.adminPhone}
-                    onChange={handleSignupChange}
-                    onBlur={handlePhoneBlur}
-                    className={inputWithIconCls + (errors.adminPhone ? inputErrorCls : "")}
-                  />
-                </InputIcon>
+                <PhoneField
+                  name="adminPhone"
+                  value={signupFields.adminPhone}
+                  onChange={handleSignupChange}
+                  hasError={!!errors.adminPhone}
+                />
                 <FieldError msg={errors.adminPhone} />
-                <p className="text-[11px] text-[#9a9a9a] mt-1 pl-1">{t("phoneFormatHint") || "Format: +5493415551234"}</p>
               </div>
 
               <div className="space-y-1.5">
@@ -383,12 +380,12 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("city")}</label>
                 <InputIcon icon={IconCity}>
-                  <input
-                    type="text"
+                  <CityAutocomplete
                     name="city"
-                    placeholder={t("cityPlaceholder")}
                     value={signupFields.city}
                     onChange={handleSignupChange}
+                    onSelect={handleCitySelect}
+                    placeholder={t("cityPlaceholder")}
                     className={inputWithIconCls + (errors.city ? inputErrorCls : "")}
                   />
                 </InputIcon>
@@ -398,12 +395,12 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
               <div className="space-y-1.5 col-span-2">
                 <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("address")}</label>
                 <InputIcon icon={IconMapPin}>
-                  <input
-                    type="text"
+                  <AddressAutocomplete
                     name="address"
-                    placeholder={t("addressPlaceholder")}
                     value={signupFields.address}
                     onChange={handleSignupChange}
+                    onSelect={handleAddressSelect}
+                    placeholder={t("addressPlaceholder")}
                     className={inputWithIconCls + (errors.address ? inputErrorCls : "")}
                   />
                 </InputIcon>
@@ -412,19 +409,13 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
 
               <div className="space-y-1.5 col-span-2">
                 <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("branchPhone")}</label>
-                <InputIcon icon={IconPhone}>
-                  <input
-                    type="tel"
-                    name="branchPhone"
-                    placeholder={t("branchPhonePlaceholder")}
-                    value={signupFields.branchPhone}
-                    onChange={handleSignupChange}
-                    onBlur={handlePhoneBlur}
-                    className={inputWithIconCls + (errors.branchPhone ? inputErrorCls : "")}
-                  />
-                </InputIcon>
+                <PhoneField
+                  name="branchPhone"
+                  value={signupFields.branchPhone}
+                  onChange={handleSignupChange}
+                  hasError={!!errors.branchPhone}
+                />
                 <FieldError msg={errors.branchPhone} />
-                <p className="text-[11px] text-[#9a9a9a] mt-1 pl-1">{t("phoneFormatHint") || "Format: +5493415551234"}</p>
               </div>
 
             </div>
@@ -442,7 +433,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
             ? <><IconLoader />{t("loading")}</>
             : isForgotPassword
               ? (t("sendResetLink") ?? "Send reset link")
-              : register ? t("signUp") : t("signIn")}
+              : isRegister ? t("signUp") : t("signIn")}
         </button>
 
       </form>
@@ -458,12 +449,12 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, init
         </p>
       ) : (
         <p className="mt-6 text-center text-sm text-[#9a9a9a]">
-          {register ? t("haveAccount") : t("noAccount")}{" "}
+          {isRegister ? t("haveAccount") : t("noAccount")}{" "}
           <button
             onClick={handleToggleMode}
             className="font-semibold text-[#1a1a2e] hover:underline underline-offset-4 cursor-pointer transition-colors"
           >
-            {register ? t("signIn") : t("signUp")}
+            {isRegister ? t("signIn") : t("signUp")}
           </button>
         </p>
       )}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchBusinessTypes } from "../../services/businessService";
 import { ModalOverlay, inputClass, labelClass } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
 import { IconX } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import PhoneField from "../Shared/PhoneField";
 
 const STATUS_OPTIONS = ["Habilitado", "Deshabilitado"];
 
@@ -106,7 +107,7 @@ const EditBusinessModal = ({ business, onClose, onSave }) => {
 
           <div>
             <label className={labelClass}>Phone</label>
-            <input value={form.phone} onChange={handleChange("phone")} className={inputClass} />
+            <PhoneField name="phone" value={form.phone} onChange={handleChange("phone")} />
           </div>
 
           <div className="flex gap-3 pt-2">

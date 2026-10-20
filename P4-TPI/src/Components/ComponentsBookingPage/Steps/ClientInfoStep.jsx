@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { validateClientInfo } from "./stepValidation";
-import { IconUser, IconMail, IconPhone, IconCake, IconClipboard, IconDollar } from "../Icons";
+import { IconUser, IconMail, IconCake, IconClipboard, IconDollar } from "../Icons";
+import PhoneField from "../../Shared/PhoneField";
 
 const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-1.5">
@@ -67,15 +68,13 @@ const ClientInfoStep = ({ booking, updateBooking, showErrors }) => {
           </Field>
 
           <Field label={t("clientPhoneLabel") || "Phone"} error={shouldShow("clientPhone") ? errors.clientPhone : null}>
-            <IconInput icon={<IconPhone />}>
-              <input
-                type="tel"
-                value={booking.clientPhone}
-                onChange={handleChange("clientPhone")}
-                onBlur={() => markTouched("clientPhone")}
-                className={inputClass(shouldShow("clientPhone") && errors.clientPhone)}
-              />
-            </IconInput>
+            <PhoneField
+              name="clientPhone"
+              value={booking.clientPhone}
+              onChange={handleChange("clientPhone")}
+              onBlur={() => markTouched("clientPhone")}
+              hasError={shouldShow("clientPhone") && !!errors.clientPhone}
+            />
           </Field>
         </div>
 
