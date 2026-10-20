@@ -12,16 +12,16 @@ import EditBusinessModal from "./EditBusinessModal";
 const ALL = "All";
 
 const SkeletonCard = () => (
-  <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 flex flex-col items-center gap-3 animate-pulse">
-    <div className="w-16 h-16 rounded-full bg-[#f0ede8]" />
-    <div className="h-3.5 w-28 rounded bg-[#f0ede8] mt-1" />
-    <div className="h-3 w-20 rounded-full bg-[#f0ede8]" />
+  <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col items-center gap-3 animate-pulse">
+    <div className="w-16 h-16 rounded-full bg-[var(--surface-muted)]" />
+    <div className="h-3.5 w-28 rounded bg-[var(--surface-muted)] mt-1" />
+    <div className="h-3 w-20 rounded-full bg-[var(--surface-muted)]" />
     <div className="flex flex-col gap-1.5 mt-2 w-full items-center">
-      <div className="h-2.5 w-24 rounded bg-[#f0ede8]" />
-      <div className="h-2.5 w-28 rounded bg-[#f0ede8]" />
-      <div className="h-2.5 w-20 rounded bg-[#f0ede8]" />
+      <div className="h-2.5 w-24 rounded bg-[var(--surface-muted)]" />
+      <div className="h-2.5 w-28 rounded bg-[var(--surface-muted)]" />
+      <div className="h-2.5 w-20 rounded bg-[var(--surface-muted)]" />
     </div>
-    <div className="h-8 w-24 rounded-xl bg-[#f0ede8] mt-2" />
+    <div className="h-8 w-24 rounded-xl bg-[var(--surface-muted)] mt-2" />
   </div>
 );
 
@@ -166,8 +166,8 @@ const SysAdminBusinesses = () => {
     return (
       <div className="pt-8 flex flex-col gap-6">
         <div>
-          <h2 className="text-2xl font-bold text-[#1a1a2e] mb-1">Businesses</h2>
-          <p className="text-sm text-[#9a9a9a]">All businesses registered on the platform.</p>
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Businesses</h2>
+          <p className="text-sm text-[var(--text-muted)]">All businesses registered on the platform.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -178,11 +178,11 @@ const SysAdminBusinesses = () => {
 
   if (error) {
     return (
-      <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center mt-8">
-        <p className="text-sm text-[#9a9a9a] mb-4">Couldn't load the businesses</p>
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center mt-8">
+        <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the businesses</p>
         <button
           onClick={load}
-          className="bg-[#1a1a2e] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors cursor-pointer"
+          className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
         >
           Retry
         </button>
@@ -197,12 +197,12 @@ const SysAdminBusinesses = () => {
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[#1a1a2e] mb-1">Businesses</h2>
-        <p className="text-sm text-[#9a9a9a]">All businesses registered on the platform.</p>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Businesses</h2>
+        <p className="text-sm text-[var(--text-muted)]">All businesses registered on the platform.</p>
       </div>
 
       {businesses.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#e2ddd8] py-16 text-center text-sm text-[#9a9a9a]">
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
           No businesses found.
         </div>
       ) : (
@@ -212,8 +212,8 @@ const SysAdminBusinesses = () => {
               onClick={() => setSelectedCategory(ALL)}
               className={`text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors ${
                 selectedCategory === ALL
-                  ? "bg-[#1a1a2e] text-white"
-                  : "bg-white border border-[#e2ddd8] text-[#5a5a6e] hover:bg-[#f0ede8]"
+                  ? "bg-[var(--brand)] text-white"
+                  : "bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)]"
               }`}
             >
               All
@@ -224,8 +224,8 @@ const SysAdminBusinesses = () => {
                 onClick={() => setSelectedCategory(type.name)}
                 className={`text-xs font-semibold px-3.5 py-2 rounded-xl transition-colors ${
                   selectedCategory === type.name
-                    ? "bg-[#1a1a2e] text-white"
-                    : "bg-white border border-[#e2ddd8] text-[#5a5a6e] hover:bg-[#f0ede8]"
+                    ? "bg-[var(--brand)] text-white"
+                    : "bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)]"
                 }`}
               >
                 {type.name}
@@ -234,7 +234,7 @@ const SysAdminBusinesses = () => {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-[#e2ddd8] py-16 text-center text-sm text-[#9a9a9a]">
+            <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
               No businesses found for this category.
             </div>
           ) : (
@@ -284,7 +284,7 @@ const SysAdminBusinesses = () => {
       )}
 
       {toast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[var(--brand)] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>

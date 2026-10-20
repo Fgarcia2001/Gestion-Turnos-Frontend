@@ -13,9 +13,9 @@ const CSS_ANIMATIONS = `
 const DetailRow = ({ label, value }) => {
   if (!value) return null;
   return (
-    <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[#f0ede8] last:border-b-0">
-      <span className="text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide shrink-0">{label}</span>
-      <span className="text-sm text-[#1a1a2e] text-right">{value}</span>
+    <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[var(--border-faint)] last:border-b-0">
+      <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide shrink-0">{label}</span>
+      <span className="text-sm text-[var(--text-primary)] text-right">{value}</span>
     </div>
   );
 };
@@ -37,15 +37,15 @@ const AppointmentDetailsModal = ({ appt, staffName, date, onClose }) => {
     <>
       <style>{CSS_ANIMATIONS}</style>
       <ModalOverlay onClose={onClose}>
-        <div className="w-full max-w-md bg-white rounded-2xl border border-[#e2ddd8] shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#e2ddd8]">
-            <h2 className="text-base font-bold text-[#1a1a2e]">
+        <div className="w-full max-w-md bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] shadow-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border-subtle)]">
+            <h2 className="text-base font-bold text-[var(--text-primary)]">
               {t("Appointment Details") || "Appointment Details"}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
               aria-label={t("Close") || "Close"}
             >
               <IconX />
@@ -53,8 +53,8 @@ const AppointmentDetailsModal = ({ appt, staffName, date, onClose }) => {
           </div>
 
           <div className="px-5 py-2">
-            <div className="flex items-center justify-between py-2.5 border-b border-[#f0ede8]">
-              <span className="text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide">
+            <div className="flex items-center justify-between py-2.5 border-b border-[var(--border-faint)]">
+              <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">
                 {t("Status") || "Status"}
               </span>
               <span
@@ -73,19 +73,19 @@ const AppointmentDetailsModal = ({ appt, staffName, date, onClose }) => {
             <DetailRow label={t("Payment Method") || "Payment Method"} value={appt.payment} />
             {appt.observation && (
               <div className="py-2.5">
-                <span className="text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide block mb-1.5">
+                <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide block mb-1.5">
                   {t("Observation") || "Observation"}
                 </span>
-                <p className="text-sm text-[#1a1a2e] bg-[#f9f8f6] rounded-xl px-3 py-2.5">{appt.observation}</p>
+                <p className="text-sm text-[var(--text-primary)] bg-[var(--surface-muted-3)] rounded-xl px-3 py-2.5">{appt.observation}</p>
               </div>
             )}
           </div>
 
-          <div className="px-5 py-4 border-t border-[#e2ddd8] flex justify-end">
+          <div className="px-5 py-4 border-t border-[var(--border-subtle)] flex justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-semibold bg-[#1a1a2e] text-white rounded-xl px-4 py-2 hover:bg-[#2d2d44] transition-colors"
+              className="text-sm font-semibold bg-[var(--brand)] text-white rounded-xl px-4 py-2 hover:bg-[var(--brand-hover)] transition-colors"
             >
               {t("Close") || "Close"}
             </button>

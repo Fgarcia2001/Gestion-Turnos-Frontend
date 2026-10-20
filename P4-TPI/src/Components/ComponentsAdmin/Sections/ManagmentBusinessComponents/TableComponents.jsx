@@ -42,7 +42,7 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
       <button
         ref={buttonRef}
         onClick={() => setOpen((v) => !v)}
-        className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1 rounded-lg hover:bg-[#f0ede8]"
+        className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1 rounded-lg hover:bg-[var(--surface-muted)]"
       >
         <IconDots />
       </button>
@@ -50,12 +50,12 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
       {open && createPortal(
         <div
           ref={menuRef}
-          className="fixed z-50 bg-white border border-[#e2ddd8] rounded-xl shadow-lg overflow-hidden"
+          className="fixed z-50 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-xl shadow-lg overflow-hidden"
           style={{ animation: "fadeSlideIn 0.15s ease", minWidth: "10rem", top: position.top, left: position.left }}
         >
           <button
             onClick={() => { setOpen(false); onEdit(); }}
-            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1a1a2e] hover:bg-[#f0ede8] transition-colors font-medium"
+            className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
           >
             <IconEdit />
             Edit
@@ -64,18 +64,18 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
           {/* Schedules + visibility toggle — branch only */}
           {tab === "branch" && (
             <>
-              <div className="h-px bg-[#f0ede8]" />
+              <div className="h-px bg-[var(--surface-muted)]" />
               <button
                 onClick={() => { setOpen(false); onSchedules(); }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1a1a2e] hover:bg-[#f0ede8] transition-colors font-medium"
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
               >
                 <IconClock />
                 Schedules
               </button>
-              <div className="h-px bg-[#f0ede8]" />
+              <div className="h-px bg-[var(--surface-muted)]" />
               <button
                 onClick={() => { setOpen(false); onToggleActive(row); }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1a1a2e] hover:bg-[#f0ede8] transition-colors font-medium"
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
               >
                 {row.isActive ? <IconEyeOff /> : <IconEye />}
                 {row.isActive ? "Hide from public" : "Make public"}
@@ -83,7 +83,7 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
             </>
           )}
 
-          <div className="h-px bg-[#f0ede8]" />
+          <div className="h-px bg-[var(--surface-muted)]" />
           <button
             onClick={() => { setOpen(false); onDelete(); }}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium"
@@ -100,21 +100,21 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
 
 // ── Table row ─────────────────────────────────────────────────────────────────
 export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleActive }) => {
-  const tdClass = "py-3 pr-6 text-sm text-[#6b7280]";
+  const tdClass = "py-3 pr-6 text-sm text-[var(--text-secondary)]";
   
   if (tab === "staff") {
     return (
-      <tr className="border-b border-[#f0ede8] hover:bg-[#faf9f7] transition-colors">
+      <tr className="border-b border-[var(--border-faint)] hover:bg-[var(--surface-faint)] transition-colors">
         <td className="py-3 pr-6">
           <div className="flex items-center gap-3">
             <Avatar initials={row.staffName?.charAt(0) || "S"} photo={row.staffLinkPhoto || null} />
-            <span className="font-semibold text-[#1a1a2e] text-sm">{row.staffName}</span>
+            <span className="font-semibold text-[var(--text-primary)] text-sm">{row.staffName}</span>
           </div>
         </td>
         <td className={tdClass}>{row.staffEmail}</td>
         <td className={tdClass}>{row.staffPhone}</td>
         <td className="py-3 pr-6">
-          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#f0ede8] text-[#1a1a2e]">
+          <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[var(--surface-muted)] text-[var(--text-primary)]">
             {row.rol}
           </span>
         </td>
@@ -128,11 +128,11 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
 
   if (tab === "client") {
     return (
-      <tr className="border-b border-[#f0ede8] hover:bg-[#faf9f7] transition-colors">
+      <tr className="border-b border-[var(--border-faint)] hover:bg-[var(--surface-faint)] transition-colors">
         <td className="py-3 pr-6">
           <div className="flex items-center gap-3">
             <Avatar initials={row.name?.charAt(0) || "C"} photo={null} />
-            <span className="font-semibold text-[#1a1a2e] text-sm">{row.name}</span>
+            <span className="font-semibold text-[var(--text-primary)] text-sm">{row.name}</span>
           </div>
         </td>
         <td className={tdClass}>{row.email}</td>
@@ -147,9 +147,9 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
 
   if (tab === "branch") {
     return (
-      <tr className="border-b border-[#f0ede8] hover:bg-[#faf9f7] transition-colors">
+      <tr className="border-b border-[var(--border-faint)] hover:bg-[var(--surface-faint)] transition-colors">
         <td className="py-3 pr-6">
-          <span className="font-semibold text-[#1a1a2e] text-sm">{row.name}</span>
+          <span className="font-semibold text-[var(--text-primary)] text-sm">{row.name}</span>
         </td>
         <td className={tdClass}>{row.address}</td>
         <td className={tdClass}>{row.phone}</td>
@@ -157,7 +157,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
         <td className="py-3 pr-6">
           <span
             className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-              row.isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
+              row.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
             }`}
           >
             {row.isActive ? "Public" : "Hidden"}
@@ -172,14 +172,14 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
 
   if (tab === "service") {
     return (
-      <tr className="border-b border-[#f0ede8] hover:bg-[#faf9f7] transition-colors">
+      <tr className="border-b border-[var(--border-faint)] hover:bg-[var(--surface-faint)] transition-colors">
         <td className="py-3 pr-6">
-          <span className="font-semibold text-[#1a1a2e] text-sm">{row.name}</span>
+          <span className="font-semibold text-[var(--text-primary)] text-sm">{row.name}</span>
         </td>
         <td className={tdClass}>{row.categoria}</td>
         <td className={tdClass}>{row.description}</td>
         <td className={tdClass}>{row.duration}</td>
-        <td className="py-3 pr-6 font-medium text-[#1a1a2e]">{row.price}</td>
+        <td className="py-3 pr-6 font-medium text-[var(--text-primary)]">{row.price}</td>
         <td className="py-3 text-right">
           <RowMenu tab={tab} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
         </td>

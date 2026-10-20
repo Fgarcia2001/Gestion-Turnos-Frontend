@@ -114,7 +114,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="flex w-full h-screen overflow-hidden bg-[#f0ede8]">
+    <div className="flex w-full h-screen overflow-hidden bg-[var(--surface-muted)]">
 
       {/* Sidebar — ocupa toda la altura, NO es fixed */}
       <Navbar onSelectSection={handleSelectSection} role={user?.role} active={section} />

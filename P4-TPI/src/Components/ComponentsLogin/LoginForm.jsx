@@ -60,13 +60,13 @@ const IconLoader = () => (
 );
 
 // ── Reusable input with icon ───────────────────────────────────────────────────
-const inputCls = "flex h-12 w-full rounded-xl border border-[#e2ddd8] bg-[#faf9f7] px-4 py-2 text-sm text-[#1a1a2e] placeholder-[#b0aba5] outline-none focus:border-[#1a1a2e] focus:bg-white transition-all duration-200";
+const inputCls = "flex h-12 w-full rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-faint)] px-4 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-faint)] outline-none focus:border-[var(--brand)] focus:bg-[var(--surface)] transition-all duration-200";
 const inputWithIconCls = inputCls + " pl-10";
 const inputErrorCls = " border-red-400 focus:border-red-500";
 
 const InputIcon = ({ icon: Icon, children, className = "" }) => (
   <div className={`relative ${className}`}>
-    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9a9a9a]">
+    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
       <Icon />
     </div>
     {children}
@@ -80,9 +80,9 @@ const FieldError = ({ msg }) =>
 // ── Divider ───────────────────────────────────────────────────────────────────
 const Divider = ({ label }) => (
   <div className="flex items-center gap-3 my-1">
-    <div className="flex-1 h-px bg-[#e2ddd8]" />
-    <span className="text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide">{label}</span>
-    <div className="flex-1 h-px bg-[#e2ddd8]" />
+    <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+    <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide">{label}</span>
+    <div className="flex-1 h-px bg-[var(--border-subtle)]" />
   </div>
 );
 
@@ -268,7 +268,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
 
         {/* ── Email ── */}
         <div className="space-y-1.5">
-          <label htmlFor="email" className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
+          <label htmlFor="email" className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">
             {t("emailLabel")}
           </label>
           <InputIcon icon={IconMail}>
@@ -289,14 +289,14 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
         {!isForgotPassword && (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <label htmlFor="password" className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">
+              <label htmlFor="password" className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">
                 {t("passwordLabel")}
               </label>
               {!isRegister && (
                 <button
                   type="button"
                   onClick={() => setIsForgotPassword(true)}
-                  className="text-xs text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
+                  className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   {t("forgotPass")}
                 </button>
@@ -315,7 +315,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
               >
                 {showPassword ? <IconEyeOff /> : <IconEye />}
               </button>
@@ -332,7 +332,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
             <div className="grid grid-cols-2 gap-3">
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("fullName")}</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">{t("fullName")}</label>
                 <InputIcon icon={IconUser}>
                   <input
                     type="text"
@@ -347,7 +347,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("adminPhone")}</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">{t("adminPhone")}</label>
                 <PhoneField
                   name="adminPhone"
                   value={signupFields.adminPhone}
@@ -358,7 +358,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("businessCategory")}</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">{t("businessCategory")}</label>
                 <InputIcon icon={IconBriefcase}>
                   <select
                     name="businessCategory"
@@ -378,7 +378,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("city")}</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">{t("city")}</label>
                 <InputIcon icon={IconCity}>
                   <CityAutocomplete
                     name="city"
@@ -393,7 +393,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               </div>
 
               <div className="space-y-1.5 col-span-2">
-                <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("address")}</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">{t("address")}</label>
                 <InputIcon icon={IconMapPin}>
                   <AddressAutocomplete
                     name="address"
@@ -408,7 +408,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               </div>
 
               <div className="space-y-1.5 col-span-2">
-                <label className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">{t("branchPhone")}</label>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">{t("branchPhone")}</label>
                 <PhoneField
                   name="branchPhone"
                   value={signupFields.branchPhone}
@@ -426,7 +426,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
         <button
           type="submit"
           id="btn-submit-auth"
-          className="w-full h-12 bg-[#1a1a2e] text-white rounded-xl text-sm font-semibold hover:bg-[#2d2d44] flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 mt-2"
+          className="w-full h-12 bg-[var(--brand)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--brand-hover)] flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 mt-2"
           disabled={isLoading}
         >
           {isLoading
@@ -439,20 +439,20 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
       </form>
 
       {isForgotPassword ? (
-        <p className="mt-6 text-center text-sm text-[#9a9a9a]">
+        <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
           <button
             onClick={() => setIsForgotPassword(false)}
-            className="font-semibold text-[#1a1a2e] hover:underline underline-offset-4 cursor-pointer transition-colors"
+            className="font-semibold text-[var(--text-primary)] hover:underline underline-offset-4 cursor-pointer transition-colors"
           >
             {t("backToLogin") ?? "← Back to login"}
           </button>
         </p>
       ) : (
-        <p className="mt-6 text-center text-sm text-[#9a9a9a]">
+        <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
           {isRegister ? t("haveAccount") : t("noAccount")}{" "}
           <button
             onClick={handleToggleMode}
-            className="font-semibold text-[#1a1a2e] hover:underline underline-offset-4 cursor-pointer transition-colors"
+            className="font-semibold text-[var(--text-primary)] hover:underline underline-offset-4 cursor-pointer transition-colors"
           >
             {isRegister ? t("signIn") : t("signUp")}
           </button>

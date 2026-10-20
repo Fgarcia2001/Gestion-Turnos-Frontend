@@ -22,7 +22,7 @@ const formatMoney = (value) =>
 const DetailRow = ({ label, value }) => (
   <div>
     <p className={labelClass}>{label}</p>
-    <p className="text-sm text-[#1a1a2e] break-words">{value || "—"}</p>
+    <p className="text-sm text-[var(--text-primary)] break-words">{value || "—"}</p>
   </div>
 );
 
@@ -56,13 +56,13 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
 
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+      <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
         <button type="button" onClick={onClose} aria-label="Close"
-          className="absolute top-4 right-4 text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]">
+          className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
           <IconX />
         </button>
 
-        <h2 className="text-lg font-bold text-[#1a1a2e] mb-5">
+        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-5">
           {t("Reassign appointment") || "Reasignar turno"}
         </h2>
 
@@ -107,11 +107,11 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
 
         <div className="flex gap-3">
           <button type="button" onClick={onClose} disabled={submitting}
-            className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors disabled:opacity-50 cursor-pointer">
+            className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50 cursor-pointer">
             {t("Cancel") || "Cancelar"}
           </button>
           <button type="button" onClick={handleConfirm} disabled={!staffId || submitting}
-            className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2a2a4e] transition-colors disabled:opacity-50 cursor-pointer">
+            className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50 cursor-pointer">
             {submitting ? "Saving..." : t("Confirm") || "Confirmar"}
           </button>
         </div>
@@ -152,10 +152,10 @@ const PendingReassignment = ({ onChange }) => {
   return (
     <div>
       <div className="mb-5">
-        <h2 className="text-lg font-bold text-[#1a1a2e]">
+        <h2 className="text-lg font-bold text-[var(--text-primary)]">
           {t("Pending reassignment appointments title") || "Turnos pendientes de reasignar"}
         </h2>
-        <p className="text-sm text-[#9a9a9a]">
+        <p className="text-sm text-[var(--text-muted)]">
           {t("Pending reassignment subtitle") || "Elegí un nuevo profesional para cada turno."}
         </p>
       </div>
@@ -167,10 +167,10 @@ const PendingReassignment = ({ onChange }) => {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-[#9a9a9a]">Loading...</p>
+        <p className="text-sm text-[var(--text-muted)]">Loading...</p>
       ) : appointments.length === 0 ? (
-        <div className="bg-white border border-[#e2ddd8] rounded-2xl p-8 text-center">
-          <p className="text-sm text-[#9a9a9a]">
+        <div className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-2xl p-8 text-center">
+          <p className="text-sm text-[var(--text-muted)]">
             {t("No pending reassignment appointments") || "No hay turnos pendientes de reasignar"}
           </p>
         </div>
@@ -178,27 +178,27 @@ const PendingReassignment = ({ onChange }) => {
         <div className="flex flex-col gap-3">
           {appointments.map((a) => (
             <div key={a.id}
-              className="flex flex-col sm:flex-row sm:items-center gap-3 bg-white border border-[#e2ddd8] rounded-2xl px-4 py-3">
+              className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-2xl px-4 py-3">
               <div className="flex-1 min-w-0 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="min-w-0">
                   <p className={labelClass}>{t("Client") || "Cliente"}</p>
-                  <p className="text-sm font-semibold text-[#1a1a2e] truncate">{a.clientName || "—"}</p>
+                  <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{a.clientName || "—"}</p>
                 </div>
                 <div>
                   <p className={labelClass}>{t("Date") || "Fecha"}</p>
-                  <p className="text-sm text-[#1a1a2e]">{formatDate(a.day)}</p>
+                  <p className="text-sm text-[var(--text-primary)]">{formatDate(a.day)}</p>
                 </div>
                 <div>
                   <p className={labelClass}>{t("Time") || "Horario"}</p>
-                  <p className="text-sm text-[#1a1a2e]">{a.startTime} - {a.endTime}</p>
+                  <p className="text-sm text-[var(--text-primary)]">{a.startTime} - {a.endTime}</p>
                 </div>
                 <div className="min-w-0">
                   <p className={labelClass}>{t("Branch") || "Sucursal"}</p>
-                  <p className="text-sm text-[#1a1a2e] truncate">{a.branchName || "—"}</p>
+                  <p className="text-sm text-[var(--text-primary)] truncate">{a.branchName || "—"}</p>
                 </div>
               </div>
               <button type="button" onClick={() => setSelected(a)}
-                className="shrink-0 h-10 px-4 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2a2a4e] transition-colors cursor-pointer">
+                className="shrink-0 h-10 px-4 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors cursor-pointer">
                 {t("Reassign") || "Reasignar"}
               </button>
             </div>

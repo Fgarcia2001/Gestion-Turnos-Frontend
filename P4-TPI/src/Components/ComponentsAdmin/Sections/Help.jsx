@@ -68,29 +68,29 @@ const FAQ_ITEMS = [
 ];
 
 const INPUT_CLASSES =
-  "w-full px-3 py-2 rounded-xl border border-[#e2ddd8] bg-[#fcfbf9] text-sm text-[#1a1a2e] placeholder:text-[#b5aea6] focus:outline-none focus:border-[#1a1a2e] transition-colors";
+  "w-full px-3 py-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-faint-2)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-faint)] focus:outline-none focus:border-[var(--brand)] transition-colors";
 
 // ── Card header ───────────────────────────────────────────────────────────────
 const CardHeader = ({ icon, title, subtitle }) => (
   <div className="flex items-start gap-3 mb-5">
-    <div className="w-11 h-11 rounded-xl bg-[#f0ede8] flex items-center justify-center text-[#1a1a2e] shrink-0">
+    <div className="w-11 h-11 rounded-xl bg-[var(--surface-muted)] flex items-center justify-center text-[var(--text-primary)] shrink-0">
       {icon}
     </div>
     <div className="min-w-0">
-      <h2 className="text-base font-semibold text-[#1a1a2e]">{title}</h2>
-      <p className="text-xs text-[#9a9a9a] mt-0.5 leading-relaxed">{subtitle}</p>
+      <h2 className="text-base font-semibold text-[var(--text-primary)]">{title}</h2>
+      <p className="text-xs text-[var(--text-muted)] mt-0.5 leading-relaxed">{subtitle}</p>
     </div>
   </div>
 );
 
 const ContactRow = ({ icon, label, value }) => (
-  <div className="flex items-center gap-3 bg-[#fcfbf9] border border-[#e2ddd8] rounded-xl px-3 py-2.5">
-    <div className="w-8 h-8 rounded-lg bg-[#f0ede8] flex items-center justify-center text-[#1a1a2e] shrink-0">
+  <div className="flex items-center gap-3 bg-[var(--surface-faint-2)] border border-[var(--border-subtle)] rounded-xl px-3 py-2.5">
+    <div className="w-8 h-8 rounded-lg bg-[var(--surface-muted)] flex items-center justify-center text-[var(--text-primary)] shrink-0">
       {icon}
     </div>
     <div className="min-w-0">
-      <p className="text-[11px] text-[#9a9a9a]">{label}</p>
-      <p className="text-sm font-semibold text-[#1a1a2e] break-all" dir="ltr">{value}</p>
+      <p className="text-[11px] text-[var(--text-muted)]">{label}</p>
+      <p className="text-sm font-semibold text-[var(--text-primary)] break-all" dir="ltr">{value}</p>
     </div>
   </div>
 );
@@ -169,7 +169,7 @@ const Help = ({ onStartTour }) => {
 
   const toastEl = toast ? (
     <div
-      className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out] ${toast.type === "error" ? "bg-[#b91c1c]" : "bg-[#1a1a2e]"}`}
+      className={`fixed top-6 right-6 z-50 flex items-center gap-2 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out] ${toast.type === "error" ? "bg-[#b91c1c]" : "bg-[var(--brand)]"}`}
     >
       {toast.type === "error" ? <IconAlert /> : <IconCheck />}
       {toast.message}
@@ -179,20 +179,20 @@ const Help = ({ onStartTour }) => {
   return (
     <div data-tour="help-content" className="flex flex-col w-full max-w-6xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#1a1a2e]">{t("helpTitle") || "Help & Support"}</h1>
-        <p className="text-sm text-[#9a9a9a] mt-1">{t("helpSubtitle") || "Find answers, contact us or report a problem."}</p>
+        <h1 className="text-2xl font-bold text-[var(--text-primary)]">{t("helpTitle") || "Help & Support"}</h1>
+        <p className="text-sm text-[var(--text-muted)] mt-1">{t("helpSubtitle") || "Find answers, contact us or report a problem."}</p>
       </div>
 
       {onStartTour && (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white rounded-2xl border border-[#e2ddd8] px-5 py-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] px-5 py-4 mb-6">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#1a1a2e]">{t("tourReplayTitle") || "Take the tour"}</p>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">{t("tourReplaySubtitle") || "A quick guided walkthrough of the platform."}</p>
+            <p className="text-sm font-semibold text-[var(--text-primary)]">{t("tourReplayTitle") || "Take the tour"}</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t("tourReplaySubtitle") || "A quick guided walkthrough of the platform."}</p>
           </div>
           <button
             type="button"
             onClick={onStartTour}
-            className="inline-flex items-center justify-center gap-2 shrink-0 px-4 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 shrink-0 px-4 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
           >
             <IconHelpCircle className="w-4 h-4" />
             {t("tourReplay") || "Start the tutorial"}
@@ -202,7 +202,7 @@ const Help = ({ onStartTour }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* 1 · Preguntas frecuentes */}
-        <section className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
+        <section className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
           <CardHeader
             icon={<IconHelpCircle />}
             title={t("faqTitle") || "Frequently asked questions"}
@@ -214,7 +214,7 @@ const Help = ({ onStartTour }) => {
               return (
                 <div
                   key={item.q}
-                  className={`rounded-xl border overflow-hidden transition-colors ${open ? "border-[#c9c2b8] bg-[#fcfbf9]" : "border-[#e2ddd8] bg-white"}`}
+                  className={`rounded-xl border overflow-hidden transition-colors ${open ? "border-[var(--border-accent)] bg-[var(--surface-faint-2)]" : "border-[var(--border-subtle)] bg-[var(--surface)]"}`}
                 >
                   <button
                     type="button"
@@ -222,11 +222,11 @@ const Help = ({ onStartTour }) => {
                     aria-expanded={open}
                     className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left cursor-pointer"
                   >
-                    <span className="text-sm font-semibold text-[#1a1a2e]">{t(item.q)}</span>
-                    <IconChevron className={`shrink-0 text-[#9a9a9a] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">{t(item.q)}</span>
+                    <IconChevron className={`shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
                   </button>
                   {open && (
-                    <p className="px-4 pb-4 -mt-0.5 text-xs leading-relaxed text-[#6b7280]">
+                    <p className="px-4 pb-4 -mt-0.5 text-xs leading-relaxed text-[var(--text-secondary)]">
                       {t(item.a)}
                     </p>
                   )}
@@ -237,7 +237,7 @@ const Help = ({ onStartTour }) => {
         </section>
 
         {/* 2 · Contacto */}
-        <section className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
+        <section className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
           <CardHeader
             icon={<IconChat />}
             title={t("contactTitle") || "Contact us"}
@@ -260,7 +260,7 @@ const Help = ({ onStartTour }) => {
             </a>
             <a
               href={mailtoUrl}
-              className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors"
+              className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors"
             >
               <IconMail className="w-4 h-4" />
               {t("contactSendEmail") || "Send an email"}
@@ -269,7 +269,7 @@ const Help = ({ onStartTour }) => {
         </section>
 
         {/* 3 · Reportar un bug */}
-        <section className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
+        <section className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
           <CardHeader
             icon={<IconBug />}
             title={t("bugTitle") || "Report a bug"}
@@ -277,7 +277,7 @@ const Help = ({ onStartTour }) => {
           />
           <form onSubmit={handleSendReport} className="flex flex-col gap-3" noValidate>
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-[#1a1a2e]">{t("bugTypeLabel") || "Type"}</span>
+              <span className="text-xs font-semibold text-[var(--text-primary)]">{t("bugTypeLabel") || "Type"}</span>
               <select
                 value={bugType}
                 onChange={(e) => setBugType(e.target.value)}
@@ -290,7 +290,7 @@ const Help = ({ onStartTour }) => {
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-[#1a1a2e]">{t("bugDescriptionLabel") || "What happened?"}</span>
+              <span className="text-xs font-semibold text-[var(--text-primary)]">{t("bugDescriptionLabel") || "What happened?"}</span>
               <textarea
                 value={bugDescription}
                 onChange={(e) => {
@@ -304,7 +304,7 @@ const Help = ({ onStartTour }) => {
             </label>
 
             <label className="flex flex-col gap-1">
-              <span className="text-xs font-semibold text-[#1a1a2e]">{t("bugStepsLabel") || "Steps to reproduce (optional)"}</span>
+              <span className="text-xs font-semibold text-[var(--text-primary)]">{t("bugStepsLabel") || "Steps to reproduce (optional)"}</span>
               <textarea
                 value={bugSteps}
                 onChange={(e) => setBugSteps(e.target.value)}
@@ -314,8 +314,8 @@ const Help = ({ onStartTour }) => {
               />
             </label>
 
-            <p className="text-[11px] text-[#9a9a9a] break-all">
-              <span className="font-semibold text-[#6b7280]">{t("bugBrowserLabel") || "Browser"}:</span> {userAgent}
+            <p className="text-[11px] text-[var(--text-muted)] break-all">
+              <span className="font-semibold text-[var(--text-secondary)]">{t("bugBrowserLabel") || "Browser"}:</span> {userAgent}
             </p>
 
             {formError && (
@@ -325,7 +325,7 @@ const Help = ({ onStartTour }) => {
             <div className="flex gap-3 mt-1">
               <button
                 type="submit"
-                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors"
+                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors"
               >
                 <IconSend />
                 {t("bugSend") || "Send report"}
@@ -333,7 +333,7 @@ const Help = ({ onStartTour }) => {
               <button
                 type="button"
                 onClick={handleCopyReport}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#e2ddd8] bg-[#fcfbf9] text-[#1a1a2e] text-sm font-semibold hover:bg-[#f0ede8] transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-faint-2)] text-[var(--text-primary)] text-sm font-semibold hover:bg-[var(--surface-muted)] transition-colors"
               >
                 <IconCopy />
                 {t("bugCopy") || "Copy"}

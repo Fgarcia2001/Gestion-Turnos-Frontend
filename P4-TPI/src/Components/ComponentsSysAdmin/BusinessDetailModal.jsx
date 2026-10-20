@@ -27,8 +27,8 @@ const formatDate = (value) => {
 };
 
 const Section = ({ title, children }) => (
-  <div className="px-6 py-5 border-b border-[#f0ede8] last:border-b-0">
-    <h3 className="text-xs font-bold text-[#1a1a2e] uppercase tracking-wide mb-3">{title}</h3>
+  <div className="px-6 py-5 border-b border-[var(--border-faint)] last:border-b-0">
+    <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wide mb-3">{title}</h3>
     {children}
   </div>
 );
@@ -36,17 +36,17 @@ const Section = ({ title, children }) => (
 const Field = ({ label, value }) => {
   if (value === undefined || value === null || String(value).trim() === "") return null;
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[#f0ede8] last:border-b-0">
-      <span className="text-xs font-semibold text-[#9a9a9a] uppercase tracking-wide shrink-0">{label}</span>
-      <span className="text-sm text-[#1a1a2e] sm:text-right break-all">{value}</span>
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4 py-2 border-b border-[var(--border-faint)] last:border-b-0">
+      <span className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide shrink-0">{label}</span>
+      <span className="text-sm text-[var(--text-primary)] sm:text-right break-all">{value}</span>
     </div>
   );
 };
 
 const StatTile = ({ label, value }) => (
-  <div className="bg-[#f9f8f6] rounded-xl p-4 border border-[#e2ddd8] text-center">
-    <p className="text-2xl font-bold text-[#1a1a2e] leading-tight">{value}</p>
-    <p className="text-xs text-[#9a9a9a] mt-1">{label}</p>
+  <div className="bg-[var(--surface-muted-3)] rounded-xl p-4 border border-[var(--border-subtle)] text-center">
+    <p className="text-2xl font-bold text-[var(--text-primary)] leading-tight">{value}</p>
+    <p className="text-xs text-[var(--text-muted)] mt-1">{label}</p>
   </div>
 );
 
@@ -86,15 +86,15 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
     <>
       <style>{CSS_ANIMATIONS}</style>
       <ModalOverlay onClose={onClose}>
-        <div className="w-full max-w-2xl bg-white rounded-2xl border border-[#e2ddd8] shadow-xl max-h-[90vh] flex flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#e2ddd8] shrink-0">
-            <h2 className="text-base font-bold text-[#1a1a2e]">{name || "Business details"}</h2>
+        <div className="w-full max-w-2xl bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] shadow-xl max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] shrink-0">
+            <h2 className="text-base font-bold text-[var(--text-primary)]">{name || "Business details"}</h2>
             <div className="flex items-center gap-2">
               {onEdit && !loading && !error && detail && (
                 <button
                   type="button"
                   onClick={onEdit}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
                 >
                   <IconEdit />
                   Edit
@@ -103,7 +103,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
               <button
                 type="button"
                 onClick={onClose}
-                className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 aria-label="Close"
               >
                 <IconX />
@@ -114,17 +114,17 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
           <div className="flex-1 overflow-y-auto">
             {loading && (
               <div className="flex flex-col items-center justify-center gap-3 py-20">
-                <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
-                <p className="text-sm text-[#9a9a9a]">Loading business details…</p>
+                <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
+                <p className="text-sm text-[var(--text-muted)]">Loading business details…</p>
               </div>
             )}
 
             {!loading && error && (
               <div className="py-20 text-center px-6">
-                <p className="text-sm text-[#9a9a9a] mb-4">Couldn't load the business details</p>
+                <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the business details</p>
                 <button
                   onClick={onRetry}
-                  className="bg-[#1a1a2e] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors cursor-pointer"
+                  className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
                 >
                   Retry
                 </button>
@@ -140,15 +140,15 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                         src={urlLogo}
                         alt={name || "Business logo"}
                         onError={() => setLogoFailed(true)}
-                        className="w-14 h-14 rounded-full object-cover border border-[#e2ddd8] shrink-0"
+                        className="w-14 h-14 rounded-full object-cover border border-[var(--border-subtle)] shrink-0"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-[#f0ede8] text-[#1a1a2e] flex items-center justify-center text-base font-bold shrink-0">
+                      <div className="w-14 h-14 rounded-full bg-[var(--surface-muted)] text-[var(--text-primary)] flex items-center justify-center text-base font-bold shrink-0">
                         {getBusinessInitials(name)}
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-semibold text-[#1a1a2e]">{name || "—"}</p>
+                      <p className="text-sm font-semibold text-[var(--text-primary)]">{name || "—"}</p>
                       <span className="flex items-center gap-1.5 text-xs font-semibold mt-0.5" style={{ color: st.text }}>
                         <span className="w-2 h-2 rounded-full" style={{ background: st.dot }} />
                         {st.label}
@@ -173,14 +173,14 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                           <Field label="End date" value={formatDate(subscriptionEndDate) || "Not provided"} />
                         </>
                       ) : (
-                        <p className="text-sm text-[#9a9a9a]">No subscription information.</p>
+                        <p className="text-sm text-[var(--text-muted)]">No subscription information.</p>
                       )}
                     </div>
                     {onChangePlan && (
                       <button
                         type="button"
                         onClick={onChangePlan}
-                        className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors"
+                        className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
                       >
                         <IconEdit />
                         Change plan
@@ -200,28 +200,28 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
 
                 <Section title="Branches">
                   {branches.length === 0 ? (
-                    <p className="text-sm text-[#9a9a9a]">No branches registered.</p>
+                    <p className="text-sm text-[var(--text-muted)]">No branches registered.</p>
                   ) : (
                     <div className="flex flex-col gap-2">
                       {branches.map((branch, i) => (
                         <div
                           key={branch.id ?? i}
-                          className="flex items-center justify-between gap-3 border border-[#e2ddd8] rounded-xl px-4 py-3"
+                          className="flex items-center justify-between gap-3 border border-[var(--border-subtle)] rounded-xl px-4 py-3"
                         >
                           <div>
                             <div className="flex items-center gap-2">
-                              <p className="text-sm font-semibold text-[#1a1a2e]">{branch.name || "—"}</p>
+                              <p className="text-sm font-semibold text-[var(--text-primary)]">{branch.name || "—"}</p>
                               <span
                                 className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                                  branch.isActive ? "bg-green-50 text-green-600" : "bg-[#f0ede8] text-[#9a9a9a]"
+                                  branch.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
                                 }`}
                               >
                                 {branch.isActive ? "Public" : "Hidden"}
                               </span>
                             </div>
-                            {branch.address && <p className="text-xs text-[#5a5a6e] mt-0.5">{branch.address}</p>}
-                            {branch.city && <p className="text-xs text-[#5a5a6e]">{branch.city}</p>}
-                            {branch.phone && <p className="text-xs text-[#9a9a9a] mt-0.5">{branch.phone}</p>}
+                            {branch.address && <p className="text-xs text-[var(--text-tertiary)] mt-0.5">{branch.address}</p>}
+                            {branch.city && <p className="text-xs text-[var(--text-tertiary)]">{branch.city}</p>}
+                            {branch.phone && <p className="text-xs text-[var(--text-muted)] mt-0.5">{branch.phone}</p>}
                           </div>
                           {onToggleBranch && (
                             <button
@@ -229,7 +229,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                               onClick={() => onToggleBranch(branch)}
                               disabled={togglingBranchId === branch.id}
                               title={branch.isActive ? "Hide from public" : "Make public"}
-                              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] border border-[#e2ddd8] rounded-lg px-3 py-1.5 hover:bg-[#f0ede8] transition-colors disabled:opacity-50"
+                              className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
                             >
                               {branch.isActive ? <IconEyeOff /> : <IconEye />}
                               {branch.isActive ? "Hide" : "Make public"}
@@ -244,11 +244,11 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
             )}
           </div>
 
-          <div className="px-6 py-4 border-t border-[#e2ddd8] flex justify-end shrink-0">
+          <div className="px-6 py-4 border-t border-[var(--border-subtle)] flex justify-end shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="text-sm font-semibold bg-[#1a1a2e] text-white rounded-xl px-4 py-2 hover:bg-[#2d2d44] transition-colors"
+              className="text-sm font-semibold bg-[var(--brand)] text-white rounded-xl px-4 py-2 hover:bg-[var(--brand-hover)] transition-colors"
             >
               Close
             </button>

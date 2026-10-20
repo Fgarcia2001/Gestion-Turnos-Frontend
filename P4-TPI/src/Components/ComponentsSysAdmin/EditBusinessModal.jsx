@@ -44,18 +44,18 @@ const EditBusinessModal = ({ business, onClose, onSave }) => {
   return (
     <ModalOverlay onClose={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
+        className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative"
         style={{ maxHeight: "90vh", overflowY: "auto" }}
       >
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
-            <h2 className="text-lg font-bold text-[#1a1a2e]">Edit business</h2>
-            <p className="text-xs text-[#9a9a9a] mt-0.5">Update any information for this business</p>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">Edit business</h2>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Update any information for this business</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[#9a9a9a] hover:text-[#1a1a2e] transition-colors p-1.5 rounded-lg hover:bg-[#f0ede8]"
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]"
           >
             <IconX />
           </button>
@@ -114,14 +114,14 @@ const EditBusinessModal = ({ business, onClose, onSave }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-[#e2ddd8] text-sm font-semibold text-[#6b7280] hover:bg-[#f0ede8] transition-colors"
+              className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 py-2.5 rounded-xl bg-[#1a1a2e] text-white text-sm font-semibold hover:bg-[#2d2d44] transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
             >
               {submitting ? "Saving..." : "Save changes"}
             </button>

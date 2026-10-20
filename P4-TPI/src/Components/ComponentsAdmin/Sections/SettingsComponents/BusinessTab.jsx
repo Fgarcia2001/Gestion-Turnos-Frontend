@@ -25,33 +25,33 @@ const IconBuildingSmall = () => (
 // escala reducida, reflejando en vivo lo que el admin esta tipeando en el form.
 const BusinessPreview = ({ name, category, logoUrl, color, url }) => (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
-    <p className="text-xs font-semibold text-[#5a5a6e] uppercase tracking-wide">Public page preview</p>
+    <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Public page preview</p>
 
-    <div className="bg-[#F8F5F0] border border-[#e2ddd8] rounded-2xl overflow-hidden">
-      <div className="h-8 bg-[#eee9e2] border-b border-[#e2ddd8] flex items-center gap-1.5 px-3">
-        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
-        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
-        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
+    <div className="bg-[var(--page-bg)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden">
+      <div className="h-8 bg-[var(--surface-muted)] border-b border-[var(--border-subtle)] flex items-center gap-1.5 px-3">
+        <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
+        <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
+        <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
       </div>
 
       <div className="text-white px-4 py-5 flex items-center gap-3" style={{ backgroundColor: color }}>
-        <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[var(--surface)]/10 flex items-center justify-center overflow-hidden shrink-0">
           {logoUrl ? <img src={logoUrl} alt={name} className="w-full h-full object-cover" /> : <IconBuildingSmall />}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold truncate">{name || "Business name"}</p>
           {category && <p className="text-[10px] text-white/70 truncate">{category}</p>}
         </div>
-        <span className="hidden sm:inline-block text-[10px] font-semibold bg-white px-2.5 py-1.5 rounded-lg shrink-0" style={{ color }}>
+        <span className="hidden sm:inline-block text-[10px] font-semibold bg-[var(--surface)] px-2.5 py-1.5 rounded-lg shrink-0" style={{ color }}>
           Reservar turno
         </span>
       </div>
 
       <div className="p-4">
-        <div className="bg-white border border-[#e2ddd8] rounded-xl p-3 flex items-center justify-between gap-3">
+        <div className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-xl p-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-bold text-[#1a1a2e] truncate">Sucursal</p>
-            <p className="text-[10px] text-[#9a9a9a] truncate">Dirección, Ciudad</p>
+            <p className="text-xs font-bold text-[var(--text-primary)] truncate">Sucursal</p>
+            <p className="text-[10px] text-[var(--text-muted)] truncate">Dirección, Ciudad</p>
           </div>
           <span className="text-[10px] font-semibold text-white px-2.5 py-1.5 rounded-lg shrink-0" style={{ backgroundColor: color }}>
             Reservar acá
@@ -60,7 +60,7 @@ const BusinessPreview = ({ name, category, logoUrl, color, url }) => (
       </div>
     </div>
 
-    <p className="text-[11px] text-[#9a9a9a] text-center truncate">
+    <p className="text-[11px] text-[var(--text-muted)] text-center truncate">
       {window.location.origin}/{url || "..."}
     </p>
   </div>
@@ -170,25 +170,25 @@ const BusinessTab = () => {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="size-8 animate-spin rounded-full border-2 border-[#1a1a2e] border-t-transparent" />
+        <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 items-start max-w-5xl mx-auto">
-    <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6">
-      <h2 className="text-lg font-semibold text-[#1a1a2e]">Business Information</h2>
-      <p className="text-sm text-[#9a9a9a] mb-6 mt-1">Edit all the data of your business profile.</p>
+    <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)]">Business Information</h2>
+      <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">Edit all the data of your business profile.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
         {/* Logo */}
         <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-6 items-start">
-          <div className="w-32 h-32 rounded-xl border border-[#e2ddd8] bg-[#fcfbf9] flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-32 h-32 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-faint-2)] flex items-center justify-center overflow-hidden shrink-0">
             {logoPreview ? (
               <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
             ) : (
-              <div className="text-[#9a9a9a] flex flex-col items-center gap-1">
+              <div className="text-[var(--text-muted)] flex flex-col items-center gap-1">
                 <IconCamera />
                 <span className="text-[10px] font-medium">No logo</span>
               </div>
@@ -199,14 +199,14 @@ const BusinessTab = () => {
               <button
                 type="button"
                 onClick={() => { setLogoInputMode("url"); setLogoPreview(formData.logoUrl); }}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${logoInputMode === "url" ? "bg-[#1a1a2e] text-white" : "bg-[#f0ede8] text-[#5a5a6e] hover:bg-[#e2ddd8]"}`}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${logoInputMode === "url" ? "bg-[var(--brand)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] hover:bg-[var(--border-subtle)]"}`}
               >
                 URL
               </button>
               <button
                 type="button"
                 onClick={() => setLogoInputMode("upload")}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${logoInputMode === "upload" ? "bg-[#1a1a2e] text-white" : "bg-[#f0ede8] text-[#5a5a6e] hover:bg-[#e2ddd8]"}`}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${logoInputMode === "upload" ? "bg-[var(--brand)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] hover:bg-[var(--border-subtle)]"}`}
               >
                 Upload
               </button>
@@ -217,10 +217,10 @@ const BusinessTab = () => {
                 value={formData.logoUrl}
                 onChange={handleChange("logoUrl")}
                 placeholder="https://example.com/logo.png"
-                className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+                className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] transition-colors bg-transparent"
               />
             ) : (
-              <label className="flex items-center gap-2 cursor-pointer text-sm text-[#1a1a2e] font-medium bg-[#f0ede8] hover:bg-[#e2ddd8] transition-colors rounded-xl px-4 py-2.5 self-start">
+              <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-primary)] font-medium bg-[var(--surface-muted)] hover:bg-[var(--border-subtle)] transition-colors rounded-xl px-4 py-2.5 self-start">
                 <IconUpload />
                 Choose file
                 <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
@@ -231,19 +231,19 @@ const BusinessTab = () => {
 
         {/* Name */}
         <div>
-          <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Business name</label>
+          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Business name</label>
           <input
             type="text"
             value={formData.name}
             onChange={handleChange("name")}
-            className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+            className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] transition-colors bg-transparent"
           />
         </div>
 
         {/* Brand color */}
         <div>
-          <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Brand color</label>
-          <div className="flex items-center gap-2 border-b border-[#e2ddd8] pb-2">
+          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Brand color</label>
+          <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2">
             <input
               type="color"
               value={formData.color}
@@ -254,19 +254,19 @@ const BusinessTab = () => {
               type="text"
               value={formData.color}
               onChange={handleChange("color")}
-              className="w-full text-sm text-[#1a1a2e] focus:outline-none bg-transparent"
+              className="w-full text-sm text-[var(--text-primary)] focus:outline-none bg-transparent"
             />
           </div>
-          <p className="text-[11px] text-[#9a9a9a] mt-1.5">Shown on your public page at {window.location.origin}/{formData.url || "..."}</p>
+          <p className="text-[11px] text-[var(--text-muted)] mt-1.5">Shown on your public page at {window.location.origin}/{formData.url || "..."}</p>
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-xs font-semibold text-[#1a1a2e] mb-2">Category</label>
+          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Category</label>
           <select
             value={formData.category}
             onChange={handleChange("category")}
-            className="w-full border-b border-[#e2ddd8] pb-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] transition-colors bg-transparent"
+            className="w-full border-b border-[var(--border-subtle)] pb-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] transition-colors bg-transparent"
           >
             {!businessTypes.some((type) => type.name === formData.category) && formData.category && (
               <option value={formData.category}>{formData.category}</option>
@@ -279,25 +279,25 @@ const BusinessTab = () => {
 
         {/* Website */}
         <div className="col-span-2">
-          <label className="flex items-center gap-1.5 text-xs font-semibold text-[#1a1a2e] mb-2">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-primary)] mb-2">
             <IconGlobe /> Website
           </label>
           <div className="flex items-center gap-2">
-            <div className="flex items-center flex-1 min-w-0 border-b border-[#e2ddd8] focus-within:border-[#1a1a2e] transition-colors">
-              <span className="text-sm text-[#9a9a9a] pb-2 whitespace-nowrap">{window.location.origin}/</span>
+            <div className="flex items-center flex-1 min-w-0 border-b border-[var(--border-subtle)] focus-within:border-[var(--brand)] transition-colors">
+              <span className="text-sm text-[var(--text-muted)] pb-2 whitespace-nowrap">{window.location.origin}/</span>
               <input
                 type="text"
                 value={formData.url}
                 onChange={handleChange("url")}
                 placeholder="mi-negocio"
-                className="w-full pb-2 text-sm text-[#1a1a2e] focus:outline-none bg-transparent min-w-0"
+                className="w-full pb-2 text-sm text-[var(--text-primary)] focus:outline-none bg-transparent min-w-0"
               />
             </div>
             <button
               type="button"
               onClick={handleCopyUrl}
               title="Copiar URL"
-              className={`flex items-center gap-1.5 shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${copied ? "bg-[#dcfce7] text-[#15803d]" : "bg-[#f0ede8] text-[#1a1a2e] hover:bg-[#e2ddd8]"}`}
+              className={`flex items-center gap-1.5 shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${copied ? "bg-[#dcfce7] text-[#15803d]" : "bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]"}`}
             >
               {copied ? <IconCheck /> : <IconCopy />}
               {copied ? "Copiado" : "Copiar"}
@@ -314,14 +314,14 @@ const BusinessTab = () => {
         <button
           onClick={handleCancel}
           disabled={!hasChanges}
-          className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges ? "bg-[#f0ede8] text-[#1a1a2e] hover:bg-[#e2ddd8]" : "bg-[#f0ede8] text-[#c5c0b8] cursor-not-allowed"}`}
+          className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges ? "bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]" : "bg-[var(--surface-muted)] text-[var(--text-faint)] cursor-not-allowed"}`}
         >
           Cancel
         </button>
         <button
           onClick={handleSave}
           disabled={!hasChanges || saving}
-          className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges && !saving ? "bg-[#1a1a2e] text-white hover:bg-[#2d2d44]" : "bg-[#9a9a9a] text-[#d5d5d5] cursor-not-allowed"}`}
+          className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges && !saving ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[#9a9a9a] text-[var(--text-faint)] cursor-not-allowed"}`}
         >
           {saving ? "Saving..." : "Save changes"}
         </button>

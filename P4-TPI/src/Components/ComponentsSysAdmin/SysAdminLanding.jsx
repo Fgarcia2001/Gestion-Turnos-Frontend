@@ -6,11 +6,11 @@ import { IconMail, IconPhone } from "../ComponentsHome/FooterIcons";
 import { SOCIAL_LINKS } from "../ComponentsHome/socialLinksConfig";
 
 const SkeletonForm = () => (
-  <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 flex flex-col gap-4 animate-pulse">
+  <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 animate-pulse">
     {Array.from({ length: 4 }).map((_, i) => (
       <div key={i} className="flex flex-col gap-2">
-        <div className="h-3 w-24 rounded bg-[#f0ede8]" />
-        <div className="h-10 w-full rounded-xl bg-[#f0ede8]" />
+        <div className="h-3 w-24 rounded bg-[var(--surface-muted)]" />
+        <div className="h-10 w-full rounded-xl bg-[var(--surface-muted)]" />
       </div>
     ))}
   </div>
@@ -25,14 +25,14 @@ const IconTranslate = () => (
 const Field = ({ label, value, onChange, textarea, onTranslate, translating }) => (
   <div className="flex flex-col gap-1.5">
     <div className="flex items-center justify-between gap-2">
-      <label className="text-xs font-semibold text-[#5a5a6e]">{label}</label>
+      <label className="text-xs font-semibold text-[var(--text-tertiary)]">{label}</label>
       {onTranslate && (
         <button
           type="button"
           onClick={onTranslate}
           disabled={translating || !value}
           title="Auto-translate to English"
-          className="flex items-center gap-1 text-[10px] font-semibold text-[#5a5a6e] hover:text-[#1a1a2e] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+          className="flex items-center gap-1 text-[10px] font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
         >
           <IconTranslate />
           {translating ? "Translating..." : "Translate → EN"}
@@ -44,13 +44,13 @@ const Field = ({ label, value, onChange, textarea, onTranslate, translating }) =
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={3}
-        className="w-full rounded-xl border border-[#e2ddd8] px-3 py-2.5 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e] resize-none"
+        className="w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)] resize-none"
       />
     ) : (
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-[#e2ddd8] px-3 py-2.5 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#1a1a2e]"
+        className="w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)]"
       />
     )}
   </div>
@@ -80,26 +80,26 @@ const LivePreview = ({
 }) => (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
-      <p className="text-xs font-semibold text-[#5a5a6e] uppercase tracking-wide">Live preview</p>
+      <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Live preview</p>
       <button
         onClick={onToggleLang}
-        className="bg-white border border-[#e2ddd8] px-3 py-1 rounded-full shadow-sm hover:bg-[#F0EDE8] transition-all font-medium text-[11px] flex items-center gap-1.5"
+        className="bg-[var(--surface)] border border-[var(--border-subtle)] px-3 py-1 rounded-full shadow-sm hover:bg-[var(--surface-muted)] transition-all font-medium text-[11px] flex items-center gap-1.5"
       >
-        <span className={lang === "es" ? "font-bold text-[#1a1a2e]" : "text-[#b3aca3]"}>ES</span>
-        <span className="text-[#e2ddd8]">|</span>
-        <span className={lang === "en" ? "font-bold text-[#1a1a2e]" : "text-[#b3aca3]"}>EN</span>
+        <span className={lang === "es" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-faint)]"}>ES</span>
+        <span className="text-[var(--border-subtle)]">|</span>
+        <span className={lang === "en" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-faint)]"}>EN</span>
       </button>
     </div>
 
     <div className="border rounded-2xl overflow-hidden" style={{ backgroundColor, borderColor: accentColor }}>
       <div className="h-8 flex items-center gap-1.5 px-3 border-b" style={{ backgroundColor: "#eee9e2", borderColor: accentColor }}>
-        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
-        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
-        <span className="w-2 h-2 rounded-full bg-[#d8d2c9]" />
+        <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
+        <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
+        <span className="w-2 h-2 rounded-full bg-[var(--surface-accent)]" />
       </div>
 
       <div className="px-5 py-8 text-center">
-        <div className="inline-flex items-center gap-1.5 bg-white/60 border px-3 py-1 rounded-full mb-4" style={{ borderColor: accentColor }}>
+        <div className="inline-flex items-center gap-1.5 bg-[var(--surface)]/60 border px-3 py-1 rounded-full mb-4" style={{ borderColor: accentColor }}>
           <div className="p-1 rounded-md" style={{ backgroundColor: primaryColor }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
@@ -114,14 +114,14 @@ const LivePreview = ({
           {title || "..."}
         </h1>
 
-        <p className="text-[#6b6b6b] text-xs mt-3 max-w-[220px] mx-auto break-words">
+        <p className="text-[var(--text-secondary-alt)] text-xs mt-3 max-w-[220px] mx-auto break-words">
           {desc || "..."}
         </p>
       </div>
 
       <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
         <h2 className="text-sm font-bold break-words" style={{ color: primaryColor }}>{plansTitle || "..."}</h2>
-        <p className="text-[#6b6b6b] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
+        <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
           {plansSubtitle || "..."}
         </p>
         {plans && plans.length > 0 ? (
@@ -133,11 +133,11 @@ const LivePreview = ({
               return (
                 <div
                   key={id ?? name}
-                  className="w-[68px] h-14 rounded-lg bg-white border flex flex-col items-center justify-center px-1"
+                  className="w-[68px] h-14 rounded-lg bg-[var(--surface)] border flex flex-col items-center justify-center px-1"
                   style={{ borderColor: accentColor }}
                 >
                   <span className="text-[9px] font-semibold truncate w-full text-center" style={{ color: primaryColor }}>{name}</span>
-                  <span className="text-[9px] text-[#9a9a9a]">${price}</span>
+                  <span className="text-[9px] text-[var(--text-muted)]">${price}</span>
                 </div>
               );
             })}
@@ -145,7 +145,7 @@ const LivePreview = ({
         ) : (
           <div className="flex flex-wrap justify-center gap-1.5 mt-3">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="w-[68px] h-10 rounded-lg bg-white border" style={{ borderColor: accentColor }} />
+              <div key={i} className="w-[68px] h-10 rounded-lg bg-[var(--surface)] border" style={{ borderColor: accentColor }} />
             ))}
           </div>
         )}
@@ -153,14 +153,14 @@ const LivePreview = ({
 
       <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
         <h2 className="text-sm font-bold break-words" style={{ color: primaryColor }}>{aboutTitle || "..."}</h2>
-        <p className="text-[#6b6b6b] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
+        <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
           {aboutDesc || "..."}
         </p>
       </div>
 
       <div className="text-white px-5 py-6 flex flex-col items-center text-center" style={{ backgroundColor: primaryColor }}>
         <div className="flex items-center gap-1.5 mb-2">
-          <div className="bg-white/10 p-1 rounded-md">
+          <div className="bg-[var(--surface)]/10 p-1 rounded-md">
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" />
             </svg>
@@ -186,7 +186,7 @@ const LivePreview = ({
 
         <div className="flex justify-center gap-1.5 mt-3">
           {SOCIAL_LINKS.filter((social) => socials?.[social.key]).map((social) => (
-            <div key={social.key} className="w-6 h-6 rounded-md bg-white/10 flex items-center justify-center">
+            <div key={social.key} className="w-6 h-6 rounded-md bg-[var(--surface)]/10 flex items-center justify-center">
               <social.Icon width="11" height="11" />
             </div>
           ))}
@@ -202,8 +202,8 @@ const LivePreview = ({
 
 const ColorField = ({ label, value, onChange }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-xs font-semibold text-[#5a5a6e]">{label}</label>
-    <div className="flex items-center gap-2 rounded-xl border border-[#e2ddd8] px-2 py-1.5">
+    <label className="text-xs font-semibold text-[var(--text-tertiary)]">{label}</label>
+    <div className="flex items-center gap-2 rounded-xl border border-[var(--border-subtle)] px-2 py-1.5">
       <input
         type="color"
         value={value}
@@ -214,7 +214,7 @@ const ColorField = ({ label, value, onChange }) => (
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full text-sm text-[#1a1a2e] focus:outline-none bg-transparent"
+        className="w-full text-sm text-[var(--text-primary)] focus:outline-none bg-transparent"
       />
     </div>
   </div>
@@ -383,18 +383,18 @@ const SysAdminLanding = () => {
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[#1a1a2e] mb-1">Landing Page</h2>
-        <p className="text-sm text-[#9a9a9a]">
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Landing Page</h2>
+        <p className="text-sm text-[var(--text-muted)]">
           Edit the brand name, hero and plans section copy shown on the public landing page, in both languages.
         </p>
       </div>
 
       {error ? (
-        <div className="bg-white rounded-2xl border border-[#e2ddd8] p-8 text-center">
-          <p className="text-sm text-[#9a9a9a] mb-4">Couldn't load the landing content</p>
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
+          <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the landing content</p>
           <button
             onClick={load}
-            className="bg-[#1a1a2e] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[#2d2d44] transition-colors cursor-pointer"
+            className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
           >
             Retry
           </button>
@@ -403,11 +403,11 @@ const SysAdminLanding = () => {
         <SkeletonForm />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 items-start">
-          <div className="bg-white rounded-2xl border border-[#e2ddd8] p-6 flex flex-col gap-5">
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-5">
             <Field label="Brand name" value={form.brandName} onChange={handleChange("brandName")} />
 
-            <div className="h-px bg-[#e2ddd8]" />
-            <p className="text-xs font-semibold text-[#5a5a6e]">Color palette</p>
+            <div className="h-px bg-[var(--border-subtle)]" />
+            <p className="text-xs font-semibold text-[var(--text-tertiary)]">Color palette</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
               <ColorField label="Primary" value={form.primaryColor} onChange={handleChange("primaryColor")} />
               <ColorField label="Background" value={form.backgroundColor} onChange={handleChange("backgroundColor")} />
@@ -458,8 +458,8 @@ const SysAdminLanding = () => {
                 onChange={handleChange("aboutTitleEn")}
               />
             </div>
-            <p className="text-[11px] text-[#9a9a9a] -mt-1">
-              Tip: use <code className="bg-[#f0ede8] px-1 py-0.5 rounded">{"{brandName}"}</code> inside the
+            <p className="text-[11px] text-[var(--text-muted)] -mt-1">
+              Tip: use <code className="bg-[var(--surface-muted)] px-1 py-0.5 rounded">{"{brandName}"}</code> inside the
               description and it will automatically be replaced with the brand name above.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -526,8 +526,8 @@ const SysAdminLanding = () => {
               />
             </div>
 
-            <div className="h-px bg-[#e2ddd8]" />
-            <p className="text-xs font-semibold text-[#5a5a6e]">
+            <div className="h-px bg-[var(--border-subtle)]" />
+            <p className="text-xs font-semibold text-[var(--text-tertiary)]">
               Contact &amp; social links (optional — hidden on the landing if left blank)
             </p>
 
@@ -548,7 +548,7 @@ const SysAdminLanding = () => {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-[#1a1a2e] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-[#2d2d44] transition-colors disabled:opacity-60 cursor-pointer"
+                className="bg-[var(--brand)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-60 cursor-pointer"
               >
                 {saving ? "Saving..." : "Save changes"}
               </button>
@@ -578,7 +578,7 @@ const SysAdminLanding = () => {
       )}
 
       {toast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[#1a1a2e] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 bg-[var(--brand)] text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg animate-[fadeIn_0.2s_ease-out]">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 6L9 17l-5-5" />
           </svg>
