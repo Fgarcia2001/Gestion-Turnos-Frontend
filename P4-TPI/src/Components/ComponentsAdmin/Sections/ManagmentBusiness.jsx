@@ -307,7 +307,7 @@ const ManagmentBusiness = () => {
   };
 
   const handleSchedulesSave = () => {
-    showToast("Horario actualizado");
+    showToast(t("scheduleUpdated") || "Schedule updated");
   };
 
   const handleToggleBranchActive = async (branch) => {
@@ -324,7 +324,9 @@ const ManagmentBusiness = () => {
       ...prev,
       branches: prev.branches.map((b) => ((b.id ?? b.branchId) === id ? saved : b)),
     }));
-    showToast(nextActive ? "Branch is now public" : "Branch hidden from the public page");
+    showToast(nextActive
+      ? (t("branchNowPublic") || "Branch is now public")
+      : (t("branchNowHidden") || "Branch hidden from the public page"));
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
