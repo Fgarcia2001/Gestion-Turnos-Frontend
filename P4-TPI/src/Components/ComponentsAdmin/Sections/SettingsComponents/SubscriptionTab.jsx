@@ -8,6 +8,7 @@ import {
   PENDING_PLAN_KEY,
 } from "../../../../services/api";
 import { useAuth } from "../../../../../CustomHooks/AuthContext";
+import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 import { IconSparkles } from './SettingsIcons';
 import PlanDetailsModal from './PlanDetailsModal';
 import ChangePlanConfirmModal from './ChangePlanConfirmModal';
@@ -28,6 +29,7 @@ const readMpReturn = () => {
 
 const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [plan, setPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,25 +142,25 @@ const SubscriptionTab = ({ autoOpenPlanId } = {}) => {
         if (status === "approved") {
           // Solo avisa en un retorno fresco de MercadoPago; en un refresh simple
           // (orden ya aprobada) solo refresca sin molestar.
-          finish(isMpReturn ? "Pago aprobado. Suscripción actualizada." : null, "success", true);
+          finish(isMpReturn ? (t("paymentApprovedToast") || "Payment approved. Subscription updated.") : null, "success", true);
           return;
         }
         if (status === "rejected" || status === "cancelled" || status === "expired") {
-          finish("El pago no se completó", "error", false);
+          finish(t("paymentNotCompletedToast") || "The payment was not completed", "error", false);
           return;
         }
       } catch (err) {
         if (err?.status === 401) {
-          finish("Sesión expirada, volvé a iniciar sesión", "error", false);
+          finish(t("sessionExpiredToast") || "Session expired, please sign in again", "error", false);
           return;
         }
         if (err?.status && err.status < 500 && err.status !== 404) {
-          finish("No se pudo consultar el pago", "error", false);
+          finish(t("paymentCheckFailedToast") || "Could not check the payment", "error", false);
           return;
         }
       }
       if (attempts >= POLL_MAX_ATTEMPTS) {
-        finish("Pago pendiente de confirmación", "success", false);
+        finish(t("paymentPendingToast") || "Payment pending confirmation", "success", false);
         return;
       }
       timer = setTimeout(poll, POLL_INTERVAL_MS);

@@ -339,7 +339,7 @@ const Home = ({ onUpgradePlan }) => {
               ))}
               {branches.length === 0 && (
                 <tr className="border-t border-[var(--border-faint)]">
-                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-[var(--text-muted)]">{t("No branches found for this business.") || "No branches."}</td>
+                  <td colSpan={5} className="px-5 py-8 text-center text-sm text-[var(--text-muted)]">{t("noBranchesFound") || "No branches found for this business."}</td>
                 </tr>
               )}
             </tbody>

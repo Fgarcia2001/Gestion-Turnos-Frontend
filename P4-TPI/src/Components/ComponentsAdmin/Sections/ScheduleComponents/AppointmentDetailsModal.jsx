@@ -5,6 +5,12 @@ import { IconX } from "../ManagmentBusinessComponents/Icons";
 import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 import { STATUS_STYLES } from "./statusStyles";
 
+const STATUS_LABEL_KEYS = {
+  Pending: "statusPending",
+  Confirmed: "statusConfirmed",
+  Cancelled: "statusCancelled",
+};
+
 const CSS_ANIMATIONS = `
   @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
   @keyframes scaleIn { from { opacity: 0; transform: scale(0.95) } to { opacity: 1; transform: scale(1) } }
@@ -61,7 +67,7 @@ const AppointmentDetailsModal = ({ appt, staffName, date, onClose }) => {
                 className="text-xs font-bold px-2.5 py-1 rounded-full"
                 style={{ backgroundColor: style.bg, color: style.text }}
               >
-                {appt.status || "—"}
+                {appt.status ? (t(STATUS_LABEL_KEYS[appt.status]) || appt.status) : "—"}
               </span>
             </div>
             <DetailRow label={t("Client") || "Client"} value={appt.clientName} />

@@ -9,6 +9,7 @@ import { fetchAllPlans } from "../../services/planService";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
 import { IconX, IconWarning, IconTrash, IconEdit } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import ChangePlanModal from "./ChangePlanModal";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const STATUS_OPTIONS = ["Active", "Inactive", "Cancelled", "Expired"];
 
@@ -50,6 +51,7 @@ const groupByBusiness = (subscriptions) => {
 };
 
 const DeleteSubscriptionModal = ({ subscription, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
@@ -60,7 +62,7 @@ const DeleteSubscriptionModal = ({ subscription, onClose, onConfirm }) => {
       await onConfirm(subscription);
       onClose();
     } catch (err) {
-      setError(err.message || "Failed to delete subscription. Please try again.");
+      setError(err.message || (t("Failed to delete subscription. Please try again.") || "Failed to delete subscription. Please try again."));
       setDeleting(false);
     }
   };
@@ -79,10 +81,10 @@ const DeleteSubscriptionModal = ({ subscription, onClose, onConfirm }) => {
           <IconWarning />
         </div>
 
-        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Delete subscription?</h2>
-        <p className="text-sm text-[var(--text-secondary)] mb-2">You are about to delete the subscription of</p>
+        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t("Delete subscription?") || "Delete subscription?"}</h2>
+        <p className="text-sm text-[var(--text-secondary)] mb-2">{t("You are about to delete the subscription of") || "You are about to delete the subscription of"}</p>
         <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">"{subscription?.businessName}"</p>
-        <p className="text-xs text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
+        <p className="text-xs text-[var(--text-muted)] mb-6">{t("This action cannot be undone.") || "This action cannot be undone."}</p>
 
         {error && (
           <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 text-left">
@@ -96,14 +98,14 @@ const DeleteSubscriptionModal = ({ subscription, onClose, onConfirm }) => {
             disabled={deleting}
             className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t("Cancel") || "Cancel"}
           </button>
           <button
             onClick={handleConfirm}
             disabled={deleting}
             className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50"
           >
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? (t("Deleting...") || "Deleting...") : (t("Delete") || "Delete")}
           </button>
         </div>
       </div>
@@ -112,6 +114,7 @@ const DeleteSubscriptionModal = ({ subscription, onClose, onConfirm }) => {
 };
 
 const SysAdminSubscriptions = () => {
+  const { t } = useTranslation();
   const [subscriptions, setSubscriptions] = useState([]);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -169,9 +172,9 @@ const SysAdminSubscriptions = () => {
     try {
       const updated = await updateSubscriptionStatus(subscription.id, status);
       setSubscriptions((prev) => prev.map((s) => (s.id === subscription.id ? updated : s)));
-      showToast("Subscription status updated");
+      showToast(t("Subscription status updated") || "Subscription status updated");
     } catch (err) {
-      showToast(err.message || "Failed to update status");
+      showToast(err.message || (t("Failed to update status") || "Failed to update status"));
     } finally {
       setUpdatingId(null);
     }
@@ -180,21 +183,21 @@ const SysAdminSubscriptions = () => {
   const handleChangePlan = async (planId) => {
     await changeSubscriptionPlan(changePlanTarget.businessId, planId);
     await load();
-    showToast("Plan changed");
+    showToast(t("Plan changed") || "Plan changed");
   };
 
   const handleDelete = async (subscription) => {
     await deleteSubscription(subscription.id);
     setSubscriptions((prev) => prev.filter((s) => s.id !== subscription.id));
-    showToast("Subscription deleted");
+    showToast(t("Subscription deleted") || "Subscription deleted");
   };
 
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Subscriptions</h2>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Subscriptions") || "Subscriptions"}</h2>
         <p className="text-sm text-[var(--text-muted)]">
-          Full subscription history, grouped by business. Change a status, switch plans or remove a subscription.
+          {t("sysAdminSubscriptionsSubtitle") || "Full subscription history, grouped by business. Change a status, switch plans or remove a subscription."}
         </p>
       </div>
 
@@ -202,19 +205,19 @@ const SysAdminSubscriptions = () => {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by business name..."
+          placeholder={t("Search by business name...") || "Search by business name..."}
           className="w-full sm:w-80 border border-[var(--border-subtle)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/20 focus:border-[var(--brand)] transition-all bg-[var(--surface)]"
         />
       )}
 
       {error ? (
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
-          <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the subscriptions</p>
+          <p className="text-sm text-[var(--text-muted)] mb-4">{t("Couldn't load the subscriptions") || "Couldn't load the subscriptions"}</p>
           <button
             onClick={load}
             className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
           >
-            Retry
+            {t("Retry") || "Retry"}
           </button>
         </div>
       ) : loading ? (
@@ -223,7 +226,7 @@ const SysAdminSubscriptions = () => {
         </div>
       ) : subscriptions.length === 0 ? (
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
-          No subscriptions found.
+          {t("No subscriptions found.") || "No subscriptions found."}
         </div>
       ) : (
         (() => {
@@ -234,7 +237,7 @@ const SysAdminSubscriptions = () => {
           if (groups.length === 0) {
             return (
               <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
-                No businesses match "{search}".
+                {(t("No businesses match") || "No businesses match")} "{search}".
               </div>
             );
           }
@@ -246,16 +249,16 @@ const SysAdminSubscriptions = () => {
                   <div className="px-6 pt-5 pb-1 flex items-center gap-2">
                     <h3 className="text-sm font-bold text-[var(--text-primary)]">{group.businessName}</h3>
                     <span className="text-[11px] text-[var(--text-muted)]">
-                      {group.items.length} subscription{group.items.length === 1 ? "" : "s"}
+                      {group.items.length} {group.items.length === 1 ? (t("subscription") || "subscription") : (t("subscriptions") || "subscriptions")}
                     </span>
                   </div>
                   <div className="px-6 pt-2 pb-4 overflow-x-auto">
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-[var(--border-subtle)]">
-                          {["Plan", "Status", "Start date", "End date", ""].map((header) => (
+                          {[t("Plan") || "Plan", t("Status") || "Status", t("Start date") || "Start date", t("End date") || "End date", ""].map((header, idx) => (
                             <th
-                              key={header}
+                              key={idx}
                               className="text-left text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide pb-2 pr-6"
                             >
                               {header}
@@ -270,7 +273,7 @@ const SysAdminSubscriptions = () => {
                               {sub.planName}
                               {i === 0 && (
                                 <span className="ml-2 text-[10px] font-semibold text-[var(--text-muted)] uppercase">
-                                  Most recent
+                                  {t("Most recent") || "Most recent"}
                                 </span>
                               )}
                             </td>
@@ -289,7 +292,7 @@ const SysAdminSubscriptions = () => {
                                     value={opt}
                                     disabled={opt === "Expired" && sub.status !== "Expired"}
                                   >
-                                    {opt}
+                                    {t(opt) || opt}
                                   </option>
                                 ))}
                               </select>
@@ -300,14 +303,14 @@ const SysAdminSubscriptions = () => {
                               <button
                                 onClick={() => setChangePlanTarget(sub)}
                                 className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] transition-colors"
-                                title="Change plan"
+                                title={t("Change plan") || "Change plan"}
                               >
                                 <IconEdit />
                               </button>
                               <button
                                 onClick={() => setDeleteTarget(sub)}
                                 className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:bg-red-50 hover:text-red-500 transition-colors"
-                                title="Delete subscription"
+                                title={t("Delete subscription") || "Delete subscription"}
                               >
                                 <IconTrash />
                               </button>

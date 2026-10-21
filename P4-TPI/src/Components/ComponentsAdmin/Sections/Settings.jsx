@@ -3,8 +3,10 @@ import { IconBuilding, IconCard, IconUser } from './SettingsComponents/SettingsI
 import BusinessTab from './SettingsComponents/BusinessTab';
 import SubscriptionTab from './SettingsComponents/SubscriptionTab';
 import AdminTab from './SettingsComponents/AdminTab';
+import { useTranslation } from '../../../../CustomHooks/TraslateHook';
 
 const Settings = ({ initialTab, autoOpenPlanId, profileOnly = false }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(initialTab || 'business');
 
   // Recepcionista/Profesional: solo su perfil, sin datos de la empresa.
@@ -17,9 +19,9 @@ const Settings = ({ initialTab, autoOpenPlanId, profileOnly = false }) => {
   }
 
   const tabs = [
-    { id: 'business', label: 'Business', icon: IconBuilding },
-    { id: 'subscription', label: 'Subscription', icon: IconCard },
-    { id: 'admin', label: 'General Administrator', icon: IconUser },
+    { id: 'business', label: t('Business') || 'Business', icon: IconBuilding },
+    { id: 'subscription', label: t('Subscription') || 'Subscription', icon: IconCard },
+    { id: 'admin', label: t('General Administrator') || 'General Administrator', icon: IconUser },
   ];
 
   return (

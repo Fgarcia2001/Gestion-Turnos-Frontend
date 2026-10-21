@@ -50,13 +50,21 @@ const resolveSteps = (role) => {
   return steps;
 };
 
-const STEP_LABELS = {
-  client: "Cliente",
-  branch: "Sucursal",
-  service: "Servicio",
-  staff: "Profesional",
-  datetime: "Fecha y hora",
-  confirm: "Confirmar",
+const STEP_LABEL_KEYS = {
+  client: "Client",
+  branch: "Branch",
+  service: "Service",
+  staff: "Staff",
+  datetime: "Date and time",
+  confirm: "Confirm",
+};
+const STEP_LABEL_FALLBACKS = {
+  client: "Client",
+  branch: "Branch",
+  service: "Service",
+  staff: "Staff",
+  datetime: "Date and time",
+  confirm: "Confirm",
 };
 
 const emptyClientFields = { clientName: "", clientEmail: "", clientPhone: "", clientBirthDay: "" };
@@ -159,7 +167,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
   }, [branchId, isProfessional]);
 
   const effectiveStaffId = isProfessional ? user?.sub : staffId;
-  const effectiveStaffName = isProfessional ? (user?.name || "Yo") : staffList.find((s) => s.id === staffId)?.name;
+  const effectiveStaffName = isProfessional ? (user?.name || (t("selfStaffLabel") || "Me")) : staffList.find((s) => s.id === staffId)?.name;
 
   // ── Date & time ──
   const today = new Date();
@@ -235,7 +243,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
       onCreated?.(result);
       onClose();
     } catch (e) {
-      setSubmitError(e.message === "bookingFailed" ? "No se pudo crear el turno. Intentá nuevamente." : e.message);
+      setSubmitError(e.message === "bookingFailed" ? (t("bookingFailedError") || "Couldn't create the appointment. Please try again.") : e.message);
     } finally {
       setSubmitting(false);
     }
@@ -254,12 +262,12 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                     autoFocus
                     value={clientQuery}
                     onChange={(e) => setClientQuery(e.target.value)}
-                    placeholder="Buscar por nombre o email..."
+                    placeholder={t("searchClientPlaceholder") || "Search by name or email..."}
                     className={inputClass + " pl-10"}
                   />
                 </div>
 
-                {searchLoading && <p className="text-sm text-[var(--text-muted)] text-center py-4">Buscando...</p>}
+                {searchLoading && <p className="text-sm text-[var(--text-muted)] text-center py-4">{t("Searching") || "Searching..."}</p>}
 
                 {!searchLoading && clientQuery.trim().length >= 2 && (
                   clientResults.length ? (
@@ -277,7 +285,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-[var(--text-muted)] text-center py-4">No se encontraron clientes.</p>
+                    <p className="text-sm text-[var(--text-muted)] text-center py-4">{t("No client found") || "No clients found."}</p>
                   )
                 )}
 
@@ -286,33 +294,33 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   onClick={startNewClient}
                   className="text-sm font-semibold text-[var(--text-primary)] hover:underline self-start"
                 >
-                  + Nuevo cliente
+                  + {t("Add Client") || "Add Client"}
                 </button>
               </>
             ) : (
               <>
                 <button type="button" onClick={backToSearch} className="flex items-center gap-1 text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] self-start">
-                  <IconChevronLeft /> Buscar otro cliente
+                  <IconChevronLeft /> {t("searchAnotherClient") || "Search another client"}
                 </button>
 
                 {pickedFromSearch && (
                   <div className="bg-[#eef2ff] border border-[#c7d2fe] rounded-xl px-4 py-2.5 text-xs text-[#3730a3]">
-                    Cliente existente seleccionado — podés corregir sus datos si hace falta.
+                    {t("existingClientSelected") || "Existing client selected — you can edit their info if needed."}
                   </div>
                 )}
 
                 <div>
-                  <label className={labelClass}>Nombre completo</label>
-                  <input value={clientFields.clientName} onChange={(e) => setClientFields((p) => ({ ...p, clientName: e.target.value }))} className={inputClass} placeholder="Nombre y apellido" />
+                  <label className={labelClass}>{t("fullName") || "Full name"}</label>
+                  <input value={clientFields.clientName} onChange={(e) => setClientFields((p) => ({ ...p, clientName: e.target.value }))} className={inputClass} placeholder={t("fullNamePlaceholder") || "First and last name"} />
                   {clientErrors.clientName && <p className="text-xs text-[#dc2626] mt-1">{clientErrors.clientName}</p>}
                 </div>
                 <div>
-                  <label className={labelClass}>Email</label>
+                  <label className={labelClass}>{t("Email") || "Email"}</label>
                   <input type="email" value={clientFields.clientEmail} onChange={(e) => setClientFields((p) => ({ ...p, clientEmail: e.target.value }))} className={inputClass} placeholder="email@example.com" />
                   {clientErrors.clientEmail && <p className="text-xs text-[#dc2626] mt-1">{clientErrors.clientEmail}</p>}
                 </div>
                 <div>
-                  <label className={labelClass}>Teléfono</label>
+                  <label className={labelClass}>{t("Phone") || "Phone"}</label>
                   <PhoneField
                     name="clientPhone"
                     value={clientFields.clientPhone}
@@ -322,7 +330,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   {clientErrors.clientPhone && <p className="text-xs text-[#dc2626] mt-1">{clientErrors.clientPhone}</p>}
                 </div>
                 <div>
-                  <label className={labelClass}>Fecha de nacimiento</label>
+                  <label className={labelClass}>{t("birthDate") || "Date of birth"}</label>
                   <input type="date" value={clientFields.clientBirthDay} onChange={(e) => setClientFields((p) => ({ ...p, clientBirthDay: e.target.value }))} className={inputClass} />
                   {clientErrors.clientBirthDay && <p className="text-xs text-[#dc2626] mt-1">{clientErrors.clientBirthDay}</p>}
                 </div>
@@ -371,7 +379,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] shrink-0"><IconClipboard /></span>
                   <div>
                     <p className="font-semibold text-[var(--text-primary)]">{s.name}</p>
-                    <p className="text-xs text-[var(--text-muted)]">{s.durationMinutes} min · ${s.price}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{s.durationMinutes} {t("minutesAbbrev") || "min"} · ${s.price}</p>
                   </div>
                 </button>
               );
@@ -411,7 +419,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
             </div>
             {day && (
               slotsLoading ? (
-                <p className="text-sm text-[var(--text-muted)] text-center">Cargando horarios...</p>
+                <p className="text-sm text-[var(--text-muted)] text-center">{t("loadingSlots") || "Loading available times..."}</p>
               ) : slots.length ? (
                 <div className="grid grid-cols-4 gap-2 max-w-md mx-auto">
                   {slots.map((slot) => (
@@ -428,7 +436,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-[var(--text-muted)] text-center">No hay horarios disponibles ese día.</p>
+                <p className="text-sm text-[var(--text-muted)] text-center">{t("noSlotsAvailable") || "No available times for that day."}</p>
               )
             )}
           </div>
@@ -438,22 +446,22 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
         return (
           <div className="flex flex-col gap-4">
             <div className="rounded-2xl border border-[var(--border-subtle)] p-4 flex flex-col gap-2">
-              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Cliente</span><span className="font-semibold text-[var(--text-primary)]">{clientFields.clientName}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Sucursal</span><span className="font-semibold text-[var(--text-primary)]">{branchName}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Servicio</span><span className="font-semibold text-[var(--text-primary)]">{selectedService?.name}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Profesional</span><span className="font-semibold text-[var(--text-primary)]">{effectiveStaffName}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">Fecha</span><span className="font-semibold text-[var(--text-primary)]">{day?.toLocaleDateString()} {startTime}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">{t("Client") || "Client"}</span><span className="font-semibold text-[var(--text-primary)]">{clientFields.clientName}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">{t("Branch") || "Branch"}</span><span className="font-semibold text-[var(--text-primary)]">{branchName}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">{t("Service") || "Service"}</span><span className="font-semibold text-[var(--text-primary)]">{selectedService?.name}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">{t("Staff") || "Staff"}</span><span className="font-semibold text-[var(--text-primary)]">{effectiveStaffName}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-[var(--text-muted)]">{t("Date") || "Date"}</span><span className="font-semibold text-[var(--text-primary)]">{day?.toLocaleDateString()} {startTime}</span></div>
             </div>
 
             <div>
-              <label className={labelClass}>Observaciones (opcional)</label>
+              <label className={labelClass}>{t("Observation") || "Observation"} ({t("Optional") || "Optional"})</label>
               <textarea value={observation} onChange={(e) => setObservation(e.target.value)} rows={2} className={inputClass} />
             </div>
 
             <div>
-              <label className={labelClass}>Método de pago</label>
+              <label className={labelClass}>{t("Payment Method") || "Payment Method"}</label>
               <div className="grid grid-cols-2 gap-3">
-                {[{ value: 0, label: "Efectivo" }, { value: 1, label: "Tarjeta" }].map((opt) => (
+                {[{ value: 0, key: "cashOption", label: "Cash" }, { value: 1, key: "cardOption", label: "Card" }].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -462,7 +470,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                       Number(payment) === opt.value ? "border-[var(--brand)] bg-[var(--brand)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
                     }`}
                   >
-                    {opt.label}
+                    {t(opt.key) || opt.label}
                   </button>
                 ))}
               </div>
@@ -482,10 +490,10 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
       <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative" style={{ maxHeight: "90vh", overflowY: "auto" }}>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">Nuevo turno</h2>
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">{t("New Appointment") || "New Appointment"}</h2>
             <p className="text-xs text-[var(--text-muted)] mt-0.5 flex items-center gap-1.5">
               <IconUser />
-              {STEP_LABELS[currentStep]} · paso {stepIndex + 1} de {steps.length}
+              {t(STEP_LABEL_KEYS[currentStep]) || STEP_LABEL_FALLBACKS[currentStep]} · {(t("stepOfTotal") || "step {current} of {total}").replace("{current}", stepIndex + 1).replace("{total}", steps.length)}
             </p>
           </div>
           <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
@@ -501,7 +509,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
             disabled={submitting}
             className="px-5 py-2 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
           >
-            {stepIndex === 0 ? "Cancelar" : "Atrás"}
+            {stepIndex === 0 ? (t("Cancel") || "Cancel") : (t("Back") || "Back")}
           </button>
           <button
             onClick={goNext}
@@ -510,7 +518,11 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
               canContinue && !submitting ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[var(--border-subtle)] text-[var(--text-faint)] cursor-not-allowed"
             }`}
           >
-            {submitting ? "Creando..." : currentStep === "confirm" ? "Crear turno" : "Continuar"}
+            {submitting
+              ? (t("creatingAppointment") || "Creating...")
+              : currentStep === "confirm"
+                ? (t("createAppointmentButton") || "Create appointment")
+                : (t("continueButton") || "Continue")}
           </button>
         </div>
       </div>

@@ -1,4 +1,6 @@
 // DashboardCharts.jsx — small presentational chart primitives for the SysAdmin dashboard.
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
+
 const shortMonth = (month) => {
   const [y, m] = (month || "").split("-").map(Number);
   if (!y || !m) return month || "";
@@ -12,13 +14,14 @@ const STATUS_COLORS = {
 };
 
 // Generic single-series bar chart, e.g. { month, revenue }[] or { month, count }[].
-export const BarChart = ({ data, valueKey, formatValue = (v) => v, emptyLabel = "No data" }) => {
+export const BarChart = ({ data, valueKey, formatValue = (v) => v, emptyLabel }) => {
+  const { t } = useTranslation();
   const items = data || [];
   const values = items.map((d) => Number(d[valueKey]) || 0);
   const max = Math.max(...values, 1);
 
   if (items.length === 0) {
-    return <p className="text-xs text-[var(--text-muted)] mt-5 text-center">{emptyLabel}</p>;
+    return <p className="text-xs text-[var(--text-muted)] mt-5 text-center">{emptyLabel || t("No data") || "No data"}</p>;
   }
 
   return (
@@ -47,13 +50,14 @@ export const BarChart = ({ data, valueKey, formatValue = (v) => v, emptyLabel = 
 };
 
 // Stacked bar per month for pending/confirmed/cancelled appointment counts.
-export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
+export const AppointmentTrendChart = ({ data, emptyLabel }) => {
+  const { t } = useTranslation();
   const items = data || [];
   const totals = items.map((d) => (Number(d.pending) || 0) + (Number(d.confirmed) || 0) + (Number(d.cancelled) || 0));
   const max = Math.max(...totals, 1);
 
   if (items.length === 0) {
-    return <p className="text-xs text-[var(--text-muted)] mt-5 text-center">{emptyLabel}</p>;
+    return <p className="text-xs text-[var(--text-muted)] mt-5 text-center">{emptyLabel || t("No data") || "No data"}</p>;
   }
 
   return (
@@ -69,7 +73,7 @@ export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
             <div
               key={item.month}
               className="h-full flex-1 min-w-0 flex flex-col items-center justify-end gap-1"
-              title={`${shortMonth(item.month)}: ${pending} pending, ${confirmed} confirmed, ${cancelled} cancelled`}
+              title={`${shortMonth(item.month)}: ${pending} ${(t("Pending") || "pending").toLowerCase()}, ${confirmed} ${(t("Confirmed") || "confirmed").toLowerCase()}, ${cancelled} ${(t("Cancelled") || "cancelled").toLowerCase()}`}
             >
               <div className="flex flex-col-reverse items-center w-full h-16 justify-start">
                 {total === 0 ? (
@@ -89,9 +93,9 @@ export const AppointmentTrendChart = ({ data, emptyLabel = "No data" }) => {
       </div>
       <div className="flex items-center gap-4 mt-4">
         {[
-          { label: "Pending", color: STATUS_COLORS.pending },
-          { label: "Confirmed", color: STATUS_COLORS.confirmed },
-          { label: "Cancelled", color: STATUS_COLORS.cancelled },
+          { label: t("Pending") || "Pending", color: STATUS_COLORS.pending },
+          { label: t("Confirmed") || "Confirmed", color: STATUS_COLORS.confirmed },
+          { label: t("Cancelled") || "Cancelled", color: STATUS_COLORS.cancelled },
         ].map(({ label, color }) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />

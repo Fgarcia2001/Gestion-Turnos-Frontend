@@ -1,8 +1,15 @@
 // ScheduleGrid.jsx
 // Horizontal day agenda: staff as rows, time running left-to-right in 30-minute columns.
 import { useState, useEffect, useMemo } from "react";
+import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 import AppointmentDetailsModal from "./AppointmentDetailsModal";
 import { STATUS_STYLES } from "./statusStyles";
+
+const STATUS_LABEL_KEYS = {
+  Pending: "statusPending",
+  Confirmed: "statusConfirmed",
+  Cancelled: "statusCancelled",
+};
 
 const LABEL_WIDTH = 184;
 const SLOT_WIDTH = 120;
@@ -127,16 +134,18 @@ const CurrentTimeLine = ({ scheduleStart, scheduleEnd, rowsHeight, minutesToX })
 };
 
 const AppointmentBlock = ({ appt, onSelect, minutesToX }) => {
+  const { t } = useTranslation();
   const style = STATUS_STYLES[appt.status] || STATUS_STYLES.Confirmed;
   const left = minutesToX(appt.startTime);
   const right = minutesToX(appt.endTime);
   const isCancelled = appt.status === "Cancelled";
+  const statusLabel = appt.status ? (t(STATUS_LABEL_KEYS[appt.status]) || appt.status) : "";
 
   return (
     <button
       type="button"
       onClick={() => onSelect(appt)}
-      title={`${appt.clientName || "—"} · ${appt.serviceName || "—"} · ${appt.startTime}-${appt.endTime}${appt.status ? ` · ${appt.status}` : ""}`}
+      title={`${appt.clientName || "—"} · ${appt.serviceName || "—"} · ${appt.startTime}-${appt.endTime}${statusLabel ? ` · ${statusLabel}` : ""}`}
       className="absolute top-1.5 bottom-1.5 rounded-lg pl-2.5 pr-2 py-1.5 overflow-hidden border border-l-4 text-left cursor-pointer transition-shadow hover:shadow-md"
       style={{
         left: left + 2,
@@ -189,6 +198,7 @@ const StaffRow = ({ staff, widths, totalWidth, onSelect, minutesToX }) => (
 );
 
 const ScheduleGrid = ({ staff, schedule, isToday, selectedDate }) => {
+  const { t } = useTranslation();
   const slots = useMemo(() => generateSlots(schedule.startTime, schedule.endTime), [schedule.startTime, schedule.endTime]);
   const [selected, setSelected] = useState(null);
   const [compact, setCompact] = useState(true);
@@ -208,7 +218,7 @@ const ScheduleGrid = ({ staff, schedule, isToday, selectedDate }) => {
           onClick={() => setCompact((c) => !c)}
           className="text-xs font-semibold bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
         >
-          {compact ? "Show full day" : "Hide empty slots"}
+          {compact ? (t("showFullDay") || "Show full day") : (t("hideEmptySlots") || "Hide empty slots")}
         </button>
       </div>
 

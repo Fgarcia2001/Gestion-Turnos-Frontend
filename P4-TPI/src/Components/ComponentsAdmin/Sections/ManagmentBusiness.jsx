@@ -78,11 +78,11 @@ const TableHeader = ({ tab, t }) => (
   </thead>
 );
 
-const LoadingState = () => (
+const LoadingState = ({ t }) => (
   <div className="flex items-center justify-center py-12">
     <div className="flex flex-col items-center gap-3">
       <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
-      <span className="text-sm text-[var(--text-muted)]">Loading...</span>
+      <span className="text-sm text-[var(--text-muted)]">{t("Loading") || "Loading..."}</span>
     </div>
   </div>
 );
@@ -385,7 +385,7 @@ const ManagmentBusiness = () => {
           {/* Table */}
           <div className="px-6 pb-4 mt-4 overflow-x-auto">
             {isLoading ? (
-              <LoadingState />
+              <LoadingState t={t} />
             ) : (
               <table className="w-full">
                 <TableHeader tab={tab} t={t} />
@@ -417,6 +417,7 @@ const ManagmentBusiness = () => {
       {createTarget && (
         <CreateModal
           tab={tab}
+          t={t}
           branches={data.branches}
           onClose={() => setCreateTarget(false)}
           onSave={handleCreate}
@@ -427,6 +428,7 @@ const ManagmentBusiness = () => {
         <EditModal
           row={editTarget}
           tab={tab}
+          t={t}
           branches={data.branches}
           onClose={() => setEditTarget(null)}
           onSave={handleEdit}
@@ -436,6 +438,7 @@ const ManagmentBusiness = () => {
       {schedulesTarget && (
         <SchedulesModal
           row={schedulesTarget}
+          t={t}
           onClose={() => setSchedulesTarget(null)}
           onSave={handleSchedulesSave}
         />
@@ -444,6 +447,7 @@ const ManagmentBusiness = () => {
       {deleteTarget && (
         <DeleteModal
           row={deleteTarget}
+          t={t}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
         />
