@@ -8,6 +8,7 @@ import BusinessCard from "./BusinessCard";
 import BusinessDetailModal from "./BusinessDetailModal";
 import ChangePlanModal from "./ChangePlanModal";
 import EditBusinessModal from "./EditBusinessModal";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const ALL = "All";
 
@@ -26,6 +27,7 @@ const SkeletonCard = () => (
 );
 
 const SysAdminBusinesses = () => {
+  const { t } = useTranslation();
   const [businesses, setBusinesses] = useState([]);
   const [types, setTypes] = useState([]);
   const [plans, setPlans] = useState([]);
@@ -134,14 +136,14 @@ const SysAdminBusinesses = () => {
   const handleChangePlan = async (planId) => {
     await changeSubscriptionPlan(selectedId, planId);
     retryDetail();
-    showToast("Plan changed");
+    showToast(t("Plan changed") || "Plan changed");
   };
 
   const handleEditBusiness = async (payload) => {
     await updateBusinessAsAdmin(selectedId, payload);
     retryDetail();
     await load();
-    showToast("Business updated");
+    showToast(t("Business updated") || "Business updated");
   };
 
   const handleToggleBranch = async (branch) => {
@@ -154,9 +156,9 @@ const SysAdminBusinesses = () => {
           branches: prev.branches.map((b) => (b.id === branch.id ? { ...b, isActive: updated.isActive } : b)),
         }
       );
-      showToast(updated.isActive ? "Branch is now public" : "Branch hidden from the public page");
+      showToast(updated.isActive ? (t("branchNowPublic") || "Branch is now public") : (t("branchNowHidden") || "Branch hidden from the public page"));
     } catch (err) {
-      showToast(err.message || "Failed to update the branch");
+      showToast(err.message || (t("Failed to update the branch") || "Failed to update the branch"));
     } finally {
       setTogglingBranchId(null);
     }
@@ -166,8 +168,8 @@ const SysAdminBusinesses = () => {
     return (
       <div className="pt-8 flex flex-col gap-6">
         <div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Businesses</h2>
-          <p className="text-sm text-[var(--text-muted)]">All businesses registered on the platform.</p>
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Businesses") || "Businesses"}</h2>
+          <p className="text-sm text-[var(--text-muted)]">{t("sysAdminBusinessesSubtitle") || "All businesses registered on the platform."}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -179,12 +181,12 @@ const SysAdminBusinesses = () => {
   if (error) {
     return (
       <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center mt-8">
-        <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the businesses</p>
+        <p className="text-sm text-[var(--text-muted)] mb-4">{t("Couldn't load the businesses") || "Couldn't load the businesses"}</p>
         <button
           onClick={load}
           className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
         >
-          Retry
+          {t("Retry") || "Retry"}
         </button>
       </div>
     );
@@ -197,13 +199,13 @@ const SysAdminBusinesses = () => {
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Businesses</h2>
-        <p className="text-sm text-[var(--text-muted)]">All businesses registered on the platform.</p>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Businesses") || "Businesses"}</h2>
+        <p className="text-sm text-[var(--text-muted)]">{t("sysAdminBusinessesSubtitle") || "All businesses registered on the platform."}</p>
       </div>
 
       {businesses.length === 0 ? (
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
-          No businesses found.
+          {t("No businesses found.") || "No businesses found."}
         </div>
       ) : (
         <>
@@ -216,7 +218,7 @@ const SysAdminBusinesses = () => {
                   : "bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)]"
               }`}
             >
-              All
+              {t("All") || "All"}
             </button>
             {types.map((type) => (
               <button
@@ -235,7 +237,7 @@ const SysAdminBusinesses = () => {
 
           {filtered.length === 0 ? (
             <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
-              No businesses found for this category.
+              {t("No businesses found for this category.") || "No businesses found for this category."}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">

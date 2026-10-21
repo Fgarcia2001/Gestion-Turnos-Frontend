@@ -4,7 +4,7 @@ import { IconDots, IconEdit, IconClock, IconTrash, IconEye, IconEyeOff } from '.
 import { Avatar, Badge } from './Shared';
 
 // ── Dropdown context menu ─────────────────────────────────────────────────────
-export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActive }) => {
+export const RowMenu = ({ tab, row, t, onEdit, onDelete, onSchedules, onToggleActive }) => {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef(null);
@@ -58,7 +58,7 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
           >
             <IconEdit />
-            Edit
+            {t("Edit") || "Edit"}
           </button>
 
           {/* Schedules + visibility toggle — branch only */}
@@ -70,7 +70,7 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
                 className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
               >
                 <IconClock />
-                Schedules
+                {t("Schedules") || "Schedules"}
               </button>
               <div className="h-px bg-[var(--surface-muted)]" />
               <button
@@ -78,7 +78,7 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
                 className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
               >
                 {row.isActive ? <IconEyeOff /> : <IconEye />}
-                {row.isActive ? "Hide from public" : "Make public"}
+                {row.isActive ? (t("Hide from public") || "Hide from public") : (t("Make public") || "Make public")}
               </button>
             </>
           )}
@@ -89,7 +89,7 @@ export const RowMenu = ({ tab, row, onEdit, onDelete, onSchedules, onToggleActiv
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors font-medium"
           >
             <IconTrash />
-            Delete
+            {t("Delete") || "Delete"}
           </button>
         </div>,
         document.body
@@ -120,7 +120,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
         </td>
         <td className={tdClass}>{row.branchName}</td>
         <td className="py-3 text-right">
-          <RowMenu tab={tab} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
+          <RowMenu tab={tab} t={t} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
         </td>
       </tr>
     );
@@ -139,7 +139,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
         <td className={tdClass}>{row.phone}</td>
         <td className={tdClass}>{row.birthday ? new Date(row.birthday).toLocaleDateString() : ""}</td>
         <td className="py-3 text-right">
-          <RowMenu tab={tab} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
+          <RowMenu tab={tab} t={t} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
         </td>
       </tr>
     );
@@ -160,11 +160,11 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
               row.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
             }`}
           >
-            {row.isActive ? "Public" : "Hidden"}
+            {row.isActive ? (t("Public") || "Public") : (t("Hidden") || "Hidden")}
           </span>
         </td>
         <td className="py-3 text-right">
-          <RowMenu tab={tab} row={row} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} onToggleActive={onToggleActive} />
+          <RowMenu tab={tab} row={row} t={t} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} onToggleActive={onToggleActive} />
         </td>
       </tr>
     );
@@ -181,7 +181,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
         <td className={tdClass}>{row.duration}</td>
         <td className="py-3 pr-6 font-medium text-[var(--text-primary)]">{row.price}</td>
         <td className="py-3 text-right">
-          <RowMenu tab={tab} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
+          <RowMenu tab={tab} t={t} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
         </td>
       </tr>
     );

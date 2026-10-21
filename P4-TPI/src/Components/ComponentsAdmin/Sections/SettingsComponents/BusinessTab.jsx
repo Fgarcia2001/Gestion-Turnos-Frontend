@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BASE_URL, getAuthHeaders } from "../../../../services/api";
 import { fetchBusinessTypes } from "../../../../services/businessService";
 import { IconGlobe, IconCamera, IconCheck } from './SettingsIcons';
+import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 
 const IconUpload = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -23,9 +24,11 @@ const IconBuildingSmall = () => (
 
 // Mini mockup de la pagina publica del negocio (BusinessPublicPage.jsx), a
 // escala reducida, reflejando en vivo lo que el admin esta tipeando en el form.
-const BusinessPreview = ({ name, category, logoUrl, color, url }) => (
+const BusinessPreview = ({ name, category, logoUrl, color, url }) => {
+  const { t } = useTranslation();
+  return (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
-    <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Public page preview</p>
+    <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">{t("Public page preview") || "Public page preview"}</p>
 
     <div className="bg-[var(--page-bg)] border border-[var(--border-subtle)] rounded-2xl overflow-hidden">
       <div className="h-8 bg-[var(--surface-muted)] border-b border-[var(--border-subtle)] flex items-center gap-1.5 px-3">
@@ -39,22 +42,22 @@ const BusinessPreview = ({ name, category, logoUrl, color, url }) => (
           {logoUrl ? <img src={logoUrl} alt={name} className="w-full h-full object-cover" /> : <IconBuildingSmall />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold truncate">{name || "Business name"}</p>
+          <p className="text-sm font-bold truncate">{name || (t("Business name") || "Business name")}</p>
           {category && <p className="text-[10px] text-white/70 truncate">{category}</p>}
         </div>
         <span className="hidden sm:inline-block text-[10px] font-semibold bg-[var(--surface)] px-2.5 py-1.5 rounded-lg shrink-0" style={{ color }}>
-          Reservar turno
+          {t("Book appointment") || "Book appointment"}
         </span>
       </div>
 
       <div className="p-4">
         <div className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-xl p-3 flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-bold text-[var(--text-primary)] truncate">Sucursal</p>
-            <p className="text-[10px] text-[var(--text-muted)] truncate">Dirección, Ciudad</p>
+            <p className="text-xs font-bold text-[var(--text-primary)] truncate">{t("Branch") || "Branch"}</p>
+            <p className="text-[10px] text-[var(--text-muted)] truncate">{t("Address") || "Address"}, {t("City") || "City"}</p>
           </div>
           <span className="text-[10px] font-semibold text-white px-2.5 py-1.5 rounded-lg shrink-0" style={{ backgroundColor: color }}>
-            Reservar acá
+            {t("Book here") || "Book here"}
           </span>
         </div>
       </div>
@@ -64,9 +67,11 @@ const BusinessPreview = ({ name, category, logoUrl, color, url }) => (
       {window.location.origin}/{url || "..."}
     </p>
   </div>
-);
+  );
+};
 
 const BusinessTab = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: "", category: "", url: "", logoUrl: "", color: "#1a1a2e" });
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -161,7 +166,7 @@ const BusinessTab = () => {
       const updated = { ...formData };
       setOriginalData(updated);
     } catch {
-      setError("Could not save changes. Please try again.");
+      setError(t("Could not save changes. Please try again.") || "Could not save changes. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -178,8 +183,8 @@ const BusinessTab = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 items-start max-w-5xl mx-auto">
     <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
-      <h2 className="text-lg font-semibold text-[var(--text-primary)]">Business Information</h2>
-      <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">Edit all the data of your business profile.</p>
+      <h2 className="text-lg font-semibold text-[var(--text-primary)]">{t("Business Information") || "Business Information"}</h2>
+      <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">{t("Edit all the data of your business profile.") || "Edit all the data of your business profile."}</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
         {/* Logo */}
@@ -190,7 +195,7 @@ const BusinessTab = () => {
             ) : (
               <div className="text-[var(--text-muted)] flex flex-col items-center gap-1">
                 <IconCamera />
-                <span className="text-[10px] font-medium">No logo</span>
+                <span className="text-[10px] font-medium">{t("No logo") || "No logo"}</span>
               </div>
             )}
           </div>
@@ -208,7 +213,7 @@ const BusinessTab = () => {
                 onClick={() => setLogoInputMode("upload")}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${logoInputMode === "upload" ? "bg-[var(--brand)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] hover:bg-[var(--border-subtle)]"}`}
               >
-                Upload
+                {t("Upload") || "Upload"}
               </button>
             </div>
             {logoInputMode === "url" ? (
@@ -222,7 +227,7 @@ const BusinessTab = () => {
             ) : (
               <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-primary)] font-medium bg-[var(--surface-muted)] hover:bg-[var(--border-subtle)] transition-colors rounded-xl px-4 py-2.5 self-start">
                 <IconUpload />
-                Choose file
+                {t("Choose file") || "Choose file"}
                 <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
               </label>
             )}
@@ -231,7 +236,7 @@ const BusinessTab = () => {
 
         {/* Name */}
         <div>
-          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Business name</label>
+          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">{t("Business name") || "Business name"}</label>
           <input
             type="text"
             value={formData.name}
@@ -242,7 +247,7 @@ const BusinessTab = () => {
 
         {/* Brand color */}
         <div>
-          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Brand color</label>
+          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">{t("Brand color") || "Brand color"}</label>
           <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] pb-2">
             <input
               type="color"
@@ -257,12 +262,12 @@ const BusinessTab = () => {
               className="w-full text-sm text-[var(--text-primary)] focus:outline-none bg-transparent"
             />
           </div>
-          <p className="text-[11px] text-[var(--text-muted)] mt-1.5">Shown on your public page at {window.location.origin}/{formData.url || "..."}</p>
+          <p className="text-[11px] text-[var(--text-muted)] mt-1.5">{t("Shown on your public page at") || "Shown on your public page at"} {window.location.origin}/{formData.url || "..."}</p>
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Category</label>
+          <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">{t("Category") || "Category"}</label>
           <select
             value={formData.category}
             onChange={handleChange("category")}
@@ -280,7 +285,7 @@ const BusinessTab = () => {
         {/* Website */}
         <div className="col-span-2">
           <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-primary)] mb-2">
-            <IconGlobe /> Website
+            <IconGlobe /> {t("Website") || "Website"}
           </label>
           <div className="flex items-center gap-2">
             <div className="flex items-center flex-1 min-w-0 border-b border-[var(--border-subtle)] focus-within:border-[var(--brand)] transition-colors">
@@ -296,11 +301,11 @@ const BusinessTab = () => {
             <button
               type="button"
               onClick={handleCopyUrl}
-              title="Copiar URL"
+              title={t("Copy URL") || "Copy URL"}
               className={`flex items-center gap-1.5 shrink-0 px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${copied ? "bg-[#dcfce7] text-[#15803d]" : "bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]"}`}
             >
               {copied ? <IconCheck /> : <IconCopy />}
-              {copied ? "Copiado" : "Copiar"}
+              {copied ? (t("Copied") || "Copied") : (t("Copy") || "Copy")}
             </button>
           </div>
         </div>
@@ -316,14 +321,14 @@ const BusinessTab = () => {
           disabled={!hasChanges}
           className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges ? "bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]" : "bg-[var(--surface-muted)] text-[var(--text-faint)] cursor-not-allowed"}`}
         >
-          Cancel
+          {t("Cancel") || "Cancel"}
         </button>
         <button
           onClick={handleSave}
           disabled={!hasChanges || saving}
           className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges && !saving ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[#9a9a9a] text-[var(--text-faint)] cursor-not-allowed"}`}
         >
-          {saving ? "Saving..." : "Save changes"}
+          {saving ? (t("Saving") || "Saving...") : (t("Save changes") || "Save changes")}
         </button>
       </div>
     </div>

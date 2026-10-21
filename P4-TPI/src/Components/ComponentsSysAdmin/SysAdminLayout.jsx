@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../CustomHooks/AuthContext";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 import ThemeToggle from "../Shared/ThemeToggle";
+import LanguageToggle from "../Shared/LanguageToggle";
 
 const IconDashboard = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -45,12 +47,12 @@ const IconMenu = () => (
 );
 
 const navItems = [
-  { to: "/sysadmin", end: true, label: "Dashboard", Icon: IconDashboard },
-  { to: "/sysadmin/businesses", label: "Businesses", Icon: IconBuilding },
-  { to: "/sysadmin/plans", label: "Plans", Icon: IconLayers },
-  { to: "/sysadmin/subscriptions", label: "Subscriptions", Icon: IconCreditCard },
-  { to: "/sysadmin/landing", label: "Landing Page", Icon: IconLanding },
-  { to: "/sysadmin/profile", label: "Profile", Icon: IconUser },
+  { to: "/sysadmin", end: true, labelKey: "Dashboard", label: "Dashboard", Icon: IconDashboard },
+  { to: "/sysadmin/businesses", labelKey: "Businesses", label: "Businesses", Icon: IconBuilding },
+  { to: "/sysadmin/plans", labelKey: "Plans", label: "Plans", Icon: IconLayers },
+  { to: "/sysadmin/subscriptions", labelKey: "Subscriptions", label: "Subscriptions", Icon: IconCreditCard },
+  { to: "/sysadmin/landing", labelKey: "Landing Page", label: "Landing Page", Icon: IconLanding },
+  { to: "/sysadmin/profile", labelKey: "Profile", label: "Profile", Icon: IconUser },
 ];
 
 const getInitials = (name) => {
@@ -60,6 +62,7 @@ const getInitials = (name) => {
 
 const SysAdminLayout = () => {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -88,12 +91,12 @@ const SysAdminLayout = () => {
           </div>
           <div>
             <p className="text-sm font-bold text-[var(--text-primary)] leading-tight">SysAdmin</p>
-            <p className="text-[11px] text-[var(--text-muted)] leading-tight">Platform console</p>
+            <p className="text-[11px] text-[var(--text-muted)] leading-tight">{t("Platform console") || "Platform console"}</p>
           </div>
         </div>
 
         <div className="flex flex-col gap-1 flex-1">
-          {navItems.map(({ to, end, label, Icon }) => (
+          {navItems.map(({ to, end, labelKey, label, Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -106,7 +109,7 @@ const SysAdminLayout = () => {
               }
             >
               <Icon />
-              {label}
+              {t(labelKey) || label}
             </NavLink>
           ))}
         </div>
@@ -116,7 +119,7 @@ const SysAdminLayout = () => {
           className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-tertiary)] hover:bg-[var(--surface-muted-2)] hover:text-[var(--text-primary)] transition-all duration-200"
         >
           <IconLogout />
-          Log out
+          {t("Log out") || "Log out"}
         </button>
       </nav>
 
@@ -132,12 +135,13 @@ const SysAdminLayout = () => {
             </button>
             <div className="min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-primary)] leading-tight truncate">
-                Hello, <span className="font-bold">{user?.name || "there"}</span>
+                {t("Hello") || "Hello"}, <span className="font-bold">{user?.name || (t("there") || "there")}</span>
               </h1>
-              <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 truncate">Manage businesses, plans and subscriptions.</p>
+              <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 truncate">{t("sysAdminHeaderSubtitle") || "Manage businesses, plans and subscriptions."}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 shrink-0">
+            <LanguageToggle />
             <ThemeToggle />
             <button
               onClick={() => navigate("/sysadmin/profile")}

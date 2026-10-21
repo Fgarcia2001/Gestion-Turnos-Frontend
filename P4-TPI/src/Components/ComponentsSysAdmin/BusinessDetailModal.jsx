@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
 import { IconX, IconEdit, IconEye, IconEyeOff } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { getBusinessInitials, statusStyle } from "./businessStatus";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const CSS_ANIMATIONS = `
   @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
@@ -51,6 +52,7 @@ const StatTile = ({ label, value }) => (
 );
 
 const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onEdit, onToggleBranch, togglingBranchId }) => {
+  const { t } = useTranslation();
   const [logoFailed, setLogoFailed] = useState(false);
 
   useEffect(() => {
@@ -88,7 +90,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
       <ModalOverlay onClose={onClose}>
         <div className="w-full max-w-2xl bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] shadow-xl max-h-[90vh] flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-subtle)] shrink-0">
-            <h2 className="text-base font-bold text-[var(--text-primary)]">{name || "Business details"}</h2>
+            <h2 className="text-base font-bold text-[var(--text-primary)]">{name || (t("Business details") || "Business details")}</h2>
             <div className="flex items-center gap-2">
               {onEdit && !loading && !error && detail && (
                 <button
@@ -97,7 +99,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                   className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
                 >
                   <IconEdit />
-                  Edit
+                  {t("Edit") || "Edit"}
                 </button>
               )}
               <button
@@ -115,30 +117,30 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
             {loading && (
               <div className="flex flex-col items-center justify-center gap-3 py-20">
                 <div className="size-8 animate-spin rounded-full border-2 border-[var(--brand)] border-t-transparent" />
-                <p className="text-sm text-[var(--text-muted)]">Loading business details…</p>
+                <p className="text-sm text-[var(--text-muted)]">{t("Loading business details…") || "Loading business details…"}</p>
               </div>
             )}
 
             {!loading && error && (
               <div className="py-20 text-center px-6">
-                <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the business details</p>
+                <p className="text-sm text-[var(--text-muted)] mb-4">{t("Couldn't load the business details") || "Couldn't load the business details"}</p>
                 <button
                   onClick={onRetry}
                   className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
                 >
-                  Retry
+                  {t("Retry") || "Retry"}
                 </button>
               </div>
             )}
 
             {!loading && !error && detail && (
               <>
-                <Section title="General information">
+                <Section title={t("General information") || "General information"}>
                   <div className="flex items-center gap-4 mb-3">
                     {showLogo ? (
                       <img
                         src={urlLogo}
-                        alt={name || "Business logo"}
+                        alt={name || (t("Business logo") || "Business logo")}
                         onError={() => setLogoFailed(true)}
                         className="w-14 h-14 rounded-full object-cover border border-[var(--border-subtle)] shrink-0"
                       />
@@ -155,25 +157,25 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                       </span>
                     </div>
                   </div>
-                  <Field label="Type" value={detail.typeBusiness || "—"} />
-                  <Field label="Status" value={detail.status || "—"} />
-                  <Field label="URL" value={website} />
-                  <Field label="Email" value={email} />
-                  <Field label="Phone" value={phone} />
+                  <Field label={t("Type") || "Type"} value={detail.typeBusiness || "—"} />
+                  <Field label={t("Status") || "Status"} value={detail.status || "—"} />
+                  <Field label={t("URL") || "URL"} value={website} />
+                  <Field label={t("Email") || "Email"} value={email} />
+                  <Field label={t("Phone") || "Phone"} value={phone} />
                 </Section>
 
-                <Section title="Subscription">
+                <Section title={t("Subscription") || "Subscription"}>
                   <div className="flex items-start justify-between gap-3 mb-1">
                     <div className="flex-1">
                       {hasSubscription ? (
                         <>
-                          <Field label="Plan" value={currentPlan || "Not provided"} />
-                          <Field label="Status" value={subscriptionStatus || "Not provided"} />
-                          <Field label="Start date" value={formatDate(subscriptionStartDate) || "Not provided"} />
-                          <Field label="End date" value={formatDate(subscriptionEndDate) || "Not provided"} />
+                          <Field label={t("Plan") || "Plan"} value={currentPlan || (t("Not provided") || "Not provided")} />
+                          <Field label={t("Status") || "Status"} value={subscriptionStatus || (t("Not provided") || "Not provided")} />
+                          <Field label={t("Start date") || "Start date"} value={formatDate(subscriptionStartDate) || (t("Not provided") || "Not provided")} />
+                          <Field label={t("End date") || "End date"} value={formatDate(subscriptionEndDate) || (t("Not provided") || "Not provided")} />
                         </>
                       ) : (
-                        <p className="text-sm text-[var(--text-muted)]">No subscription information.</p>
+                        <p className="text-sm text-[var(--text-muted)]">{t("No subscription information.") || "No subscription information."}</p>
                       )}
                     </div>
                     {onChangePlan && (
@@ -183,24 +185,24 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                         className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
                       >
                         <IconEdit />
-                        Change plan
+                        {t("Change plan") || "Change plan"}
                       </button>
                     )}
                   </div>
                 </Section>
 
-                <Section title="Statistics">
+                <Section title={t("Statistics") || "Statistics"}>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <StatTile label="Branches" value={detail.branchCount ?? 0} />
-                    <StatTile label="Staff" value={detail.staffCount ?? 0} />
-                    <StatTile label="Clients" value={detail.clientCount ?? 0} />
-                    <StatTile label="Appointments" value={detail.appointmentCount ?? 0} />
+                    <StatTile label={t("Branches") || "Branches"} value={detail.branchCount ?? 0} />
+                    <StatTile label={t("Staff") || "Staff"} value={detail.staffCount ?? 0} />
+                    <StatTile label={t("Clients") || "Clients"} value={detail.clientCount ?? 0} />
+                    <StatTile label={t("sysAdminAppointmentsColumn") || "Appointments"} value={detail.appointmentCount ?? 0} />
                   </div>
                 </Section>
 
-                <Section title="Branches">
+                <Section title={t("Branches") || "Branches"}>
                   {branches.length === 0 ? (
-                    <p className="text-sm text-[var(--text-muted)]">No branches registered.</p>
+                    <p className="text-sm text-[var(--text-muted)]">{t("No branches registered.") || "No branches registered."}</p>
                   ) : (
                     <div className="flex flex-col gap-2">
                       {branches.map((branch, i) => (
@@ -216,7 +218,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                                   branch.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
                                 }`}
                               >
-                                {branch.isActive ? "Public" : "Hidden"}
+                                {branch.isActive ? (t("Public") || "Public") : (t("Hidden") || "Hidden")}
                               </span>
                             </div>
                             {branch.address && <p className="text-xs text-[var(--text-tertiary)] mt-0.5">{branch.address}</p>}
@@ -228,11 +230,11 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                               type="button"
                               onClick={() => onToggleBranch(branch)}
                               disabled={togglingBranchId === branch.id}
-                              title={branch.isActive ? "Hide from public" : "Make public"}
+                              title={branch.isActive ? (t("Hide from public") || "Hide from public") : (t("Make public") || "Make public")}
                               className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
                             >
                               {branch.isActive ? <IconEyeOff /> : <IconEye />}
-                              {branch.isActive ? "Hide" : "Make public"}
+                              {branch.isActive ? (t("Hide") || "Hide") : (t("Make public") || "Make public")}
                             </button>
                           )}
                         </div>
@@ -250,7 +252,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
               onClick={onClose}
               className="text-sm font-semibold bg-[var(--brand)] text-white rounded-xl px-4 py-2 hover:bg-[var(--brand-hover)] transition-colors"
             >
-              Close
+              {t("Close") || "Close"}
             </button>
           </div>
         </div>

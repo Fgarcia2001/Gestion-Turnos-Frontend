@@ -10,8 +10,9 @@ import {
   IconBuilding,
   IconTag,
 } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
-const formatLimit = (value) => (value === -1 || value === "-1" ? "Unlimited" : value);
+const formatLimit = (value, unlimitedLabel) => (value === -1 || value === "-1" ? unlimitedLabel : value);
 
 const formatPrice = (value) => {
   const n = Number(value);
@@ -47,6 +48,8 @@ const SkeletonCard = () => (
 );
 
 const SysAdminPlans = () => {
+  const { t } = useTranslation();
+  const unlimitedLabel = t("Unlimited") || "Unlimited";
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -94,17 +97,17 @@ const SysAdminPlans = () => {
   const handleSave = async (payload) => {
     if (formModal?.mode === "edit") {
       await updatePlan(formModal.plan.id, payload);
-      showToast("Plan updated");
+      showToast(t("Plan updated") || "Plan updated");
     } else {
       await createPlan(payload);
-      showToast("Plan created");
+      showToast(t("Plan created") || "Plan created");
     }
     await load();
   };
 
   const handleDelete = async (plan) => {
     await deletePlan(plan.id);
-    showToast("Plan deleted");
+    showToast(t("Plan deleted") || "Plan deleted");
     await load();
   };
 
@@ -112,31 +115,31 @@ const SysAdminPlans = () => {
     <div className="pt-8 flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Plans</h2>
-          <p className="text-sm text-[var(--text-muted)]">Manage the subscription plans offered on the platform.</p>
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Plans") || "Plans"}</h2>
+          <p className="text-sm text-[var(--text-muted)]">{t("sysAdminPlansSubtitle") || "Manage the subscription plans offered on the platform."}</p>
         </div>
         <button
           onClick={() => setFormModal({ mode: "create" })}
           className="flex items-center justify-center gap-2 w-full sm:w-auto bg-[var(--brand)] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-[var(--brand-hover)] transition-colors"
         >
           <IconPlus />
-          New plan
+          {t("New plan") || "New plan"}
         </button>
       </div>
 
       {error ? (
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
-          <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the plans</p>
+          <p className="text-sm text-[var(--text-muted)] mb-4">{t("Couldn't load the plans") || "Couldn't load the plans"}</p>
           <button
             onClick={load}
             className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
           >
-            Retry
+            {t("Retry") || "Retry"}
           </button>
         </div>
       ) : !loading && plans.length === 0 ? (
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
-          No plans found.
+          {t("No plans found.") || "No plans found."}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -152,21 +155,21 @@ const SysAdminPlans = () => {
                           plan.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
                         }`}
                       >
-                        {plan.isActive ? "Active" : "Inactive"}
+                        {plan.isActive ? (t("Active") || "Active") : (t("Inactive") || "Inactive")}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => setFormModal({ mode: "edit", plan })}
                         className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] transition-colors"
-                        title="Edit plan"
+                        title={t("Edit plan") || "Edit plan"}
                       >
                         <IconEdit />
                       </button>
                       <button
                         onClick={() => setDeleteTarget(plan)}
                         className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:bg-red-50 hover:text-red-500 transition-colors"
-                        title="Delete plan"
+                        title={t("Delete plan") || "Delete plan"}
                       >
                         <IconTrash />
                       </button>
@@ -180,10 +183,10 @@ const SysAdminPlans = () => {
                   <p className="text-2xl font-bold text-[var(--text-primary)]">{formatPrice(plan.price)}</p>
 
                   <div className="grid grid-cols-2 gap-2.5">
-                    <StatBox icon={<IconClock />} label="Duration" value={`${plan.durationDays} days`} />
-                    <StatBox icon={<IconUsers />} label="Staff" value={formatLimit(plan.maxStaffAllowed)} />
-                    <StatBox icon={<IconBuilding />} label="Branches" value={formatLimit(plan.maxBranchesAllowed)} />
-                    <StatBox icon={<IconTag />} label="Services" value={formatLimit(plan.maxServicesAllowed)} />
+                    <StatBox icon={<IconClock />} label={t("Duration") || "Duration"} value={`${plan.durationDays} ${t("daysSuffix") || "days"}`} />
+                    <StatBox icon={<IconUsers />} label={t("Staff") || "Staff"} value={formatLimit(plan.maxStaffAllowed, unlimitedLabel)} />
+                    <StatBox icon={<IconBuilding />} label={t("Branches") || "Branches"} value={formatLimit(plan.maxBranchesAllowed, unlimitedLabel)} />
+                    <StatBox icon={<IconTag />} label={t("Services") || "Services"} value={formatLimit(plan.maxServicesAllowed, unlimitedLabel)} />
                   </div>
                 </div>
               ))}
