@@ -215,7 +215,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                               <p className="text-sm font-semibold text-[var(--text-primary)]">{branch.name || "—"}</p>
                               <span
                                 className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                                  branch.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
+                                  branch.isActive ? "bg-[var(--success-bg)] text-[var(--success-text)]" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
                                 }`}
                               >
                                 {branch.isActive ? (t("Public") || "Public") : (t("Hidden") || "Hidden")}

@@ -1,17 +1,30 @@
 // ── Avatar ───────────────────────────────────────────────────────────────────
-export const Avatar = ({ initials, color = "#e2ddd8", photo }) => {
-  if (photo) {
-    return (
-      <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-[var(--border-subtle)]">
-        <img src={photo} alt={initials} className="w-full h-full object-cover"
-          onError={(e) => { e.target.style.display = "none"; }} />
-      </div>
-    );
-  }
-  return (
-    <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0"
+export const Avatar = ({ initials, color = "#e2ddd8", photo, isActive }) => {
+  const circle = photo ? (
+    <div className="w-9 h-9 rounded-full overflow-hidden border border-[var(--border-subtle)]">
+      <img src={photo} alt={initials} className="w-full h-full object-cover"
+        onError={(e) => { e.target.style.display = "none"; }} />
+    </div>
+  ) : (
+    <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold"
       style={{ background: color, color: "#1a1a2e" }}>
       {initials}
+    </div>
+  );
+
+  if (isActive === undefined || isActive === null) {
+    return <div className="shrink-0">{circle}</div>;
+  }
+
+  return (
+    <div className="relative shrink-0">
+      {circle}
+      <span
+        title={isActive ? "Active" : "Inactive"}
+        className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-[var(--surface)] ${
+          isActive ? "bg-green-500" : "bg-[var(--text-muted)]"
+        }`}
+      />
     </div>
   );
 };
