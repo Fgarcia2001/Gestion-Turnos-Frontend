@@ -273,6 +273,9 @@ export const translations = {
     tourReplaySubtitle: "A quick guided walkthrough of the platform.",
     tourReplay: "Start the tutorial",
 
+    // Pending reassignment
+    "Appointment reassigned email sent": "Appointment reassigned. An email was sent to the client.",
+
     // Misc
     minutesAbbrev: "min"
   },
@@ -549,6 +552,9 @@ export const translations = {
     tourReplayTitle: "Hacé el tutorial",
     tourReplaySubtitle: "Un recorrido guiado rápido por la plataforma.",
     tourReplay: "Iniciar tutorial",
+
+    // Reasignación pendiente
+    "Appointment reassigned email sent": "Turno reasignado. Se envió un email al cliente.",
 
     // Varios
     minutesAbbrev: "min"

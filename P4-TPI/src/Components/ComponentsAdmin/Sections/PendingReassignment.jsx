@@ -145,7 +145,7 @@ const PendingReassignment = ({ onChange }) => {
     setAppointments(remaining);
     setSelected(null);
     onChange?.(remaining.length);
-    setToast(t("Appointment reassigned successfully") || "Turno reasignado correctamente");
+    setToast(t("Appointment reassigned email sent") || "Turno reasignado. Se envió un email al cliente.");
     setTimeout(() => setToast(null), 3000);
   };
 
