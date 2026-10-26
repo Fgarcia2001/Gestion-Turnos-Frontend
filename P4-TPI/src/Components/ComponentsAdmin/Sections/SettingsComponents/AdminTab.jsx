@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BASE_URL, getAuthHeaders, fetchMyProfile, updateMyProfile } from "../../../../services/api";
 import { IconCamera, IconMail, IconPhone as IconPhoneIcon } from './SettingsIcons';
+import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 
 const IconUpload = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -18,6 +19,7 @@ const toFormData = (data) => ({
 
 // self=true: el usuario logueado edita su propio perfil (/Staff/me), sin datos de empresa.
 const AdminTab = ({ self = false }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ staffName: "", staffEmail: "", staffLinkPhoto: "", staffPhone: "" });
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ const AdminTab = ({ self = false }) => {
         setOriginalData(updated);
       }
     } catch {
-      setError("Could not save changes. Please try again.");
+      setError(t("Could not save changes. Please try again.") || "Could not save changes. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -126,8 +128,8 @@ const AdminTab = ({ self = false }) => {
     <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto">
       {/* Profile */}
       <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">{self ? "My Profile" : "Administrator Profile"}</h2>
-        <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">Manage your personal account data.</p>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">{self ? (t("My Profile") || "My Profile") : (t("Administrator Profile") || "Administrator Profile")}</h2>
+        <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">{t("Manage your personal account data.") || "Manage your personal account data."}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
           {/* Photo */}
@@ -138,7 +140,7 @@ const AdminTab = ({ self = false }) => {
               ) : (
                 <div className="text-[var(--text-muted)] flex flex-col items-center gap-1">
                   <IconCamera />
-                  <span className="text-[10px] font-medium">No photo</span>
+                  <span className="text-[10px] font-medium">{t("No photo") || "No photo"}</span>
                 </div>
               )}
             </div>
@@ -156,7 +158,7 @@ const AdminTab = ({ self = false }) => {
                   onClick={() => setPhotoInputMode("upload")}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${photoInputMode === "upload" ? "bg-[var(--brand)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] hover:bg-[var(--border-subtle)]"}`}
                 >
-                  Upload
+                  {t("Upload") || "Upload"}
                 </button>
               </div>
               {photoInputMode === "url" ? (
@@ -170,7 +172,7 @@ const AdminTab = ({ self = false }) => {
               ) : (
                 <label className="flex items-center gap-2 cursor-pointer text-sm text-[var(--text-primary)] font-medium bg-[var(--surface-muted)] hover:bg-[var(--border-subtle)] transition-colors rounded-xl px-4 py-2.5 self-start">
                   <IconUpload />
-                  Choose file
+                  {t("Choose file") || "Choose file"}
                   <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
                 </label>
               )}
@@ -179,7 +181,7 @@ const AdminTab = ({ self = false }) => {
 
           {/* Staff name */}
           <div className="col-span-2">
-            <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">Full name</label>
+            <label className="block text-xs font-semibold text-[var(--text-primary)] mb-2">{t("Full name") || "Full name"}</label>
             <input
               type="text"
               value={formData.staffName}
@@ -191,7 +193,7 @@ const AdminTab = ({ self = false }) => {
           {/* Email */}
           <div>
             <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-primary)] mb-2">
-              <IconMail /> Email
+              <IconMail /> {t("Email") || "Email"}
             </label>
             <input
               type="email"
@@ -205,7 +207,7 @@ const AdminTab = ({ self = false }) => {
           {/* Phone */}
           <div>
             <label className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-primary)] mb-2">
-              <IconPhoneIcon /> Phone
+              <IconPhoneIcon /> {t("Phone") || "Phone"}
             </label>
             <input
               type="text"
@@ -226,14 +228,14 @@ const AdminTab = ({ self = false }) => {
             disabled={!hasChanges}
             className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges ? "bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)]" : "bg-[var(--surface-muted)] text-[var(--text-faint)] cursor-not-allowed"}`}
           >
-            Cancel
+            {t("Cancel") || "Cancel"}
           </button>
           <button
             onClick={handleSave}
             disabled={!hasChanges || saving}
             className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${hasChanges && !saving ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[#9a9a9a] text-[var(--text-faint)] cursor-not-allowed"}`}
           >
-            {saving ? "Saving..." : "Save changes"}
+            {saving ? (t("Saving") || "Saving...") : (t("Save changes") || "Save changes")}
           </button>
         </div>
       </div>
@@ -241,15 +243,15 @@ const AdminTab = ({ self = false }) => {
       {/* Danger Zone */}
       {!self && (
       <div className="bg-[var(--surface)] rounded-2xl border border-red-200 p-6">
-        <h2 className="text-sm font-semibold text-red-600 mb-1">Danger Zone</h2>
-        <p className="text-xs text-[var(--text-muted)] mb-4">Irreversible actions for your account.</p>
+        <h2 className="text-sm font-semibold text-red-600 mb-1">{t("Danger Zone") || "Danger Zone"}</h2>
+        <p className="text-xs text-[var(--text-muted)] mb-4">{t("Irreversible actions for your account.") || "Irreversible actions for your account."}</p>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
           <div>
-            <h4 className="text-sm font-semibold text-[var(--text-primary)]">Delete account</h4>
-            <p className="text-xs text-[var(--text-muted)]">Permanently remove your account and all data.</p>
+            <h4 className="text-sm font-semibold text-[var(--text-primary)]">{t("Delete account") || "Delete account"}</h4>
+            <p className="text-xs text-[var(--text-muted)]">{t("Permanently remove your account and all data.") || "Permanently remove your account and all data."}</p>
           </div>
           <button className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shrink-0">
-            Delete account
+            {t("Delete account") || "Delete account"}
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
 import { useNotifications } from "../../../CustomHooks/NotificationContext";
 import ThemeToggle from "../Shared/ThemeToggle";
+import LanguageToggle from "../Shared/LanguageToggle";
 
 const IconBell = () => (
   <svg
@@ -113,10 +114,10 @@ const Header = ({
     <header className="flex items-center justify-between w-full gap-3 px-4 sm:px-8 py-4 sm:py-5 bg-[var(--surface-muted)]">
       <div className="min-w-0" data-tour="greeting">
         <h1 className="text-lg sm:text-2xl font-bold text-[var(--text-primary)] leading-tight truncate">
-          Hello, <span className="font-bold">{displayName || "there"}</span>
+          {t("Hello") || "Hello"}, <span className="font-bold">{displayName || (t("there") || "there")}</span>
         </h1>
         <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5 truncate">
-          View and control your appointments here!
+          {t("headerSubtitle") || "View and control your appointments here!"}
         </p>
       </div>
       <div className="flex items-center gap-3">
@@ -128,10 +129,11 @@ const Header = ({
           >
             <IconAlert />
             <span className="hidden sm:inline">
-              {t("Pending reassignment appointments") || "Tienes turnos pendiente de reasignar"}
+              {t("Pending reassignment appointments") || "Pending reassignment appointments"}
             </span>
           </button>
         )}
+        <LanguageToggle />
         <ThemeToggle />
         <div className="relative">
           <button

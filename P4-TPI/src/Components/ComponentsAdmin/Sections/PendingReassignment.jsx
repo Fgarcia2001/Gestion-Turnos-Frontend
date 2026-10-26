@@ -49,7 +49,7 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
       await reassignAppointment(appointment.id, staffId);
       onReassigned(appointment.id);
     } catch (e) {
-      setError(e.message || "No se pudo reasignar el turno");
+      setError(e.message || (t("reassignError") || "Couldn't reassign the appointment."));
       setSubmitting(false);
     }
   };
@@ -57,7 +57,7 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
   return (
     <ModalOverlay onClose={onClose}>
       <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-        <button type="button" onClick={onClose} aria-label="Close"
+        <button type="button" onClick={onClose} aria-label={t("Close") || "Close"}
           className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
           <IconX />
         </button>
@@ -68,7 +68,7 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
 
         <div className="grid grid-cols-2 gap-4 mb-5">
           <DetailRow label={t("Client") || "Cliente"} value={appointment.clientName} />
-          <DetailRow label="Email" value={appointment.clientEmail} />
+          <DetailRow label={t("Email") || "Email"} value={appointment.clientEmail} />
           <DetailRow label={t("Phone") || "Teléfono"} value={appointment.clientPhone} />
           <DetailRow label={t("Service") || "Servicio"} value={
             appointment.serviceName
@@ -80,7 +80,7 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
           <DetailRow label={t("Branch") || "Sucursal"} value={appointment.branchName} />
           <DetailRow label={t("Previous professional") || "Profesional anterior"} value={appointment.staffName} />
           <DetailRow label={t("Payment") || "Pago"} value={appointment.payment} />
-          <DetailRow label="Total" value={formatMoney(appointment.totalCost)} />
+          <DetailRow label={t("Total") || "Total"} value={formatMoney(appointment.totalCost)} />
           <div className="col-span-2">
             <DetailRow label={t("Observation") || "Observación"} value={appointment.observation} />
           </div>
@@ -112,7 +112,7 @@ const ReassignModal = ({ appointment, staff, onClose, onReassigned }) => {
           </button>
           <button type="button" onClick={handleConfirm} disabled={!staffId || submitting}
             className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50 cursor-pointer">
-            {submitting ? "Saving..." : t("Confirm") || "Confirmar"}
+            {submitting ? (t("Saving") || "Saving...") : (t("Confirm") || "Confirm")}
           </button>
         </div>
       </div>
@@ -167,7 +167,7 @@ const PendingReassignment = ({ onChange }) => {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-[var(--text-muted)]">Loading...</p>
+        <p className="text-sm text-[var(--text-muted)]">{t("Loading") || "Loading..."}</p>
       ) : appointments.length === 0 ? (
         <div className="bg-[var(--surface)] border border-[var(--border-subtle)] rounded-2xl p-8 text-center">
           <p className="text-sm text-[var(--text-muted)]">

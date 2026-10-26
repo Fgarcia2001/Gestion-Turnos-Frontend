@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { ModalOverlay, inputClass, labelClass } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
 import { IconX } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 // Modal compartido para cambiar el plan de un negocio (sin pasar por el
 // checkout de MercadoPago). Lo usan tanto SysAdminSubscriptions.jsx como
 // BusinessDetailModal.jsx, asi el comportamiento queda igual en los dos.
 const ChangePlanModal = ({ businessName, currentPlanId, plans, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   const otherPlans = plans.filter((p) => p.id !== currentPlanId);
   const [planId, setPlanId] = useState(otherPlans[0]?.id ?? "");
   const [submitting, setSubmitting] = useState(false);
@@ -19,7 +21,7 @@ const ChangePlanModal = ({ businessName, currentPlanId, plans, onClose, onConfir
       await onConfirm(planId);
       onClose();
     } catch (err) {
-      setError(err.message || "Failed to change the plan. Please try again.");
+      setError(err.message || (t("Failed to change the plan. Please try again.") || "Failed to change the plan. Please try again."));
       setSubmitting(false);
     }
   };
@@ -34,17 +36,17 @@ const ChangePlanModal = ({ businessName, currentPlanId, plans, onClose, onConfir
           <IconX />
         </button>
 
-        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Change plan</h2>
+        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t("Change plan") || "Change plan"}</h2>
         <p className="text-sm text-[var(--text-secondary)] mb-5">
-          Change the plan for <span className="font-semibold text-[var(--text-primary)]">"{businessName}"</span>.
-          This takes effect immediately, without going through checkout.
+          {t("changePlanModalDesc") || "Change the plan for"} <span className="font-semibold text-[var(--text-primary)]">"{businessName}"</span>.
+          {" "}{t("changePlanModalDesc2") || "This takes effect immediately, without going through checkout."}
         </p>
 
         {otherPlans.length === 0 ? (
-          <p className="text-sm text-[var(--text-muted)] mb-5">There are no other plans to switch to.</p>
+          <p className="text-sm text-[var(--text-muted)] mb-5">{t("There are no other plans to switch to.") || "There are no other plans to switch to."}</p>
         ) : (
           <div className="mb-5">
-            <label className={labelClass}>New plan</label>
+            <label className={labelClass}>{t("New plan") || "New plan"}</label>
             <select value={planId} onChange={(e) => setPlanId(e.target.value)} className={inputClass}>
               {otherPlans.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -67,14 +69,14 @@ const ChangePlanModal = ({ businessName, currentPlanId, plans, onClose, onConfir
             disabled={submitting}
             className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t("Cancel") || "Cancel"}
           </button>
           <button
             onClick={handleConfirm}
             disabled={submitting || otherPlans.length === 0}
             className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
           >
-            {submitting ? "Changing..." : "Change plan"}
+            {submitting ? (t("Changing...") || "Changing...") : (t("Change plan") || "Change plan")}
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ModalOverlay } from "../ManagmentBusinessComponents/Shared";
 import { IconX } from "../ManagmentBusinessComponents/Icons";
 import { IconSparkles } from "./SettingsIcons";
+import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 
 const CSS_ANIMATIONS = `
   @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
@@ -12,6 +13,7 @@ const CSS_ANIMATIONS = `
 // gratis el padre aplica el cambio directamente; si requiere pago, redirige a
 // initPoint en la misma pestaña y el botón queda en spinner.
 const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   const [confirming, setConfirming] = useState(false);
 
   if (!plan) return null;
@@ -41,13 +43,13 @@ const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
             <IconSparkles />
           </div>
 
-          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Change plan?</h2>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t("Change plan?") || "Change plan?"}</h2>
           <p className="text-sm text-[var(--text-secondary)] mb-2">
-            You are about to switch to <span className="font-semibold text-[var(--text-primary)]">{name}</span>
-            {price != null ? <> (${price}{durationDays ? ` / ${durationDays} days` : ""})</> : null}.
+            {t("You are about to switch to") || "You are about to switch to"} <span className="font-semibold text-[var(--text-primary)]">{name}</span>
+            {price != null ? <> (${price}{durationDays ? ` / ${durationDays} ${t("days") || "days"}` : ""})</> : null}.
           </p>
           <p className="text-xs text-[var(--text-muted)] mb-6">
-            You&apos;ll be redirected to MercadoPago to complete the payment. Free plans are applied instantly.
+            {t("changePlanRedirectNotice") || "You'll be redirected to MercadoPago to complete the payment. Free plans are applied instantly."}
           </p>
 
           <div className="flex gap-3">
@@ -56,14 +58,14 @@ const ChangePlanConfirmModal = ({ plan, onClose, onConfirm }) => {
               disabled={confirming}
               className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t("Cancel") || "Cancel"}
             </button>
             <button
               onClick={handleConfirm}
               disabled={confirming}
               className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
             >
-              {confirming ? "Redirecting…" : "Confirm"}
+              {confirming ? (t("Redirecting") || "Redirecting…") : (t("Confirm") || "Confirm")}
             </button>
           </div>
         </div>

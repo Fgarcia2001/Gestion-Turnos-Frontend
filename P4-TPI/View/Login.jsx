@@ -1,12 +1,13 @@
 import LoginForm from "../src/Components/ComponentsLogin/LoginForm";
 import ThemeToggle from "../src/Components/Shared/ThemeToggle";
+import LanguageToggle from "../src/Components/Shared/LanguageToggle";
 import { useTranslation } from "../CustomHooks/TraslateHook";
 import { useLandingContent } from "../CustomHooks/useLandingContent";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { t, toggleLanguage, language } = useTranslation();
+  const { t, language } = useTranslation();
   const content = useLandingContent();
   const brandName = content?.brandName || t("brandName");
   const heroTitle = (language === "en" ? content?.heroTitleEn : content?.heroTitleEs) || t("heroTitle");
@@ -27,26 +28,7 @@ const Login = () => {
       {/* Selector de Idioma y modo claro/oscuro, flotantes */}
       <div className="absolute top-6 right-6 z-10 flex items-center gap-2">
         <ThemeToggle />
-        <button
-          onClick={toggleLanguage}
-          className="bg-[var(--surface)] border border-[var(--border-subtle)] px-4 py-2 rounded-full shadow-sm hover:bg-[var(--surface-muted)] transition-all font-medium text-sm flex items-center gap-2"
-        >
-          <span
-            className={
-              language === "es" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-muted)]"
-            }
-          >
-            ES
-          </span>
-          <span className="text-[var(--text-faint)]">|</span>
-          <span
-            className={
-              language === "en" ? "font-bold text-[var(--text-primary)]" : "text-[var(--text-muted)]"
-            }
-          >
-            EN
-          </span>
-        </button>
+        <LanguageToggle />
       </div>
 
       {/* SECCIÓN IZQUIERDA: Hero / Info */}

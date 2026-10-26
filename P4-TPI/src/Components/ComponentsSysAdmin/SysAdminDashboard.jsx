@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchSysAdminDashboard } from "../../services/sysAdminService";
 import { BarChart, AppointmentTrendChart } from "./DashboardCharts";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const money = (value) =>
   Number(value || 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -15,6 +16,7 @@ const StatCard = ({ label, value }) => (
 const PLAN_DOT_COLORS = ["#2563eb", "#f59e0b", "#15803d", "#b91c1c", "#7c3aed", "#0ea5e9"];
 
 const SysAdminDashboard = () => {
+  const { t } = useTranslation();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -60,12 +62,12 @@ const SysAdminDashboard = () => {
   if (error || !data) {
     return (
       <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center mt-8">
-        <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the dashboard</p>
+        <p className="text-sm text-[var(--text-muted)] mb-4">{t("Load dashboard error") || "Couldn't load the dashboard summary."}</p>
         <button
           onClick={load}
           className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
         >
-          Retry
+          {t("Retry") || "Retry"}
         </button>
       </div>
     );
@@ -82,49 +84,49 @@ const SysAdminDashboard = () => {
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Dashboard</h2>
-        <p className="text-sm text-[var(--text-muted)]">Platform-wide overview across all businesses.</p>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Dashboard") || "Dashboard"}</h2>
+        <p className="text-sm text-[var(--text-muted)]">{t("sysAdminDashboardSubtitle") || "Platform-wide overview across all businesses."}</p>
       </div>
 
       {/* Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard label="Total Businesses" value={overview.totalBusinesses ?? 0} />
-        <StatCard label="Active Businesses" value={overview.activeBusinesses ?? 0} />
-        <StatCard label="Total Users" value={overview.totalUsers ?? 0} />
-        <StatCard label="Total Appointments" value={overview.totalAppointments ?? 0} />
+        <StatCard label={t("Total Businesses") || "Total Businesses"} value={overview.totalBusinesses ?? 0} />
+        <StatCard label={t("Active Businesses") || "Active Businesses"} value={overview.activeBusinesses ?? 0} />
+        <StatCard label={t("Total Users") || "Total Users"} value={overview.totalUsers ?? 0} />
+        <StatCard label={t("Total Appointments") || "Total Appointments"} value={overview.totalAppointments ?? 0} />
       </div>
 
       {/* Revenue & subscriptions */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="Current Month Revenue" value={`$${money(revenue.currentMonth)}`} />
-        <StatCard label="Active Subscriptions" value={subscriptions.active ?? 0} />
-        <StatCard label="Expired Subscriptions" value={subscriptions.expired ?? 0} />
+        <StatCard label={t("Current Month Revenue") || "Current Month Revenue"} value={`$${money(revenue.currentMonth)}`} />
+        <StatCard label={t("Active Subscriptions") || "Active Subscriptions"} value={subscriptions.active ?? 0} />
+        <StatCard label={t("Expired Subscriptions") || "Expired Subscriptions"} value={subscriptions.expired ?? 0} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
-          <p className="text-sm font-semibold text-[var(--text-primary)]">Revenue Evolution</p>
-          <BarChart data={revenue.evolution} valueKey="revenue" formatValue={(v) => `$${money(v)}`} emptyLabel="No revenue data" />
+          <p className="text-sm font-semibold text-[var(--text-primary)]">{t("Revenue Evolution") || "Revenue Evolution"}</p>
+          <BarChart data={revenue.evolution} valueKey="revenue" formatValue={(v) => `$${money(v)}`} emptyLabel={t("No revenue data") || "No revenue data"} />
         </div>
         <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
-          <p className="text-sm font-semibold text-[var(--text-primary)]">Business Growth</p>
-          <BarChart data={businessGrowth} valueKey="count" emptyLabel="No business growth data" />
+          <p className="text-sm font-semibold text-[var(--text-primary)]">{t("Business Growth") || "Business Growth"}</p>
+          <BarChart data={businessGrowth} valueKey="count" emptyLabel={t("No business growth data") || "No business growth data"} />
         </div>
       </div>
 
       {/* Appointment trend */}
       <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
-        <p className="text-sm font-semibold text-[var(--text-primary)]">Appointment Trend</p>
-        <AppointmentTrendChart data={appointmentTrend} emptyLabel="No appointment data" />
+        <p className="text-sm font-semibold text-[var(--text-primary)]">{t("Appointment Trend") || "Appointment Trend"}</p>
+        <AppointmentTrendChart data={appointmentTrend} emptyLabel={t("No appointment data") || "No appointment data"} />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Plan distribution */}
         <div className="bg-[var(--surface)] rounded-2xl p-5 border border-[var(--border-subtle)]">
-          <p className="text-sm font-semibold text-[var(--text-primary)] mb-4">Plan Distribution</p>
+          <p className="text-sm font-semibold text-[var(--text-primary)] mb-4">{t("Plan Distribution") || "Plan Distribution"}</p>
           {planDistribution.length === 0 ? (
-            <p className="text-xs text-[var(--text-muted)] text-center py-4">No plan data</p>
+            <p className="text-xs text-[var(--text-muted)] text-center py-4">{t("No plan data") || "No plan data"}</p>
           ) : (
             <div className="flex flex-col gap-2.5">
               {planDistribution.map((plan, i) => (
@@ -141,14 +143,14 @@ const SysAdminDashboard = () => {
         {/* Top businesses */}
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
           <div className="px-5 py-4 border-b border-[var(--border-faint)]">
-            <p className="text-sm font-semibold text-[var(--text-primary)]">Top Businesses</p>
+            <p className="text-sm font-semibold text-[var(--text-primary)]">{t("Top Businesses") || "Top Businesses"}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-[var(--text-muted)] uppercase tracking-wide">
-                  <th className="px-5 py-3 font-semibold">Business</th>
-                  <th className="px-5 py-3 font-semibold text-right">Appointments</th>
+                  <th className="px-5 py-3 font-semibold">{t("businessLabel") || "Business"}</th>
+                  <th className="px-5 py-3 font-semibold text-right">{t("sysAdminAppointmentsColumn") || "Appointments"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -160,7 +162,7 @@ const SysAdminDashboard = () => {
                 ))}
                 {topBusinesses.length === 0 && (
                   <tr className="border-t border-[var(--border-faint)]">
-                    <td colSpan={2} className="px-5 py-8 text-center text-sm text-[var(--text-muted)]">No businesses found.</td>
+                    <td colSpan={2} className="px-5 py-8 text-center text-sm text-[var(--text-muted)]">{t("No businesses found.") || "No businesses found."}</td>
                   </tr>
                 )}
               </tbody>

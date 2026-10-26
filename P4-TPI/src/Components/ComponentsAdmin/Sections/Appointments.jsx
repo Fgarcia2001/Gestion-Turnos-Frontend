@@ -56,8 +56,14 @@ const IconPlus = () => (
 );
 
 // ── Data ──────────────────────────────────────────────────────────────────────
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const MONTHS = {
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  es: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+};
+const DAYS = {
+  en: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+  es: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sá"],
+};
 
 const CSS_ANIMATIONS = `
   @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
@@ -67,7 +73,9 @@ const CSS_ANIMATIONS = `
 
 
 // ── Calendar ──────────────────────────────────────────────────────────────────
-const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange }) => {
+const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange, language }) => {
+  const months = MONTHS[language] || MONTHS.en;
+  const days = DAYS[language] || DAYS.en;
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
 
@@ -96,13 +104,13 @@ const Calendar = ({ selected, onSelect, appointments, viewDate, onViewDateChange
         <button onClick={() => onViewDateChange(new Date(year, month - 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] transition-colors">
           <IconChevronLeft />
         </button>
-        <span className="text-sm font-semibold text-[var(--text-primary)]">{MONTHS[month]} {year}</span>
+        <span className="text-sm font-semibold text-[var(--text-primary)]">{months[month]} {year}</span>
         <button onClick={() => onViewDateChange(new Date(year, month + 1, 1))} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] transition-colors">
           <IconChevronRight />
         </button>
       </div>
       <div className="grid grid-cols-7 mb-1">
-        {DAYS.map(d => (
+        {days.map(d => (
           <div key={d} className="text-center text-[11px] font-semibold text-[var(--text-muted)] py-1">{d}</div>
         ))}
       </div>
@@ -144,15 +152,25 @@ const STATUS_STYLES = {
   Cancelled: "bg-[#fee2e2] text-[#b91c1c]",
 };
 
+// Claves de traducción para los valores de estado que guarda el backend
+// (en inglés): el valor almacenado no cambia, solo su representación visual.
+const STATUS_LABEL_KEYS = {
+  Pending: "statusPending",
+  Confirmed: "statusConfirmed",
+  Cancelled: "statusCancelled",
+};
+
 const StatusBadge = ({ status }) => {
+  const { t } = useTranslation();
   const cfg = STATUS_STYLES[status] || STATUS_STYLES.Confirmed;
   return (
-    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${cfg}`}>{status}</span>
+    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${cfg}`}>{t(STATUS_LABEL_KEYS[status]) || status}</span>
   );
 };
 
 // ── Status change menu ───────────────────────────────────────────────────────
 const StatusMenu = ({ status, onChangeStatus, disabled }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const current = APPOINTMENT_STATUS.find(s => s.label === status)?.value;
 
@@ -175,7 +193,7 @@ const StatusMenu = ({ status, onChangeStatus, disabled }) => {
                 onClick={() => { setOpen(false); if (s.value !== current) onChangeStatus(s.value); }}
                 className={`w-full text-left text-xs px-3 py-2 hover:bg-[var(--surface-muted)] transition-colors ${s.value === current ? "font-semibold text-[var(--text-primary)]" : "text-[var(--text-secondary)]"}`}
               >
-                {s.label}
+                {t(STATUS_LABEL_KEYS[s.label]) || s.label}
               </button>
             ))}
           </div>
@@ -254,7 +272,7 @@ const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
           </button>
         </div>
 
-        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">{t("Cancel appointment") || "Cancelar turno"}</h3>
+        <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4">{t("Cancel appointment") || "Cancel appointment"}</h3>
 
         <div className="bg-[var(--surface-muted-3)] rounded-xl p-4 space-y-2 mb-4">
           <p className="text-sm">
@@ -266,14 +284,14 @@ const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
             <span className="text-[var(--text-secondary)]">{appt.serviceName || "—"}</span>
           </p>
           <p className="text-sm">
-            <span className="font-semibold text-[var(--text-primary)]">{t("Date and time") || "Fecha y hora"}: </span>
-            <span className="text-[var(--text-secondary)]">{dateLabel} {t("at") || "a las"} {timeLabel}</span>
+            <span className="font-semibold text-[var(--text-primary)]">{t("Date and time") || "Date and time"}: </span>
+            <span className="text-[var(--text-secondary)]">{dateLabel} {t("at") || "at"} {timeLabel}</span>
           </p>
         </div>
 
         <div className="bg-[#fef3c7] border border-[#fde68a] rounded-xl px-4 py-3 mb-5">
           <p className="text-xs text-[#92400e] leading-relaxed">
-            {t("Cancel email warning") || "Se enviará un email al cliente avisándole que su turno fue cancelado."}
+            {t("Cancel email warning") || "An email will be sent to the client letting them know their appointment was cancelled."}
           </p>
         </div>
 
@@ -283,7 +301,7 @@ const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
             disabled={submitting}
             className="px-4 py-2 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {t("Back") || "Volver"}
+            {t("Back") || "Back"}
           </button>
           <button
             onClick={handleConfirm}
@@ -291,7 +309,7 @@ const CancelAppointmentModal = ({ appt, onClose, onConfirm }) => {
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm font-semibold transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting && <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />}
-            {t("Yes, cancel appointment") || "Sí, cancelar turno"}
+            {t("Yes, cancel appointment") || "Yes, cancel appointment"}
           </button>
         </div>
       </div>
@@ -392,7 +410,7 @@ const parseInitialDate = (value) => {
 };
 
 const Appointments = ({ initialDate }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const today = new Date();
   const initial = parseInitialDate(initialDate);
   const [selectedDay, setSelectedDay] = useState(initial ? initial.d : today.getDate());
@@ -462,7 +480,7 @@ const Appointments = ({ initialDate }) => {
 
   const handleAppointmentCreated = () => {
     setShowNewAppointment(false);
-    showToast(t("Appointment created") || "Turno creado correctamente.");
+    showToast(t("Appointment created") || "Appointment created successfully.");
     loadAppointments();
   };
 
@@ -473,19 +491,21 @@ const Appointments = ({ initialDate }) => {
     try {
       await updateAppointmentStatus(apptId, statusValue);
       if (statusValue === 2) {
-        showToast(t("Appointment cancelled, email sent") || "Turno cancelado. Se envió un email al cliente.");
+        showToast(t("Appointment cancelled, email sent") || "Appointment cancelled. An email was sent to the client.");
       }
     } catch (e) {
       console.error(e);
       setAppointments(prevAppointments);
-      showToast(e?.message || "No se pudo actualizar el turno. Inténtelo nuevamente.", true);
+      showToast(e?.message || (t("apptUpdateError") || "Couldn't update the appointment. Please try again."), true);
       throw e;
     }
   };
 
   const formatDate = (day) => {
     const d = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-    return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    const locale = language === "es" ? "es-ES" : "en-US";
+    const label = d.toLocaleDateString(locale, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    return language === "es" ? label.charAt(0).toUpperCase() + label.slice(1) : label;
   };
 
   return (
@@ -537,7 +557,7 @@ const Appointments = ({ initialDate }) => {
                 onChange={e => setSelectedBranchId(e.target.value || null)}
                 className="w-full text-sm bg-[var(--surface-muted-3)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-[var(--text-primary)] outline-none focus:border-[var(--brand)] transition-colors"
               >
-                <option value="">{t("All branches") || "All branches"}</option>
+                <option value="">{t("allBranches") || "All branches"}</option>
                 {branches.map(b => (
                   <option key={b.id || b.branchId} value={b.id || b.branchId}>
                     {b.name || b.branchName}
@@ -546,7 +566,7 @@ const Appointments = ({ initialDate }) => {
               </select>
             </div>
           )}
-          <Calendar selected={selectedDay} onSelect={setSelectedDay} appointments={appointments} viewDate={viewDate} onViewDateChange={setViewDate} />
+          <Calendar selected={selectedDay} onSelect={setSelectedDay} appointments={appointments} viewDate={viewDate} onViewDateChange={setViewDate} language={language} />
         </div>
 
         <div data-tour="appointments-list" className="flex-1 flex flex-col gap-3">
@@ -558,7 +578,7 @@ const Appointments = ({ initialDate }) => {
             <>
               <div className="mb-1">
                 <h2 className="text-lg font-bold text-[var(--text-primary)]">{formatDate(selectedDay)}</h2>
-                <p className="text-sm text-[var(--text-muted)]">{appointments.length} appointments scheduled</p>
+                <p className="text-sm text-[var(--text-muted)]">{(t("apptsScheduledCount") || "{count} appointments scheduled").replace("{count}", appointments.length)}</p>
               </div>
               {appointments.length === 0 ? (
                 <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">

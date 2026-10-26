@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ModalOverlay, inputClass, labelClass } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
 import { IconX, IconWarning } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const CSS_ANIMATIONS = `
   @keyframes fadeIn  { from { opacity: 0 } to { opacity: 1 } }
@@ -25,10 +26,10 @@ const isValidLimit = (value) => {
   return Number.isInteger(n) && (n === -1 || n >= 0);
 };
 
-const validate = (form) => {
-  if (!form.name || !form.name.trim()) return "Plan name is required.";
+const validate = (form, t) => {
+  if (!form.name || !form.name.trim()) return t("Plan name is required.") || "Plan name is required.";
   if (form.price === "" || form.price === null || Number.isNaN(Number(form.price)) || Number(form.price) < 0) {
-    return "Price must be a non-negative number.";
+    return t("Price must be a non-negative number.") || "Price must be a non-negative number.";
   }
   if (
     form.durationDays === "" ||
@@ -36,11 +37,11 @@ const validate = (form) => {
     !Number.isInteger(Number(form.durationDays)) ||
     Number(form.durationDays) < 0
   ) {
-    return "Duration (days) must be a non-negative whole number.";
+    return t("Duration (days) must be a non-negative whole number.") || "Duration (days) must be a non-negative whole number.";
   }
-  if (!isValidLimit(form.maxStaffAllowed)) return "Max staff allowed must be -1 (unlimited) or a non-negative whole number.";
-  if (!isValidLimit(form.maxBranchesAllowed)) return "Max branches allowed must be -1 (unlimited) or a non-negative whole number.";
-  if (!isValidLimit(form.maxServicesAllowed)) return "Max services allowed must be -1 (unlimited) or a non-negative whole number.";
+  if (!isValidLimit(form.maxStaffAllowed)) return t("Max staff allowed must be -1 (unlimited) or a non-negative whole number.") || "Max staff allowed must be -1 (unlimited) or a non-negative whole number.";
+  if (!isValidLimit(form.maxBranchesAllowed)) return t("Max branches allowed must be -1 (unlimited) or a non-negative whole number.") || "Max branches allowed must be -1 (unlimited) or a non-negative whole number.";
+  if (!isValidLimit(form.maxServicesAllowed)) return t("Max services allowed must be -1 (unlimited) or a non-negative whole number.") || "Max services allowed must be -1 (unlimited) or a non-negative whole number.";
   return "";
 };
 
@@ -57,6 +58,7 @@ const buildPayload = (form) => ({
 
 // ── Create / Edit Modal ─────────────────────────────────────────────────────
 export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState(() =>
     mode === "edit" && plan
       ? {
@@ -81,7 +83,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationError = validate(form);
+    const validationError = validate(form, t);
     if (validationError) {
       setError(validationError);
       return;
@@ -92,7 +94,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
       await onSave(buildPayload(form));
       onClose();
     } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || (t("Something went wrong. Please try again.") || "Something went wrong. Please try again."));
     } finally {
       setSubmitting(false);
     }
@@ -109,10 +111,10 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
             <h2 className="text-lg font-bold text-[var(--text-primary)]">
-              {mode === "edit" ? "Edit" : "Create"} <span className="text-[var(--text-muted)] font-semibold">Plan</span>
+              {mode === "edit" ? (t("Edit") || "Edit") : (t("Create") || "Create")} <span className="text-[var(--text-muted)] font-semibold">{t("Plan") || "Plan"}</span>
             </h2>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
-              {mode === "edit" ? "Update the plan details below" : "Fill in the details below"}
+              {mode === "edit" ? (t("Update the plan details below") || "Update the plan details below") : (t("Fill in the details below") || "Fill in the details below")}
             </p>
           </div>
           <button
@@ -132,25 +134,25 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className={labelClass}>Plan Name</label>
-            <input name="name" value={form.name} onChange={handleChange} className={inputClass} required placeholder="e.g. Pro" />
+            <label className={labelClass}>{t("Plan Name") || "Plan Name"}</label>
+            <input name="name" value={form.name} onChange={handleChange} className={inputClass} required placeholder={t("e.g. Pro") || "e.g. Pro"} />
           </div>
 
           <div>
-            <label className={labelClass}>Description</label>
+            <label className={labelClass}>{t("Description") || "Description"}</label>
             <textarea
               name="description"
               value={form.description}
               onChange={handleChange}
               className={inputClass}
               rows={3}
-              placeholder="Short description of the plan"
+              placeholder={t("Short description of the plan") || "Short description of the plan"}
             />
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <label className={labelClass}>Price</label>
+              <label className={labelClass}>{t("Price") || "Price"}</label>
               <input
                 name="price"
                 type="number"
@@ -164,7 +166,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
               />
             </div>
             <div className="flex-1">
-              <label className={labelClass}>Duration (days)</label>
+              <label className={labelClass}>{t("Duration (days)") || "Duration (days)"}</label>
               <input
                 name="durationDays"
                 type="number"
@@ -181,7 +183,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className={labelClass}>Max Staff</label>
+              <label className={labelClass}>{t("Max Staff") || "Max Staff"}</label>
               <input
                 name="maxStaffAllowed"
                 type="number"
@@ -190,10 +192,10 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
                 onChange={handleChange}
                 className={inputClass}
               />
-              <p className="text-[11px] text-[var(--text-muted)] mt-1">Use -1 for unlimited.</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">{t("Use -1 for unlimited.") || "Use -1 for unlimited."}</p>
             </div>
             <div>
-              <label className={labelClass}>Max Branches</label>
+              <label className={labelClass}>{t("Max Branches") || "Max Branches"}</label>
               <input
                 name="maxBranchesAllowed"
                 type="number"
@@ -202,10 +204,10 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
                 onChange={handleChange}
                 className={inputClass}
               />
-              <p className="text-[11px] text-[var(--text-muted)] mt-1">Use -1 for unlimited.</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">{t("Use -1 for unlimited.") || "Use -1 for unlimited."}</p>
             </div>
             <div>
-              <label className={labelClass}>Max Services</label>
+              <label className={labelClass}>{t("Max Services") || "Max Services"}</label>
               <input
                 name="maxServicesAllowed"
                 type="number"
@@ -214,7 +216,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
                 onChange={handleChange}
                 className={inputClass}
               />
-              <p className="text-[11px] text-[var(--text-muted)] mt-1">Use -1 for unlimited.</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-1">{t("Use -1 for unlimited.") || "Use -1 for unlimited."}</p>
             </div>
           </div>
 
@@ -226,7 +228,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
               onChange={handleChange}
               className="w-4 h-4 rounded border-[var(--border-subtle)] accent-[var(--brand)]"
             />
-            <span className="text-sm font-medium text-[var(--text-primary)]">Active</span>
+            <span className="text-sm font-medium text-[var(--text-primary)]">{t("Active") || "Active"}</span>
           </label>
 
           <div className="flex gap-3 pt-2">
@@ -235,14 +237,14 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
               onClick={onClose}
               className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors"
             >
-              Cancel
+              {t("Cancel") || "Cancel"}
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50"
             >
-              {submitting ? "Saving..." : mode === "edit" ? "Save changes" : "Create plan"}
+              {submitting ? (t("Saving...") || "Saving...") : mode === "edit" ? (t("Save changes") || "Save changes") : (t("Create plan") || "Create plan")}
             </button>
           </div>
         </form>
@@ -254,6 +256,7 @@ export const PlanFormModal = ({ mode, plan, onClose, onSave }) => {
 
 // ── Delete Confirmation Modal ────────────────────────────────────────────────
 export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
+  const { t } = useTranslation();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
@@ -264,7 +267,7 @@ export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
       await onConfirm(plan);
       onClose();
     } catch (err) {
-      setError(err.message || "Failed to delete plan. Please try again.");
+      setError(err.message || (t("Failed to delete plan. Please try again.") || "Failed to delete plan. Please try again."));
       setDeleting(false);
     }
   };
@@ -285,10 +288,10 @@ export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
             <IconWarning />
           </div>
 
-          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Delete plan?</h2>
-          <p className="text-sm text-[var(--text-secondary)] mb-2">You are about to delete</p>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t("Delete plan?") || "Delete plan?"}</h2>
+          <p className="text-sm text-[var(--text-secondary)] mb-2">{t("You are about to delete") || "You are about to delete"}</p>
           <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">"{plan?.name}"</p>
-          <p className="text-xs text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
+          <p className="text-xs text-[var(--text-muted)] mb-6">{t("This action cannot be undone.") || "This action cannot be undone."}</p>
 
           {error && (
             <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 text-left">
@@ -302,14 +305,14 @@ export const DeletePlanModal = ({ plan, onClose, onConfirm }) => {
               disabled={deleting}
               className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t("Cancel") || "Cancel"}
             </button>
             <button
               onClick={handleConfirm}
               disabled={deleting}
               className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50"
             >
-              {deleting ? "Deleting..." : "Delete"}
+              {deleting ? (t("Deleting...") || "Deleting...") : (t("Delete") || "Delete")}
             </button>
           </div>
         </div>

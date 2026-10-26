@@ -1,8 +1,10 @@
 // BusinessCard.jsx — presentational, clickable card for a single business in the SysAdmin businesses grid.
 import { useState } from "react";
 import { getBusinessInitials, statusStyle } from "./businessStatus";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const BusinessCard = ({ business, onClick }) => {
+  const { t } = useTranslation();
   const {
     name,
     urlLogo,
@@ -59,13 +61,13 @@ const BusinessCard = ({ business, onClick }) => {
       </span>
 
       <div className="flex flex-col gap-1 mt-4 text-xs text-[var(--text-tertiary)]">
-        <span><span className="font-bold text-[var(--text-primary)]">{branchCount ?? 0}</span> Sucursales</span>
-        <span><span className="font-bold text-[var(--text-primary)]">{staffCount ?? 0}</span> Profesionales</span>
-        <span><span className="font-bold text-[var(--text-primary)]">{clientCount ?? 0}</span> Clientes</span>
+        <span><span className="font-bold text-[var(--text-primary)]">{branchCount ?? 0}</span> {t("Branches") || "Branches"}</span>
+        <span><span className="font-bold text-[var(--text-primary)]">{staffCount ?? 0}</span> {t("Staff") || "Staff"}</span>
+        <span><span className="font-bold text-[var(--text-primary)]">{clientCount ?? 0}</span> {t("Clients") || "Clients"}</span>
       </div>
 
       <span className="mt-4 text-xs font-semibold text-[var(--text-primary)] bg-[var(--surface-muted)] px-4 py-2 rounded-xl">
-        Ver detalles
+        {t("View details") || "View details"}
       </span>
     </div>
   );

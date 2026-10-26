@@ -14,7 +14,7 @@ const ROLE_NAME_TO_ID = { Recepcionista: 1, Profesional: 2 };
 // ── Demote confirmation ───────────────────────────────────────────────────────
 // Se muestra al pasar un Profesional a Recepcionista: un recepcionista no atiende
 // clientes, así que sus turnos pasan a pendiente de reasignar.
-const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
+const DemoteConfirmModal = ({ row, t, submitting, onCancel, onConfirm }) => (
   <ModalOverlay onClose={onCancel}>
     <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
       <button type="button" onClick={onCancel}
@@ -26,10 +26,10 @@ const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
         <IconWarning />
       </div>
 
-      <h2 className="text-lg font-bold text-[var(--text-primary)] mb-2">Change role to Receptionist?</h2>
+      <h2 className="text-lg font-bold text-[var(--text-primary)] mb-2">{t("demoteModalTitle") || "Change role to Receptionist?"}</h2>
       <p className="text-sm text-[var(--text-secondary)] mb-6">
-        Receptionists can't attend clients. Any upcoming appointments assigned to{" "}
-        <span className="font-semibold text-[var(--text-primary)]">{row.staffName}</span> will be marked as pending reassignment.
+        {t("demoteWarningPre") || "Receptionists can't attend clients. Any upcoming appointments assigned to"}{" "}
+        <span className="font-semibold text-[var(--text-primary)]">{row.staffName}</span> {t("demoteWarningPost") || "will be marked as pending reassignment."}
       </p>
 
       <div className="flex items-center gap-3 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)] mb-6 text-left">
@@ -43,11 +43,11 @@ const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
       <div className="flex gap-3">
         <button type="button" onClick={onCancel} disabled={submitting}
           className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50">
-          Cancel
+          {t("Cancel") || "Cancel"}
         </button>
         <button type="button" onClick={onConfirm} disabled={submitting}
           className="flex-1 py-2.5 rounded-xl bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50">
-          {submitting ? "Saving..." : "Confirm"}
+          {submitting ? (t("Saving") || "Saving...") : (t("Confirm") || "Confirm")}
         </button>
       </div>
     </div>
@@ -55,7 +55,7 @@ const DemoteConfirmModal = ({ row, submitting, onCancel, onConfirm }) => (
 );
 
 // ── Edit Modal ────────────────────────────────────────────────────────────────
-export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
+export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
   const [form, setForm] = useState(() => {
     if (tab === "staff") {
       const matchedBranch = branches.find(
@@ -102,7 +102,7 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
       onClose();
     } catch (err) {
       setConfirmDemote(false);
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || t("errorGeneric") || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -117,12 +117,13 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
     doSave();
   };
 
-  const tabLabel = tab === "staff" ? "Staff" : tab === "client" ? "Client" : tab === "branch" ? "Branch" : "Service";
+  const tabLabel = tab === "staff" ? t("Staff") : tab === "client" ? t("Client") : tab === "branch" ? t("Branch") : t("Service");
 
   if (confirmDemote) {
     return (
       <DemoteConfirmModal
         row={form}
+        t={t}
         submitting={submitting}
         onCancel={() => setConfirmDemote(false)}
         onConfirm={doSave}
@@ -141,9 +142,9 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
             <h2 className="text-lg font-bold text-[var(--text-primary)]">
-              Edit <span className="text-[var(--text-muted)] font-semibold">{tabLabel}</span>
+              {t("Edit") || "Edit"} <span className="text-[var(--text-muted)] font-semibold">{tabLabel}</span>
             </h2>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Update the information below</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t("editModalSubtitle") || "Update the information below"}</p>
           </div>
           <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
@@ -171,23 +172,23 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
           {tab === "staff" && (
             <>
               <div>
-                <label className={labelClass}>Staff Name</label>
-                <input name="staffName" value={form.staffName || ""} onChange={handleChange} className={inputClass} required placeholder="Full name" />
+                <label className={labelClass}>{t("Staff Name") || "Staff Name"}</label>
+                <input name="staffName" value={form.staffName || ""} onChange={handleChange} className={inputClass} required placeholder={t("Full name") || "Full name"} />
               </div>
               <div>
-                <label className={labelClass}>Staff Email</label>
+                <label className={labelClass}>{t("Staff Email") || "Staff Email"}</label>
                 <input name="staffEmail" type="email" value={form.staffEmail || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
               </div>
               <div>
-                <label className={labelClass}>Password</label>
+                <label className={labelClass}>{t("Password") || "Password"}</label>
                 <input name="password" type="password" value={form.password || ""} onChange={handleChange} className={inputClass} required minLength={6} placeholder="••••••••" autoComplete="new-password" />
               </div>
               <div>
-                <label className={labelClass}>Staff Phone</label>
+                <label className={labelClass}>{t("Staff Phone") || "Staff Phone"}</label>
                 <PhoneField name="staffPhone" value={form.staffPhone} onChange={handleChange} />
               </div>
               <div>
-                <label className={labelClass}>Photo URL</label>
+                <label className={labelClass}>{t("Photo URL") || "Photo URL"}</label>
                 <div className="relative">
                   <input name="staffLinkPhoto" value={form.staffLinkPhoto || ""} onChange={handleChange} className={inputClass + " pl-9"} placeholder="https://..." />
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"><IconPhoto /></span>
@@ -196,21 +197,21 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
                   <div className="mt-2 flex items-center gap-2">
                     <img src={form.staffLinkPhoto} alt="preview" className="w-10 h-10 rounded-full object-cover border border-[var(--border-subtle)]"
                       onError={(e) => e.target.style.display = "none"} />
-                    <span className="text-xs text-[var(--text-muted)]">Photo preview</span>
+                    <span className="text-xs text-[var(--text-muted)]">{t("Photo preview") || "Photo preview"}</span>
                   </div>
                 )}
               </div>
               <div>
-                <label className={labelClass}>Role</label>
+                <label className={labelClass}>{t("Role") || "Role"}</label>
                 <select name="rol" value={form.rol || ""} onChange={handleChange} className={inputClass}>
-                  <option value={1}>Recepcionista</option>
-                  <option value={2}>Profesional</option>
+                  <option value={1}>{t("Receptionist") || "Receptionist"}</option>
+                  <option value={2}>{t("Professional") || "Professional"}</option>
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Branch</label>
+                <label className={labelClass}>{t("Branch") || "Branch"}</label>
                 <select name="branchId" value={form.branchId || ""} onChange={handleChange} className={inputClass} required>
-                  <option value="" disabled>Select a branch</option>
+                  <option value="" disabled>{t("selectBranchPlaceholder") || "Select a branch"}</option>
                   {branches.map((b) => (
                     <option key={b.id ?? b.branchId} value={b.id ?? b.branchId}>
                       {b.name ?? b.branchName}
@@ -225,19 +226,19 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
           {tab === "client" && (
             <>
               <div>
-                <label className={labelClass}>Name</label>
-                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Full name" />
+                <label className={labelClass}>{t("Name") || "Name"}</label>
+                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder={t("Full name") || "Full name"} />
               </div>
               <div>
-                <label className={labelClass}>Email</label>
+                <label className={labelClass}>{t("Email") || "Email"}</label>
                 <input name="email" type="email" value={form.email || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
               </div>
               <div>
-                <label className={labelClass}>Phone</label>
+                <label className={labelClass}>{t("Phone") || "Phone"}</label>
                 <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
               <div>
-                <label className={labelClass}>Birthday</label>
+                <label className={labelClass}>{t("Birthday") || "Birthday"}</label>
                 <input name="birthday" type="date" value={form.birthday || ""} onChange={handleChange} className={inputClass} />
               </div>
             </>
@@ -247,20 +248,20 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
           {tab === "branch" && (
             <>
               <div>
-                <label className={labelClass}>Branch Name</label>
-                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Branch name" />
+                <label className={labelClass}>{t("Branch Name") || "Branch Name"}</label>
+                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder={t("Branch Name") || "Branch name"} />
               </div>
               <div className="relative">
-                <label className={labelClass}>Address</label>
-                <AddressAutocomplete name="address" value={form.address || ""} onChange={handleChange} onSelect={handleAddressSelect} className={inputClass} placeholder="Street address" />
+                <label className={labelClass}>{t("Address") || "Address"}</label>
+                <AddressAutocomplete name="address" value={form.address || ""} onChange={handleChange} onSelect={handleAddressSelect} className={inputClass} placeholder={t("Address") || "Street address"} />
               </div>
               <div>
-                <label className={labelClass}>Phone</label>
+                <label className={labelClass}>{t("Phone") || "Phone"}</label>
                 <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
               <div className="relative">
-                <label className={labelClass}>City</label>
-                <CityAutocomplete name="city" value={form.city || ""} onChange={handleChange} onSelect={(city) => setForm((prev) => ({ ...prev, city }))} className={inputClass} placeholder="City" />
+                <label className={labelClass}>{t("City") || "City"}</label>
+                <CityAutocomplete name="city" value={form.city || ""} onChange={handleChange} onSelect={(city) => setForm((prev) => ({ ...prev, city }))} className={inputClass} placeholder={t("City") || "City"} />
               </div>
             </>
           )}
@@ -269,24 +270,24 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
           {tab === "service" && (
             <>
               <div>
-                <label className={labelClass}>Service Name</label>
-                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Service name" />
+                <label className={labelClass}>{t("Service Name") || "Service Name"}</label>
+                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder={t("Service Name") || "Service name"} />
               </div>
               <div>
-                <label className={labelClass}>Category</label>
-                <input name="categoria" value={form.categoria || ""} onChange={handleChange} className={inputClass} placeholder="Category" />
+                <label className={labelClass}>{t("Category") || "Category"}</label>
+                <input name="categoria" value={form.categoria || ""} onChange={handleChange} className={inputClass} placeholder={t("Category") || "Category"} />
               </div>
               <div>
-                <label className={labelClass}>Description</label>
-                <input name="description" value={form.description || ""} onChange={handleChange} className={inputClass} placeholder="Short description" />
+                <label className={labelClass}>{t("Description") || "Description"}</label>
+                <input name="description" value={form.description || ""} onChange={handleChange} className={inputClass} placeholder={t("shortDescriptionPlaceholder") || "Short description"} />
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className={labelClass}>Duration</label>
+                  <label className={labelClass}>{t("Duration") || "Duration"}</label>
                   <input name="duration" value={form.duration || ""} onChange={handleChange} className={inputClass} placeholder="e.g. 30 min" />
                 </div>
                 <div className="flex-1">
-                  <label className={labelClass}>Price</label>
+                  <label className={labelClass}>{t("Price") || "Price"}</label>
                   <input name="price" value={form.price || ""} onChange={handleChange} className={inputClass} placeholder="$0.00" />
                 </div>
               </div>
@@ -297,11 +298,11 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
               className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors">
-              Cancel
+              {t("Cancel") || "Cancel"}
             </button>
             <button type="submit" disabled={submitting}
               className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50">
-              {submitting ? "Saving..." : "Save changes"}
+              {submitting ? (t("Saving") || "Saving...") : (t("Save changes") || "Save changes")}
             </button>
           </div>
         </form>
@@ -311,7 +312,7 @@ export const EditModal = ({ row, tab, branches = [], onClose, onSave }) => {
 };
 
 // ── Create Modal ──────────────────────────────────────────────────────────────
-export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
+export const CreateModal = ({ tab, t, branches = [], onClose, onSave }) => {
   const [form, setForm] = useState(() => (tab === "staff" ? { rol: 1 } : {}));
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -336,13 +337,13 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
       await onSave(form);
       onClose();
     } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || t("errorGeneric") || "Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const tabLabel = tab === "staff" ? "Staff" : tab === "client" ? "Client" : tab === "branch" ? "Branch" : "Service";
+  const tabLabel = tab === "staff" ? t("Staff") : tab === "client" ? t("Client") : tab === "branch" ? t("Branch") : t("Service");
 
   return (
     <ModalOverlay onClose={onClose}>
@@ -354,9 +355,9 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
         <div className="flex items-center justify-between mb-5 w-full">
           <div>
             <h2 className="text-lg font-bold text-[var(--text-primary)]">
-              Create <span className="text-[var(--text-muted)] font-semibold">{tabLabel}</span>
+              {t("Create") || "Create"} <span className="text-[var(--text-muted)] font-semibold">{tabLabel}</span>
             </h2>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Fill in the details below</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t("createModalSubtitle") || "Fill in the details below"}</p>
           </div>
           <button type="button" onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
@@ -375,39 +376,39 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
           {tab === "staff" && (
             <>
               <div>
-                <label className={labelClass}>Staff Name</label>
-                <input name="staffName" value={form.staffName || ""} onChange={handleChange} className={inputClass} required placeholder="Full name" />
+                <label className={labelClass}>{t("Staff Name") || "Staff Name"}</label>
+                <input name="staffName" value={form.staffName || ""} onChange={handleChange} className={inputClass} required placeholder={t("Full name") || "Full name"} />
               </div>
               <div>
-                <label className={labelClass}>Staff Email</label>
+                <label className={labelClass}>{t("Staff Email") || "Staff Email"}</label>
                 <input name="staffEmail" type="email" value={form.staffEmail || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
               </div>
               <div>
-                <label className={labelClass}>Password</label>
+                <label className={labelClass}>{t("Password") || "Password"}</label>
                 <input name="password" type="password" value={form.password || ""} onChange={handleChange} className={inputClass} required minLength={6} placeholder="••••••••" autoComplete="new-password" />
               </div>
               <div>
-                <label className={labelClass}>Staff Phone</label>
+                <label className={labelClass}>{t("Staff Phone") || "Staff Phone"}</label>
                 <PhoneField name="staffPhone" value={form.staffPhone} onChange={handleChange} />
               </div>
               <div>
-                <label className={labelClass}>Photo URL</label>
+                <label className={labelClass}>{t("Photo URL") || "Photo URL"}</label>
                 <div className="relative">
                   <input name="staffLinkPhoto" value={form.staffLinkPhoto || ""} onChange={handleChange} className={inputClass + " pl-9"} placeholder="https://..." />
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"><IconPhoto /></span>
                 </div>
               </div>
               <div>
-                <label className={labelClass}>Role</label>
+                <label className={labelClass}>{t("Role") || "Role"}</label>
                 <select name="rol" value={form.rol} onChange={handleChange} className={inputClass}>
-                  <option value={1}>Recepcionista</option>
-                  <option value={2}>Profesional</option>
+                  <option value={1}>{t("Receptionist") || "Receptionist"}</option>
+                  <option value={2}>{t("Professional") || "Professional"}</option>
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Branch</label>
+                <label className={labelClass}>{t("Branch") || "Branch"}</label>
                 <select name="branchId" value={form.branchId || ""} onChange={handleChange} className={inputClass} required>
-                  <option value="" disabled>Select a branch</option>
+                  <option value="" disabled>{t("selectBranchPlaceholder") || "Select a branch"}</option>
                   {branches.map((b) => (
                     <option key={b.id ?? b.branchId} value={b.id ?? b.branchId}>
                       {b.name ?? b.branchName}
@@ -422,19 +423,19 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
           {tab === "client" && (
             <>
               <div>
-                <label className={labelClass}>Name</label>
-                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Full name" />
+                <label className={labelClass}>{t("Name") || "Name"}</label>
+                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder={t("Full name") || "Full name"} />
               </div>
               <div>
-                <label className={labelClass}>Email</label>
+                <label className={labelClass}>{t("Email") || "Email"}</label>
                 <input name="email" type="email" value={form.email || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
               </div>
               <div>
-                <label className={labelClass}>Phone</label>
+                <label className={labelClass}>{t("Phone") || "Phone"}</label>
                 <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
               <div>
-                <label className={labelClass}>Birthday</label>
+                <label className={labelClass}>{t("Birthday") || "Birthday"}</label>
                 <input name="birthday" type="date" value={form.birthday || ""} onChange={handleChange} className={inputClass} />
               </div>
             </>
@@ -444,20 +445,20 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
           {tab === "branch" && (
             <>
               <div>
-                <label className={labelClass}>Branch Name</label>
-                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Branch name" />
+                <label className={labelClass}>{t("Branch Name") || "Branch Name"}</label>
+                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder={t("Branch Name") || "Branch name"} />
               </div>
               <div className="relative">
-                <label className={labelClass}>Address</label>
-                <AddressAutocomplete name="address" value={form.address || ""} onChange={handleChange} onSelect={handleAddressSelect} className={inputClass} placeholder="Street address" />
+                <label className={labelClass}>{t("Address") || "Address"}</label>
+                <AddressAutocomplete name="address" value={form.address || ""} onChange={handleChange} onSelect={handleAddressSelect} className={inputClass} placeholder={t("Address") || "Street address"} />
               </div>
               <div>
-                <label className={labelClass}>Phone</label>
+                <label className={labelClass}>{t("Phone") || "Phone"}</label>
                 <PhoneField name="phone" value={form.phone} onChange={handleChange} />
               </div>
               <div className="relative">
-                <label className={labelClass}>City</label>
-                <CityAutocomplete name="city" value={form.city || ""} onChange={handleChange} onSelect={(city) => setForm((prev) => ({ ...prev, city }))} className={inputClass} placeholder="City" />
+                <label className={labelClass}>{t("City") || "City"}</label>
+                <CityAutocomplete name="city" value={form.city || ""} onChange={handleChange} onSelect={(city) => setForm((prev) => ({ ...prev, city }))} className={inputClass} placeholder={t("City") || "City"} />
               </div>
             </>
           )}
@@ -466,24 +467,24 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
           {tab === "service" && (
             <>
               <div>
-                <label className={labelClass}>Service Name</label>
-                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder="Service name" />
+                <label className={labelClass}>{t("Service Name") || "Service Name"}</label>
+                <input name="name" value={form.name || ""} onChange={handleChange} className={inputClass} required placeholder={t("Service Name") || "Service name"} />
               </div>
               <div>
-                <label className={labelClass}>Category</label>
-                <input name="categoria" value={form.categoria || ""} onChange={handleChange} className={inputClass} placeholder="Category" />
+                <label className={labelClass}>{t("Category") || "Category"}</label>
+                <input name="categoria" value={form.categoria || ""} onChange={handleChange} className={inputClass} placeholder={t("Category") || "Category"} />
               </div>
               <div>
-                <label className={labelClass}>Description</label>
-                <input name="description" value={form.description || ""} onChange={handleChange} className={inputClass} placeholder="Short description" />
+                <label className={labelClass}>{t("Description") || "Description"}</label>
+                <input name="description" value={form.description || ""} onChange={handleChange} className={inputClass} placeholder={t("shortDescriptionPlaceholder") || "Short description"} />
               </div>
               <div className="flex gap-4">
                 <div className="flex-1">
-                  <label className={labelClass}>Duration</label>
+                  <label className={labelClass}>{t("Duration") || "Duration"}</label>
                   <input name="duration" value={form.duration || ""} onChange={handleChange} className={inputClass} placeholder="e.g. 30 min" />
                 </div>
                 <div className="flex-1">
-                  <label className={labelClass}>Price</label>
+                  <label className={labelClass}>{t("Price") || "Price"}</label>
                   <input name="price" value={form.price || ""} onChange={handleChange} className={inputClass} placeholder="$0.00" />
                 </div>
               </div>
@@ -494,11 +495,11 @@ export const CreateModal = ({ tab, branches = [], onClose, onSave }) => {
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
               className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors">
-              Cancel
+              {t("Cancel") || "Cancel"}
             </button>
             <button type="submit" disabled={submitting}
               className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50">
-              {submitting ? "Creating..." : "Create"}
+              {submitting ? (t("Creating") || "Creating...") : (t("Create") || "Create")}
             </button>
           </div>
         </form>
@@ -518,7 +519,7 @@ const emptyDay = (day) => ({ day, isActive: false, startTime: "09:00", endTime: 
 const toHm = (value) => (typeof value === "string" ? value.slice(0, 5) : value);
 const toHms = (value) => (value && value.length === 5 ? `${value}:00` : value);
 
-export const SchedulesModal = ({ row, onClose, onSave }) => {
+export const SchedulesModal = ({ row, t, onClose, onSave }) => {
   const branchId = row.id ?? row.branchId;
   const [schedules, setSchedules] = useState(DAYS.map(emptyDay));
   const [loading, setLoading] = useState(true);
@@ -546,13 +547,13 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
         );
       })
       .catch(() => {
-        if (active) setError("No se pudo cargar el horario actual.");
+        if (active) setError(t("scheduleLoadError") || "Could not load the current schedule.");
       })
       .finally(() => {
         if (active) setLoading(false);
       });
     return () => { active = false; };
-  }, [branchId]);
+  }, [branchId, t]);
 
   const toggle = (i) =>
     setSchedules((prev) => prev.map((s, idx) => (idx === i ? { ...s, isActive: !s.isActive } : s)));
@@ -566,11 +567,11 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
     for (const s of schedules) {
       if (!s.isActive) continue;
       if (!s.startTime || !s.endTime || s.startTime >= s.endTime) {
-        setError(`${s.day}: la hora de inicio debe ser anterior a la hora de fin.`);
+        setError((t("scheduleStartBeforeEnd") || "{day}: the start time must be before the end time.").replace("{day}", t(s.day) || s.day));
         return;
       }
       if (!s.slotDurationMinutes || Number(s.slotDurationMinutes) <= 0) {
-        setError(`${s.day}: la duración del turno debe ser mayor a 0.`);
+        setError((t("scheduleDurationPositive") || "{day}: the slot duration must be greater than 0.").replace("{day}", t(s.day) || s.day));
         return;
       }
     }
@@ -590,7 +591,7 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
       onSave({ ...row, schedules });
       onClose();
     } catch (err) {
-      setError(err.message || "No se pudo guardar el horario.");
+      setError(err.message || t("scheduleSaveError") || "Could not save the schedule.");
     } finally {
       setSaving(false);
     }
@@ -606,9 +607,9 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-lg font-bold text-[var(--text-primary)]">
-              Horarios <span className="text-[var(--text-muted)] font-semibold">— {row.name}</span>
+              {t("Schedules") || "Schedules"} <span className="text-[var(--text-muted)] font-semibold">— {row.name}</span>
             </h2>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Activá los días y definí el horario de atención</p>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">{t("scheduleModalSubtitle") || "Turn on the days and set the opening hours"}</p>
           </div>
           <button onClick={onClose} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]">
             <IconX />
@@ -641,12 +642,12 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
                 </button>
 
                 {/* Day name */}
-                <span className="text-sm font-semibold text-[var(--text-primary)] w-24 shrink-0">{s.day}</span>
+                <span className="text-sm font-semibold text-[var(--text-primary)] w-24 shrink-0">{t(s.day) || s.day}</span>
 
                 {s.isActive ? (
                   <div className="flex items-center gap-2 flex-1 flex-wrap">
                     <input type="time" value={s.startTime} onChange={(e) => setField(i, "startTime", e.target.value)} className={timeInput} />
-                    <span className="text-xs text-[var(--text-muted)] font-medium">a</span>
+                    <span className="text-xs text-[var(--text-muted)] font-medium">{t("to") || "to"}</span>
                     <input type="time" value={s.endTime} onChange={(e) => setField(i, "endTime", e.target.value)} className={timeInput} />
                     <div className="flex items-center gap-1.5 ml-auto">
                       <IconClock />
@@ -658,11 +659,11 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
                         onChange={(e) => setField(i, "slotDurationMinutes", e.target.value)}
                         className={timeInput + " w-16"}
                       />
-                      <span className="text-xs text-[var(--text-muted)]">min</span>
+                      <span className="text-xs text-[var(--text-muted)]">{t("minutesAbbrev") || "min"}</span>
                     </div>
                   </div>
                 ) : (
-                  <span className="text-xs text-[var(--text-muted)] italic flex-1">Cerrado</span>
+                  <span className="text-xs text-[var(--text-muted)] italic flex-1">{t("Closed") || "Closed"}</span>
                 )}
               </div>
             ))}
@@ -673,11 +674,11 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
         <div className="flex gap-3 mt-6">
           <button onClick={onClose} disabled={saving}
             className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50">
-            Cancelar
+            {t("Cancel") || "Cancel"}
           </button>
           <button onClick={handleSave} disabled={loading || saving}
             className="flex-1 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-50">
-            {saving ? "Guardando..." : "Guardar horario"}
+            {saving ? (t("Saving") || "Saving...") : (t("Save schedule") || "Save schedule")}
           </button>
         </div>
       </div>
@@ -686,7 +687,7 @@ export const SchedulesModal = ({ row, onClose, onSave }) => {
 };
 
 // ── Delete Confirmation Modal ─────────────────────────────────────────────────
-export const DeleteModal = ({ row, onClose, onConfirm }) => (
+export const DeleteModal = ({ row, t, onClose, onConfirm }) => (
   <ModalOverlay onClose={onClose}>
     <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
       <button onClick={onClose}
@@ -698,10 +699,10 @@ export const DeleteModal = ({ row, onClose, onConfirm }) => (
         <IconWarning />
       </div>
 
-      <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">Delete record?</h2>
-      <p className="text-sm text-[var(--text-secondary)] mb-2">You are about to permanently delete</p>
+      <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t("deleteRecordTitle") || "Delete record?"}</h2>
+      <p className="text-sm text-[var(--text-secondary)] mb-2">{t("deleteRecordWarning") || "You are about to permanently delete"}</p>
       <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">"{row.name || row.staffName}"</p>
-      <p className="text-xs text-[var(--text-muted)] mb-6">This action cannot be undone.</p>
+      <p className="text-xs text-[var(--text-muted)] mb-6">{t("actionCannotBeUndone") || "This action cannot be undone."}</p>
 
       <div className="flex items-center gap-3 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)] mb-6 text-left">
         <Avatar initials={row.initials || row.staffName?.charAt(0) || row.name?.charAt(0) || "U"} color={row.color} photo={row.photo || row.staffLinkPhoto || null} />
@@ -714,11 +715,11 @@ export const DeleteModal = ({ row, onClose, onConfirm }) => (
       <div className="flex gap-3">
         <button onClick={onClose}
           className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors">
-          Cancel
+          {t("Cancel") || "Cancel"}
         </button>
         <button onClick={() => { onConfirm(row); onClose(); }}
           className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors">
-          Delete
+          {t("Delete") || "Delete"}
         </button>
       </div>
     </div>

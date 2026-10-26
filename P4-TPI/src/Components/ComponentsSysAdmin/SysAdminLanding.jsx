@@ -5,6 +5,7 @@ import { translateText } from "../../services/translateService";
 import { fetchPlans } from "../../services/api";
 import { IconMail, IconPhone } from "../ComponentsHome/FooterIcons";
 import { SOCIAL_LINKS } from "../ComponentsHome/socialLinksConfig";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const SkeletonForm = () => (
   <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 animate-pulse">
@@ -35,7 +36,9 @@ const IconMoon = () => (
   </svg>
 );
 
-const Field = ({ label, value, onChange, textarea, onTranslate, translating }) => (
+const Field = ({ label, value, onChange, textarea, onTranslate, translating }) => {
+  const { t } = useTranslation();
+  return (
   <div className="flex flex-col gap-1.5">
     <div className="flex items-center justify-between gap-2">
       <label className="text-xs font-semibold text-[var(--text-tertiary)]">{label}</label>
@@ -44,11 +47,11 @@ const Field = ({ label, value, onChange, textarea, onTranslate, translating }) =
           type="button"
           onClick={onTranslate}
           disabled={translating || !value}
-          title="Auto-translate to English"
+          title={t("Auto-translate to English") || "Auto-translate to English"}
           className="flex items-center gap-1 text-[10px] font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
         >
           <IconTranslate />
-          {translating ? "Translating..." : "Translate → EN"}
+          {translating ? (t("Translating...") || "Translating...") : (t("Translate → EN") || "Translate → EN")}
         </button>
       )}
     </div>
@@ -67,7 +70,8 @@ const Field = ({ label, value, onChange, textarea, onTranslate, translating }) =
       />
     )}
   </div>
-);
+  );
+};
 
 // Mini mockup del hero + seccion de planes de la landing (Home.jsx,
 // HeroSection.jsx y PlansSection.jsx), a escala reducida, reflejando en vivo
@@ -93,16 +97,18 @@ const LivePreview = ({
   accentColor,
   previewTheme,
   onToggleTheme,
-}) => (
+}) => {
+  const { t } = useTranslation();
+  return (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
-      <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">Live preview</p>
+      <p className="text-xs font-semibold text-[var(--text-tertiary)] uppercase tracking-wide">{t("Live preview") || "Live preview"}</p>
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onToggleTheme}
           aria-label={previewTheme === "dark" ? "Preview in light mode" : "Preview in dark mode"}
-          title={previewTheme === "dark" ? "Light mode" : "Dark mode"}
+          title={previewTheme === "dark" ? (t("Light mode") || "Light mode") : (t("Dark mode") || "Dark mode")}
           className="flex items-center justify-center w-7 h-7 rounded-full bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] shadow-sm hover:bg-[var(--surface-muted)] transition-all"
         >
           {previewTheme === "dark" ? <IconSun /> : <IconMoon />}
@@ -225,7 +231,8 @@ const LivePreview = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 const ColorField = ({ label, value, onChange }) => (
   <div className="flex flex-col gap-1.5">
@@ -275,6 +282,7 @@ const mapResponseToForm = (data) => ({
 });
 
 const SysAdminLanding = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -373,7 +381,7 @@ const SysAdminLanding = () => {
       const translated = await translateText(text);
       setForm((prev) => ({ ...prev, [enField]: translated }));
     } catch (err) {
-      showToast(err.message || "Translation failed. Please try again.");
+      showToast(err.message || (t("Translation failed. Please try again.") || "Translation failed. Please try again."));
     } finally {
       setTranslating((prev) => ({ ...prev, [esField]: false }));
     }
@@ -383,9 +391,9 @@ const SysAdminLanding = () => {
     setSaving(true);
     try {
       await updateLandingContent(form);
-      showToast("Landing page updated");
+      showToast(t("Landing page updated") || "Landing page updated");
     } catch (err) {
-      showToast(err.message || "Failed to save changes");
+      showToast(err.message || (t("Failed to save changes") || "Failed to save changes"));
     } finally {
       setSaving(false);
     }
@@ -418,20 +426,20 @@ const SysAdminLanding = () => {
   return (
     <div className="pt-8 flex flex-col gap-6">
       <div>
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Landing Page</h2>
+        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Landing Page") || "Landing Page"}</h2>
         <p className="text-sm text-[var(--text-muted)]">
-          Edit the brand name, hero and plans section copy shown on the public landing page, in both languages.
+          {t("sysAdminLandingSubtitle") || "Edit the brand name, hero and plans section copy shown on the public landing page, in both languages."}
         </p>
       </div>
 
       {error ? (
         <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
-          <p className="text-sm text-[var(--text-muted)] mb-4">Couldn't load the landing content</p>
+          <p className="text-sm text-[var(--text-muted)] mb-4">{t("Couldn't load the landing content") || "Couldn't load the landing content"}</p>
           <button
             onClick={load}
             className="bg-[var(--brand)] text-white text-xs font-semibold px-4 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors cursor-pointer"
           >
-            Retry
+            {t("Retry") || "Retry"}
           </button>
         </div>
       ) : loading ? (
@@ -439,33 +447,33 @@ const SysAdminLanding = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-6 items-start">
           <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-5">
-            <Field label="Brand name" value={form.brandName} onChange={handleChange("brandName")} />
+            <Field label={t("Brand name") || "Brand name"} value={form.brandName} onChange={handleChange("brandName")} />
 
             <div className="h-px bg-[var(--border-subtle)]" />
-            <p className="text-xs font-semibold text-[var(--text-tertiary)]">Color palette</p>
+            <p className="text-xs font-semibold text-[var(--text-tertiary)]">{t("Color palette") || "Color palette"}</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <ColorField label="Primary" value={form.primaryColor} onChange={handleChange("primaryColor")} />
-              <ColorField label="Background" value={form.backgroundColor} onChange={handleChange("backgroundColor")} />
-              <ColorField label="Accent" value={form.accentColor} onChange={handleChange("accentColor")} />
+              <ColorField label={t("Primary") || "Primary"} value={form.primaryColor} onChange={handleChange("primaryColor")} />
+              <ColorField label={t("Background") || "Background"} value={form.backgroundColor} onChange={handleChange("backgroundColor")} />
+              <ColorField label={t("Accent") || "Accent"} value={form.accentColor} onChange={handleChange("accentColor")} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="Hero title (ES)"
+                label={t("Hero title (ES)") || "Hero title (ES)"}
                 value={form.heroTitleEs}
                 onChange={handleChange("heroTitleEs")}
                 onTranslate={handleTranslate("heroTitleEs", "heroTitleEn")}
                 translating={translating.heroTitleEs}
               />
               <Field
-                label="Hero title (EN)"
+                label={t("Hero title (EN)") || "Hero title (EN)"}
                 value={form.heroTitleEn}
                 onChange={handleChange("heroTitleEn")}
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="Hero description (ES)"
+                label={t("Hero description (ES)") || "Hero description (ES)"}
                 value={form.heroDescriptionEs}
                 onChange={handleChange("heroDescriptionEs")}
                 onTranslate={handleTranslate("heroDescriptionEs", "heroDescriptionEn")}
@@ -473,7 +481,7 @@ const SysAdminLanding = () => {
                 textarea
               />
               <Field
-                label="Hero description (EN)"
+                label={t("Hero description (EN)") || "Hero description (EN)"}
                 value={form.heroDescriptionEn}
                 onChange={handleChange("heroDescriptionEn")}
                 textarea
@@ -481,25 +489,24 @@ const SysAdminLanding = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="About us title (ES)"
+                label={t("About us title (ES)") || "About us title (ES)"}
                 value={form.aboutTitleEs}
                 onChange={handleChange("aboutTitleEs")}
                 onTranslate={handleTranslate("aboutTitleEs", "aboutTitleEn")}
                 translating={translating.aboutTitleEs}
               />
               <Field
-                label="About us title (EN)"
+                label={t("About us title (EN)") || "About us title (EN)"}
                 value={form.aboutTitleEn}
                 onChange={handleChange("aboutTitleEn")}
               />
             </div>
             <p className="text-[11px] text-[var(--text-muted)] -mt-1">
-              Tip: use <code className="bg-[var(--surface-muted)] px-1 py-0.5 rounded">{"{brandName}"}</code> inside the
-              description and it will automatically be replaced with the brand name above.
+              {t("brandNamePlaceholderTip") || "Tip: use"} <code className="bg-[var(--surface-muted)] px-1 py-0.5 rounded">{"{brandName}"}</code> {t("brandNamePlaceholderTip2") || "inside the description and it will automatically be replaced with the brand name above."}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="About us description (ES)"
+                label={t("About us description (ES)") || "About us description (ES)"}
                 value={form.aboutDescriptionEs}
                 onChange={handleChange("aboutDescriptionEs")}
                 onTranslate={handleTranslate("aboutDescriptionEs", "aboutDescriptionEn")}
@@ -507,7 +514,7 @@ const SysAdminLanding = () => {
                 textarea
               />
               <Field
-                label="About us description (EN)"
+                label={t("About us description (EN)") || "About us description (EN)"}
                 value={form.aboutDescriptionEn}
                 onChange={handleChange("aboutDescriptionEn")}
                 textarea
@@ -516,21 +523,21 @@ const SysAdminLanding = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="Plans title (ES)"
+                label={t("Plans title (ES)") || "Plans title (ES)"}
                 value={form.plansTitleEs}
                 onChange={handleChange("plansTitleEs")}
                 onTranslate={handleTranslate("plansTitleEs", "plansTitleEn")}
                 translating={translating.plansTitleEs}
               />
               <Field
-                label="Plans title (EN)"
+                label={t("Plans title (EN)") || "Plans title (EN)"}
                 value={form.plansTitleEn}
                 onChange={handleChange("plansTitleEn")}
               />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="Plans subtitle (ES)"
+                label={t("Plans subtitle (ES)") || "Plans subtitle (ES)"}
                 value={form.plansSubtitleEs}
                 onChange={handleChange("plansSubtitleEs")}
                 onTranslate={handleTranslate("plansSubtitleEs", "plansSubtitleEn")}
@@ -538,7 +545,7 @@ const SysAdminLanding = () => {
                 textarea
               />
               <Field
-                label="Plans subtitle (EN)"
+                label={t("Plans subtitle (EN)") || "Plans subtitle (EN)"}
                 value={form.plansSubtitleEn}
                 onChange={handleChange("plansSubtitleEn")}
                 textarea
@@ -546,7 +553,7 @@ const SysAdminLanding = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
-                label="Footer description (ES)"
+                label={t("Footer description (ES)") || "Footer description (ES)"}
                 value={form.footerDescriptionEs}
                 onChange={handleChange("footerDescriptionEs")}
                 onTranslate={handleTranslate("footerDescriptionEs", "footerDescriptionEn")}
@@ -554,7 +561,7 @@ const SysAdminLanding = () => {
                 textarea
               />
               <Field
-                label="Footer description (EN)"
+                label={t("Footer description (EN)") || "Footer description (EN)"}
                 value={form.footerDescriptionEn}
                 onChange={handleChange("footerDescriptionEn")}
                 textarea
@@ -563,20 +570,20 @@ const SysAdminLanding = () => {
 
             <div className="h-px bg-[var(--border-subtle)]" />
             <p className="text-xs font-semibold text-[var(--text-tertiary)]">
-              Contact &amp; social links (optional — hidden on the landing if left blank)
+              {t("Contact & social links (optional — hidden on the landing if left blank)") || "Contact & social links (optional — hidden on the landing if left blank)"}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Field label="Contact email" value={form.contactEmail} onChange={handleChange("contactEmail")} />
-              <Field label="Contact phone" value={form.contactPhone} onChange={handleChange("contactPhone")} />
+              <Field label={t("Contact email") || "Contact email"} value={form.contactEmail} onChange={handleChange("contactEmail")} />
+              <Field label={t("Contact phone") || "Contact phone"} value={form.contactPhone} onChange={handleChange("contactPhone")} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Field label="Instagram URL" value={form.instagramUrl} onChange={handleChange("instagramUrl")} />
-              <Field label="Facebook URL" value={form.facebookUrl} onChange={handleChange("facebookUrl")} />
+              <Field label={t("Instagram URL") || "Instagram URL"} value={form.instagramUrl} onChange={handleChange("instagramUrl")} />
+              <Field label={t("Facebook URL") || "Facebook URL"} value={form.facebookUrl} onChange={handleChange("facebookUrl")} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Field label="Twitter / X URL" value={form.twitterUrl} onChange={handleChange("twitterUrl")} />
-              <Field label="LinkedIn URL" value={form.linkedinUrl} onChange={handleChange("linkedinUrl")} />
+              <Field label={t("Twitter / X URL") || "Twitter / X URL"} value={form.twitterUrl} onChange={handleChange("twitterUrl")} />
+              <Field label={t("LinkedIn URL") || "LinkedIn URL"} value={form.linkedinUrl} onChange={handleChange("linkedinUrl")} />
             </div>
 
             <div className="flex justify-end">
@@ -585,7 +592,7 @@ const SysAdminLanding = () => {
                 disabled={saving}
                 className="bg-[var(--brand)] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-60 cursor-pointer"
               >
-                {saving ? "Saving..." : "Save changes"}
+                {saving ? (t("Saving...") || "Saving...") : (t("Save changes") || "Save changes")}
               </button>
             </div>
           </div>

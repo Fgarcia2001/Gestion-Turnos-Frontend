@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../CustomHooks/AuthContext";
+import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
 const IconHome = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -49,16 +50,16 @@ const IconLogo = () => (
 );
 
 const navItems = [
-  { id: "home",         label: "Home",         Icon: IconHome },
-  { id: "managmentBusiness",      label: "Managment Business",      Icon: IconUsers },
-  { id: "appointments", label: "Appointments", Icon: IconCalendarEvent },
-  { id: "schedule",     label: "Schedule",     Icon: IconClock },
-  { id: "settings",     label: "Settings",     Icon: IconSettings },
+  { id: "home",         labelKey: "Home",               label: "Home",               Icon: IconHome },
+  { id: "managmentBusiness",      labelKey: "Managment Business",  label: "Managment Business",  Icon: IconUsers },
+  { id: "appointments", labelKey: "Appointments",        label: "Appointments",       Icon: IconCalendarEvent },
+  { id: "schedule",     labelKey: "Schedule",            label: "Schedule",           Icon: IconClock },
+  { id: "settings",     labelKey: "Settings",            label: "Settings",           Icon: IconSettings },
 ];
 const bottomItems = [
-  { id: "help",   label: "Help",    Icon: IconHelp },
-  { id: "profile", label: "Profile", Icon: IconProfile },
-  { id: "logout", label: "Log out", Icon: IconLogout },
+  { id: "help",   labelKey: "Help",    label: "Help",    Icon: IconHelp },
+  { id: "profile", labelKey: "Profile", label: "Profile", Icon: IconProfile },
+  { id: "logout", labelKey: "Log out", label: "Log out", Icon: IconLogout },
 ];
 
 const NavButton = ({ id, label, Icon, active, onClick }) => (
@@ -90,6 +91,7 @@ const canSeeBottom = (role, id) =>
 
 const Navbar = ({ onSelectSection, role, active }) => {
   const { logout } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleClick = (id) => {
@@ -109,15 +111,15 @@ const Navbar = ({ onSelectSection, role, active }) => {
       <div className="flex flex-col items-center gap-1 flex-1">
         {navItems
           .filter(({ id }) => canSeeNav(role, id))
-          .map(({ id, label, Icon }) => (
-            <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
+          .map(({ id, labelKey, label, Icon }) => (
+            <NavButton key={id} id={id} label={t(labelKey) || label} Icon={Icon} active={active === id} onClick={handleClick} />
           ))}
       </div>
       <div className="flex flex-col items-center gap-1">
         {bottomItems
           .filter(({ id }) => canSeeBottom(role, id))
-          .map(({ id, label, Icon }) => (
-            <NavButton key={id} id={id} label={label} Icon={Icon} active={active === id} onClick={handleClick} />
+          .map(({ id, labelKey, label, Icon }) => (
+            <NavButton key={id} id={id} label={t(labelKey) || label} Icon={Icon} active={active === id} onClick={handleClick} />
           ))}
       </div>
     </nav>
