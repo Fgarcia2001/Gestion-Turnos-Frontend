@@ -31,10 +31,9 @@ export const translations = {
     bizEstetica: "Aesthetics",
     bizMasajes: "Massage",
     bizTattoo: "Tattoo",
-    featAgendaWhatsapp: "Booking + WhatsApp",
+    featAgendaWhatsapp: "Booking",
     featSalesReports: "Sales + Reports",
-    featClients: "Clients & Records",
-    featPayments: "Process payments",
+    featClients: "Clients",
     footerDesc: "The simplest way to manage appointments for your business.",
     footerLinksTitle: "Quick links",
     footerContactTitle: "Contact",
@@ -272,6 +271,9 @@ export const translations = {
     tourReplayTitle: "Take the tour",
     tourReplaySubtitle: "A quick guided walkthrough of the platform.",
     tourReplay: "Start the tutorial",
+
+    // Pending reassignment
+    "Appointment reassigned email sent": "Appointment reassigned. An email was sent to the client.",
 
     // Misc
     minutesAbbrev: "min",
@@ -678,10 +680,9 @@ export const translations = {
     bizEstetica: "Estética",
     bizMasajes: "Masajes",
     bizTattoo: "Tattoo",
-    featAgendaWhatsapp: "Agenda + WhatsApp",
+    featAgendaWhatsapp: "Agenda",
     featSalesReports: "Ventas + Reportes",
-    featClients: "Clientes y Fichas",
-    featPayments: "Procesa pagos",
+    featClients: "Clientes",
     footerDesc: "La forma más simple de gestionar turnos para tu negocio.",
     footerLinksTitle: "Enlaces rápidos",
     footerContactTitle: "Contacto",
@@ -920,6 +921,9 @@ export const translations = {
     tourReplaySubtitle: "Un recorrido guiado rápido por la plataforma.",
     tourReplay: "Iniciar tutorial",
 
+    // Reasignación pendiente
+    "Appointment reassigned email sent": "Turno reasignado. Se envió un email al cliente.",
+
     // Varios
     minutesAbbrev: "min",
 
@@ -974,6 +978,11 @@ export const translations = {
     there: "allí",
     headerSubtitle: "¡Visualizá y controlá tus turnos acá!",
     "Pending reassignment appointments": "Turnos pendientes de reasignar",
+    "Pending reassignment appointments title": "Turnos pendientes de reasignar",
+    "Pending reassignment subtitle": "Elegí un nuevo profesional para cada turno.",
+    "Reassign appointment": "Reasignar turno",
+    "New professional": "Nuevo profesional",
+    "Previous professional": "Profesional anterior",
     "New appointments": "Turnos nuevos",
     "Live updates": "Actualizaciones en vivo",
     "No new appointments": "No hay turnos nuevos",

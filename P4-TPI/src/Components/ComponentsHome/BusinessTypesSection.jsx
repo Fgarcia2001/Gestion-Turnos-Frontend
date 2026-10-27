@@ -16,7 +16,7 @@ const RUBROS = [
   { img: tattooImg, key: "bizTattoo" },
 ];
 
-// Íconos de las 4 features (decorativos).
+// Íconos de las 3 features (decorativos).
 const IconSpark = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 2.5l2 5.7 5.7 2-5.7 2-2 5.7-2-5.7-5.7-2 5.7-2z" />
@@ -37,17 +37,10 @@ const IconClients = () => (
     <circle cx="9" cy="8" r="3.2" /><path d="M3.5 20a5.5 5.5 0 0 1 11 0" /><path d="M16 5.2a3.2 3.2 0 0 1 0 5.6" /><path d="M17 14.7a5.5 5.5 0 0 1 4 5.3" />
   </svg>
 );
-const IconPayments = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2.5" y="6" width="19" height="13" rx="2" /><line x1="2.5" y1="10.5" x2="21.5" y2="10.5" /><path d="M12 14v3" /><path d="M10.5 15.5A2 2 0 0 1 12 14.8a2 2 0 0 1 1.5.7" />
-  </svg>
-);
-
 const FEATURES = [
   { key: "featAgendaWhatsapp", icon: <IconAgendaWhatsapp /> },
   { key: "featSalesReports", icon: <IconSalesReports /> },
   { key: "featClients", icon: <IconClients /> },
-  { key: "featPayments", icon: <IconPayments /> },
 ];
 
 const BusinessTypesSection = () => {
@@ -65,7 +58,7 @@ const BusinessTypesSection = () => {
         <p className="text-[var(--text-secondary-alt)] max-w-2xl mx-auto">{subtitle}</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-14">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-14">
         {FEATURES.map(({ icon, key }) => (
           <div key={key} className="flex flex-col items-center text-center gap-3">
             <div className="bg-[var(--surface-muted)] p-3.5 rounded-2xl text-[var(--text-primary)]">{icon}</div>
