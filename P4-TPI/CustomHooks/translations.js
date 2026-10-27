@@ -1296,9 +1296,12 @@ export const translations = {
     "Contact phone": "Teléfono de contacto",
     "Instagram URL": "URL de Instagram",
     "Facebook URL": "URL de Facebook",
-    "Twitter / X URL": "URL de Twitter / X",
-    "LinkedIn URL": "URL de LinkedIn",
-    "Image uploaded from a file — type a URL to replace it": "Imagen cargada desde archivo — escribe una URL para reemplazarla",
-    sysAdminProfileSubtitle: "Administra los datos de tu cuenta personal de SysAdmin."
+"Twitter / X URL": "URL de Twitter / X",
+     "LinkedIn URL": "URL de LinkedIn",
+     "Image uploaded from a file — type a URL to replace it": "Imagen cargada desde archivo — escribe una URL para reemplazarla",
+     "payment_cash": "Efectivo",
+     "payment_transferencia": "Transferencia",
+     "payment_mercadopago": "MercadoPago",
+     sysAdminProfileSubtitle: "Administra los datos de tu cuenta personal de SysAdmin."
   }
 };
