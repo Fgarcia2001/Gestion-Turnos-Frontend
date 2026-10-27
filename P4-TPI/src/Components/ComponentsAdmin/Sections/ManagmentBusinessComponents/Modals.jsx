@@ -168,7 +168,7 @@ export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
 
         {/* Preview card */}
         <div className="flex items-center gap-3 mb-5 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)]">
-          <Avatar initials={form.initials || form.staffName?.charAt(0) || form.name?.charAt(0) || "U"} color={form.color} photo={form.photo || form.staffLinkPhoto || null} />
+          <Avatar initials={form.staffName?.charAt(0) || form.name?.charAt(0) || "U"} color={form.color} photo={form.photo || form.staffLinkPhoto || null} />
           <div>
             <p className="font-semibold text-sm text-[var(--text-primary)]">{form.name || form.staffName || "—"}</p>
             <p className="text-xs text-[var(--text-muted)]">{form.email || form.staffEmail || "—"}</p>
@@ -732,7 +732,7 @@ export const DeleteModal = ({ row, t, onClose, onConfirm }) => (
       <p className="text-xs text-[var(--text-muted)] mb-6">{t("actionCannotBeUndone") || "This action cannot be undone."}</p>
 
       <div className="flex items-center gap-3 p-3 bg-[var(--surface-faint)] rounded-xl border border-[var(--border-faint)] mb-6 text-left">
-        <Avatar initials={row.initials || row.staffName?.charAt(0) || row.name?.charAt(0) || "U"} color={row.color} photo={row.photo || row.staffLinkPhoto || null} />
+        <Avatar initials={row.staffName?.charAt(0) || row.name?.charAt(0) || "U"} color={row.color} photo={row.photo || row.staffLinkPhoto || null} />
         <div>
           <p className="font-semibold text-sm text-[var(--text-primary)]">{row.name || row.staffName}</p>
           <p className="text-xs text-[var(--text-muted)]">{row.email || row.staffEmail}</p>
