@@ -54,6 +54,20 @@ const DemoteConfirmModal = ({ row, t, submitting, onCancel, onConfirm }) => (
   </ModalOverlay>
 );
 
+// ── Status switch (staff / service) ───────────────────────────────────────────
+const StatusToggle = ({ active, t, onChange }) => (
+  <div className="flex items-center justify-between p-3 rounded-xl border border-[var(--border-faint)] bg-[var(--surface-faint)]">
+    <div>
+      <p className="text-sm font-semibold text-[var(--text-primary)]">{t("Status") || "Status"}</p>
+      <p className="text-xs text-[var(--text-muted)]">{active ? (t("Active") || "Active") : (t("Inactive") || "Inactive")}</p>
+    </div>
+    <button type="button" role="switch" aria-checked={active} onClick={() => onChange(!active)}
+      className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${active ? "bg-[var(--brand)]" : "bg-[var(--border-subtle)]"}`}>
+      <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-[var(--surface)] rounded-full shadow transition-transform ${active ? "translate-x-5" : "translate-x-0"}`} />
+    </button>
+  </div>
+);
+
 // ── Edit Modal ────────────────────────────────────────────────────────────────
 export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
   const [form, setForm] = useState(() => {
@@ -77,6 +91,7 @@ export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [confirmDemote, setConfirmDemote] = useState(false);
+  const [changePassword, setChangePassword] = useState(false);
 
   // Profesional (2) → Recepcionista (1): sus turnos pasan a pendiente de reasignar.
   const originalRol = typeof row.rol === "number" ? row.rol : ROLE_NAME_TO_ID[row.rol];
@@ -98,7 +113,7 @@ export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
     setError("");
     setSubmitting(true);
     try {
-      await onSave(form);
+      await onSave({ ...form, password: tab === "staff" && changePassword ? form.password : undefined });
       onClose();
     } catch (err) {
       setConfirmDemote(false);
@@ -180,8 +195,18 @@ export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
                 <input name="staffEmail" type="email" value={form.staffEmail || ""} onChange={handleChange} className={inputClass} required placeholder="email@example.com" />
               </div>
               <div>
-                <label className={labelClass}>{t("Password") || "Password"}</label>
-                <input name="password" type="password" value={form.password || ""} onChange={handleChange} className={inputClass} required minLength={6} placeholder="••••••••" autoComplete="new-password" />
+                <label className="flex items-center gap-2 text-sm font-medium text-[var(--text-primary)] cursor-pointer select-none">
+                  <input type="checkbox" checked={changePassword}
+                    onChange={(e) => { setChangePassword(e.target.checked); if (!e.target.checked) setForm((prev) => ({ ...prev, password: "" })); }}
+                    className="w-4 h-4 accent-[var(--brand)]" />
+                  {t("Change password") || "Change password"}
+                </label>
+                {changePassword && (
+                  <div className="mt-2">
+                    <label className={labelClass}>{t("New password") || "New password"}</label>
+                    <input name="password" type="password" value={form.password || ""} onChange={handleChange} className={inputClass} required minLength={6} placeholder="••••••••" autoComplete="new-password" />
+                  </div>
+                )}
               </div>
               <div>
                 <label className={labelClass}>{t("Staff Phone") || "Staff Phone"}</label>
@@ -219,6 +244,7 @@ export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
                   ))}
                 </select>
               </div>
+              <StatusToggle active={form.isActive !== false} t={t} onChange={(v) => setForm((prev) => ({ ...prev, isActive: v }))} />
             </>
           )}
 
@@ -291,6 +317,7 @@ export const EditModal = ({ row, tab, t, branches = [], onClose, onSave }) => {
                   <input name="price" value={form.price || ""} onChange={handleChange} className={inputClass} placeholder="$0.00" />
                 </div>
               </div>
+              <StatusToggle active={form.isActive !== false} t={t} onChange={(v) => setForm((prev) => ({ ...prev, isActive: v }))} />
             </>
           )}
 

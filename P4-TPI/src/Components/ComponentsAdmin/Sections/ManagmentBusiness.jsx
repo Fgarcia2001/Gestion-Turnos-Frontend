@@ -234,6 +234,7 @@ const ManagmentBusiness = () => {
         phone: updated.staffPhone,
         rol: Number(updated.rol),
         branchId: updated.branchId,
+        isActive: updated.isActive,
       });
       await loadCoreData();
       showToast(t("Staff updated successfully") || "Staff updated successfully");
@@ -262,6 +263,7 @@ const ManagmentBusiness = () => {
         description: updated.description,
         duration: Number(updated.duration),
         price: Number(updated.price),
+        isActive: updated.isActive,
       });
       setData((prev) => ({
         ...prev,

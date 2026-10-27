@@ -107,7 +107,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
       <tr className="border-b border-[var(--border-faint)] hover:bg-[var(--surface-faint)] transition-colors">
         <td className="py-3 pr-6">
           <div className="flex items-center gap-3">
-            <Avatar initials={row.staffName?.charAt(0) || "S"} photo={row.staffLinkPhoto || null} />
+            <Avatar initials={row.staffName?.charAt(0) || "S"} photo={row.staffLinkPhoto || null} isActive={row.isActive} />
             <span className="font-semibold text-[var(--text-primary)] text-sm">{row.staffName}</span>
           </div>
         </td>
@@ -157,7 +157,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
         <td className="py-3 pr-6">
           <span
             className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-              row.isActive ? "bg-green-50 text-green-600" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
+              row.isActive ? "bg-[var(--success-bg)] text-[var(--success-text)]" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
             }`}
           >
             {row.isActive ? (t("Public") || "Public") : (t("Hidden") || "Hidden")}
@@ -174,7 +174,18 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
     return (
       <tr className="border-b border-[var(--border-faint)] hover:bg-[var(--surface-faint)] transition-colors">
         <td className="py-3 pr-6">
-          <span className="font-semibold text-[var(--text-primary)] text-sm">{row.name}</span>
+          <div className="flex flex-col items-start gap-1">
+            <span className="font-semibold text-[var(--text-primary)] text-sm">{row.name}</span>
+            {row.isActive !== undefined && row.isActive !== null && (
+              <span
+                className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
+                  row.isActive ? "bg-[var(--success-bg)] text-[var(--success-text)]" : "bg-[var(--surface-muted)] text-[var(--text-muted)]"
+                }`}
+              >
+                {row.isActive ? (t("Active") || "Active") : (t("Inactive") || "Inactive")}
+              </span>
+            )}
+          </div>
         </td>
         <td className={tdClass}>{row.categoria}</td>
         <td className={tdClass}>{row.description}</td>
