@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "../View/Home";
 import Login from "../View/Login";
+import ResetPassword from "../View/ResetPassword";
 import { LanguageProvider } from "../CustomHooks/TraslateHook";
 import { AuthProvider } from "../CustomHooks/AuthContext";
 import { ThemeProvider } from "../CustomHooks/ThemeContext";
@@ -28,6 +29,7 @@ function App() {
               <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/:businessSlug" element={<BusinessPublicPage />} />
               <Route path="/unauthorized" element={<Unauthorized />} />
               <Route
