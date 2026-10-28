@@ -160,6 +160,8 @@ export const translations = {
     durationLabel: "Duration",
     confirmButton: "Confirm Appointment",
     appointmentConfirmedTitle: "Your appointment is confirmed!",
+    seeYouSoonNotice: "We'll be waiting for you, don't miss it!",
+    appointmentEmailNotice: "We've sent the appointment details to your email.",
     bookAnother: "Book another appointment",
     appointmentIdLabel: "Confirmation number",
 
@@ -805,6 +807,8 @@ export const translations = {
     durationLabel: "Duración",
     confirmButton: "Confirmar Turno",
     appointmentConfirmedTitle: "¡Tu turno está confirmado!",
+    seeYouSoonNotice: "Te esperamos, no faltes.",
+    appointmentEmailNotice: "Te enviamos los datos de tu turno por correo.",
     bookAnother: "Reservar otro turno",
     appointmentIdLabel: "Número de confirmación",
 
