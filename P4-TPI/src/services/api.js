@@ -160,6 +160,10 @@ export const fetchPendingReassignmentAppointments = () =>
 export const reassignAppointment = (id, staffId) =>
   putJson(`${BASE_URL}/Appointment/${id}/reassign`, { staffId });
 
+// Cancelacion de un turno futuro por parte del cliente (anonimo): se valida con su email.
+export const cancelAppointmentByClient = (id, email) =>
+  putJson(`${BASE_URL}/Appointment/${encodeURIComponent(id)}/cancel`, { email });
+
 // Version liviana de las stats de turnos del negocio (2 numeros) en vez de
 // traer el historial completo via fetchAllAppointments.
 export const fetchAppointmentStats = async () => {

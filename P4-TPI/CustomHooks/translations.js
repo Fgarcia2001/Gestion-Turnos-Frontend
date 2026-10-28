@@ -31,10 +31,9 @@ export const translations = {
     bizEstetica: "Aesthetics",
     bizMasajes: "Massage",
     bizTattoo: "Tattoo",
-    featAgendaWhatsapp: "Booking + WhatsApp",
+    featAgendaWhatsapp: "Booking",
     featSalesReports: "Sales + Reports",
-    featClients: "Clients & Records",
-    featPayments: "Process payments",
+    featClients: "Clients",
     footerDesc: "The simplest way to manage appointments for your business.",
     footerLinksTitle: "Quick links",
     footerContactTitle: "Contact",
@@ -275,6 +274,9 @@ export const translations = {
     tourReplaySubtitle: "A quick guided walkthrough of the platform.",
     tourReplay: "Start the tutorial",
 
+    // Pending reassignment
+    "Appointment reassigned email sent": "Appointment reassigned. An email was sent to the client.",
+
     // Misc
     minutesAbbrev: "min",
 
@@ -297,6 +299,8 @@ export const translations = {
     Services: "Services",
     Staff: "Staff",
     Status: "Status",
+    "Change password": "Change password",
+    "New password": "New password",
     Time: "Time",
     Today: "Today",
     Unlimited: "Unlimited",
@@ -602,6 +606,11 @@ export const translations = {
     subscription: "subscription",
     subscriptions: "subscriptions",
     "Most recent": "Most recent",
+    "Previous block": "Previous block",
+    "Next block": "Next block",
+    "Show history": "Show history",
+    "more": "more",
+    "Hide history": "Hide history",
     "Delete subscription": "Delete subscription",
     Expired: "Expired",
     "Auto-translate to English": "Auto-translate to English",
@@ -678,10 +687,9 @@ export const translations = {
     bizEstetica: "Estética",
     bizMasajes: "Masajes",
     bizTattoo: "Tattoo",
-    featAgendaWhatsapp: "Agenda + WhatsApp",
+    featAgendaWhatsapp: "Agenda",
     featSalesReports: "Ventas + Reportes",
-    featClients: "Clientes y Fichas",
-    featPayments: "Procesa pagos",
+    featClients: "Clientes",
     footerDesc: "La forma más simple de gestionar turnos para tu negocio.",
     footerLinksTitle: "Enlaces rápidos",
     footerContactTitle: "Contacto",
@@ -922,6 +930,9 @@ export const translations = {
     tourReplaySubtitle: "Un recorrido guiado rápido por la plataforma.",
     tourReplay: "Iniciar tutorial",
 
+    // Reasignación pendiente
+    "Appointment reassigned email sent": "Turno reasignado. Se envió un email al cliente.",
+
     // Varios
     minutesAbbrev: "min",
 
@@ -944,6 +955,8 @@ export const translations = {
     Services: "Servicios",
     Staff: "Staff",
     Status: "Estado",
+    "Change password": "Cambiar contraseña",
+    "New password": "Nueva contraseña",
     Time: "Horario",
     Today: "Hoy",
     Unlimited: "Ilimitado",
@@ -974,6 +987,11 @@ export const translations = {
     there: "allí",
     headerSubtitle: "¡Visualizá y controlá tus turnos acá!",
     "Pending reassignment appointments": "Turnos pendientes de reasignar",
+    "Pending reassignment appointments title": "Turnos pendientes de reasignar",
+    "Pending reassignment subtitle": "Elegí un nuevo profesional para cada turno.",
+    "Reassign appointment": "Reasignar turno",
+    "New professional": "Nuevo profesional",
+    "Previous professional": "Profesional anterior",
     "New appointments": "Turnos nuevos",
     "Live updates": "Actualizaciones en vivo",
     "No new appointments": "No hay turnos nuevos",
@@ -1248,6 +1266,11 @@ export const translations = {
     subscription: "suscripción",
     subscriptions: "suscripciones",
     "Most recent": "Más reciente",
+    "Previous block": "Bloque anterior",
+    "Next block": "Bloque siguiente",
+    "Show history": "Ver historial",
+    "more": "más",
+    "Hide history": "Ocultar historial",
     "Delete subscription": "Eliminar suscripción",
     Expired: "Vencido",
     "Auto-translate to English": "Auto-traducir al inglés",
@@ -1287,9 +1310,12 @@ export const translations = {
     "Contact phone": "Teléfono de contacto",
     "Instagram URL": "URL de Instagram",
     "Facebook URL": "URL de Facebook",
-    "Twitter / X URL": "URL de Twitter / X",
-    "LinkedIn URL": "URL de LinkedIn",
-    "Image uploaded from a file — type a URL to replace it": "Imagen cargada desde archivo — escribe una URL para reemplazarla",
-    sysAdminProfileSubtitle: "Administra los datos de tu cuenta personal de SysAdmin."
+"Twitter / X URL": "URL de Twitter / X",
+     "LinkedIn URL": "URL de LinkedIn",
+     "Image uploaded from a file — type a URL to replace it": "Imagen cargada desde archivo — escribe una URL para reemplazarla",
+     "payment_cash": "Efectivo",
+     "payment_transferencia": "Transferencia",
+     "payment_mercadopago": "MercadoPago",
+     sysAdminProfileSubtitle: "Administra los datos de tu cuenta personal de SysAdmin."
   }
 };

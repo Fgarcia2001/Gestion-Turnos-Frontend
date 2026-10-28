@@ -91,10 +91,11 @@ const ClientInfoStep = ({ booking, updateBooking, showErrors }) => {
         </Field>
 
         <Field label={t("paymentLabel") || "Payment method"}>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {[
               { value: 0, label: t("payment_cash") || "Efectivo" },
-              { value: 1, label: t("payment_card") || "Tarjeta" },
+              { value: 1, label: t("payment_transferencia") || "Transferencia" },
+              { value: 2, label: t("payment_mercadopago") || "MercadoPago" },
             ].map((option) => {
               const selected = Number(booking.payment) === option.value;
               return (

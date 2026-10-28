@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchBusinessEcosystemByUrl } from "../src/services/businessService";
 import BookingWizard from "../src/Components/ComponentsBookingPage/BookingWizard";
+import CancelAppointmentModal from "../src/Components/ComponentsBookingPage/CancelAppointmentModal";
 import { IconAlert, IconBuilding, IconClock, IconMapPin, IconUser } from "../src/Components/ComponentsBookingPage/Icons";
 
 const DAY_LABELS = {
@@ -91,6 +92,7 @@ const BusinessPublicPage = () => {
   const [business, setBusiness] = useState(null);
   const [status, setStatus] = useState("loading");
   const [bookingPrefill, setBookingPrefill] = useState(null);
+  const [showCancel, setShowCancel] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -182,13 +184,21 @@ const BusinessPublicPage = () => {
               ← Ver sucursales
             </button>
           ) : (
-            <button
-              onClick={() => startBooking(null)}
-              className="px-6 py-2.5 bg-white rounded-xl text-sm font-semibold hover:bg-white/90 transition-colors text-center"
-              style={{ color: brandColor }}
-            >
-              Reservar turno
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setShowCancel(true)}
+                className="px-6 py-2.5 bg-white/10 text-white border border-white/30 rounded-xl text-sm font-semibold hover:bg-white/20 transition-colors text-center"
+              >
+                Cancelar turno
+              </button>
+              <button
+                onClick={() => startBooking(null)}
+                className="px-6 py-2.5 bg-white rounded-xl text-sm font-semibold hover:bg-white/90 transition-colors text-center"
+                style={{ color: brandColor }}
+              >
+                Reservar turno
+              </button>
+            </div>
           )}
         </div>
       </header>
@@ -212,6 +222,8 @@ const BusinessPublicPage = () => {
           </>
         )}
       </div>
+
+      {showCancel && <CancelAppointmentModal brandColor={brandColor} onClose={() => setShowCancel(false)} />}
     </main>
   );
 };

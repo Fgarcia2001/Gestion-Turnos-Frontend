@@ -122,7 +122,7 @@ const UsageBar = ({ label, count, max }) => {
       </div>
       <div className="w-full h-2 rounded-full bg-[var(--surface-muted)] overflow-hidden">
         <div
-          className={`h-full rounded-full ${unlimited ? "bg-[#15803d]" : "bg-[var(--brand)]"}`}
+          className={`h-full rounded-full ${unlimited ? "bg-[#15803d]" : "bg-[var(--usage-fill)]"}`}
           style={{ width: `${pct}%` }}
         />
       </div>

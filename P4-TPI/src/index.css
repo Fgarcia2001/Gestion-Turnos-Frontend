@@ -21,6 +21,7 @@
 
   --brand: #1a1a2e;
   --brand-hover: #2d2d44;
+  --usage-fill: #1a1a2e;
 
   --border-subtle: #e2ddd8;
   --border-faint: #f0ede8;
@@ -33,6 +34,9 @@
   --text-muted: #9a9a9a;
   --text-faint: #b3aca3;
   --text-dim: #4a4a4a;
+
+  --success-bg: #f0fdf4;
+  --success-text: #16a34a;
 }
 
 .dark {
@@ -47,6 +51,7 @@
 
   --brand: #2d2d44;
   --brand-hover: #3d3d5c;
+  --usage-fill: #8b93e8;
 
   --border-subtle: #33334a;
   --border-faint: #2a2a3e;
@@ -59,6 +64,9 @@
   --text-muted: #9a9aac;
   --text-faint: #7a7a90;
   --text-dim: #c5c5d0;
+
+  --success-bg: #14532d;
+  --success-text: #bbf7d0;
 }
 
 body {

@@ -1,6 +1,6 @@
 // ScheduleGrid.jsx
 // Horizontal day agenda: staff as rows, time running left-to-right in 30-minute columns.
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 import AppointmentDetailsModal from "./AppointmentDetailsModal";
 import { STATUS_STYLES } from "./statusStyles";
@@ -19,10 +19,14 @@ const STEP_MINUTES = 15;
 const GRID_MAX_HEIGHT = "calc(100vh - 320px)";
 
 const timeToMinutes = (timeStr) => {
+  if (typeof timeStr === "number") return timeStr;
   if (!timeStr) return 0;
   const [h, m] = timeStr.split(":").map(Number);
   return h * 60 + m;
 };
+
+const minutesToTime = (mins) =>
+  `${String(Math.floor(mins / 60)).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
 
 const generateSlots = (startTime, endTime, stepMinutes = STEP_MINUTES) => {
   const slots = [];
@@ -57,8 +61,8 @@ const computeOccupied = (slots, staff, scheduleStart) => {
 
 // Per-slot pixel widths + cumulative offsets, so empty slots can be rendered narrower
 // without breaking real-time proportional positioning of appointments.
-const computeScale = (slots, occupied, compact) => {
-  const widths = slots.map((_, i) => (occupied[i] || !compact ? SLOT_WIDTH : COLLAPSED_WIDTH));
+const computeScale = (slots, occupied, compact, slotWidth = SLOT_WIDTH) => {
+  const widths = slots.map((_, i) => (occupied[i] || !compact ? slotWidth : COLLAPSED_WIDTH));
   const cumX = [];
   let acc = 0;
   widths.forEach((w) => {
@@ -197,43 +201,143 @@ const StaffRow = ({ staff, widths, totalWidth, onSelect, minutesToX }) => (
   </div>
 );
 
+const PagerButton = ({ direction, disabled, onClick, label }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    aria-label={label}
+    title={label}
+    className="w-7 h-7 flex items-center justify-center bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--surface)]"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d={direction === "prev" ? "M15 18l-6-6 6-6" : "M9 18l6-6-6-6"} />
+    </svg>
+  </button>
+);
+
 const ScheduleGrid = ({ staff, schedule, isToday, selectedDate }) => {
   const { t } = useTranslation();
   const slots = useMemo(() => generateSlots(schedule.startTime, schedule.endTime), [schedule.startTime, schedule.endTime]);
   const [selected, setSelected] = useState(null);
   const [compact, setCompact] = useState(true);
+  const [page, setPage] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const scrollRef = useRef(null);
   const rowsHeight = staff.length * ROW_HEIGHT;
+  const startMinutes = timeToMinutes(schedule.startTime);
 
-  const occupied = useMemo(() => computeOccupied(slots, staff, schedule.startTime), [slots, staff, schedule.startTime]);
-  const { widths, cumX, totalWidth } = useMemo(() => computeScale(slots, occupied, compact), [slots, occupied, compact]);
-  const minutesToX = useMemo(() => makeMinutesToX(schedule.startTime, widths, cumX), [schedule.startTime, widths, cumX]);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return undefined;
+    setContainerWidth(el.clientWidth);
+    const observer = new ResizeObserver(([entry]) => setContainerWidth(entry.contentRect.width));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Full-day mode shows the day in blocks that fit the available width, so there is no horizontal scroll.
+  const paged = !compact;
+  const fits = containerWidth >= LABEL_WIDTH + SLOT_WIDTH;
+  const slotsPerPage = fits ? Math.floor((containerWidth - LABEL_WIDTH) / SLOT_WIDTH) : 1;
+  const slotWidth = paged && fits ? (containerWidth - LABEL_WIDTH) / slotsPerPage : SLOT_WIDTH;
+  const pageCount = Math.max(1, Math.ceil(slots.length / slotsPerPage));
+  const currentPage = Math.min(page, pageCount - 1);
+
+  const firstPage = () => {
+    if (!isToday) return 0;
+    const now = new Date();
+    const idx = Math.floor((now.getHours() * 60 + now.getMinutes() - startMinutes) / STEP_MINUTES);
+    return Math.min(Math.max(Math.floor(idx / slotsPerPage), 0), pageCount - 1);
+  };
+
+  const resetKey = `${String(selectedDate)}|${schedule.startTime}|${schedule.endTime}`;
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey);
+    setPage(firstPage());
+  }
+
+  const toggleCompact = () => {
+    setPage(compact ? firstPage() : 0);
+    setCompact((c) => !c);
+  };
+
+  const pageStartIdx = paged ? currentPage * slotsPerPage : 0;
+  const viewSlots = paged ? slots.slice(pageStartIdx, pageStartIdx + slotsPerPage) : slots;
+  const viewStart = startMinutes + pageStartIdx * STEP_MINUTES;
+  const viewEnd = paged ? viewStart + viewSlots.length * STEP_MINUTES : timeToMinutes(schedule.endTime);
+
+  // Cancelled appointments free the slot, so another booking can land on the same time
+  // and the two blocks would overlap. Hide them from both the occupancy and the render.
+  // In paged mode, appointments outside the visible block are dropped; the ones crossing
+  // its edges are clamped by minutesToX.
+  const visibleStaff = useMemo(
+    () =>
+      staff.map((s) => ({
+        ...s,
+        appointments: (s.appointments || []).filter(
+          (a) =>
+            a.status !== "Cancelled" &&
+            (!paged || (timeToMinutes(a.endTime) > viewStart && timeToMinutes(a.startTime) < viewEnd))
+        ),
+      })),
+    [staff, paged, viewStart, viewEnd]
+  );
+
+  const occupied = useMemo(() => computeOccupied(slots, visibleStaff, schedule.startTime), [slots, visibleStaff, schedule.startTime]);
+  const { widths, cumX, totalWidth } = useMemo(
+    () => computeScale(viewSlots, occupied.slice(pageStartIdx), compact, slotWidth),
+    [viewSlots, occupied, pageStartIdx, compact, slotWidth]
+  );
+  const minutesToX = useMemo(() => makeMinutesToX(viewStart, widths, cumX), [viewStart, widths, cumX]);
 
   const handleSelect = (appt, staffName) => setSelected({ appt, staffName });
 
   return (
     <div data-tour="schedule-grid" className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
-      <div className="flex items-center justify-end px-4 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-faint-2)]">
+      <div className="flex items-center justify-end gap-3 px-4 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--surface-faint-2)]">
+        {paged && pageCount > 1 && (
+          <div className="flex items-center gap-2 mr-auto">
+            <PagerButton
+              direction="prev"
+              disabled={currentPage === 0}
+              onClick={() => setPage(currentPage - 1)}
+              label={t("Previous block") || "Previous block"}
+            />
+            <span className="text-xs font-semibold text-[var(--text-primary)] tabular-nums">
+              {minutesToTime(viewStart)} – {minutesToTime(viewEnd)}
+            </span>
+            <span className="text-xs text-[var(--text-muted)] tabular-nums">{currentPage + 1} / {pageCount}</span>
+            <PagerButton
+              direction="next"
+              disabled={currentPage === pageCount - 1}
+              onClick={() => setPage(currentPage + 1)}
+              label={t("Next block") || "Next block"}
+            />
+          </div>
+        )}
         <button
           type="button"
-          onClick={() => setCompact((c) => !c)}
+          onClick={toggleCompact}
           className="text-xs font-semibold bg-[var(--surface)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
         >
           {compact ? (t("showFullDay") || "Show full day") : (t("hideEmptySlots") || "Hide empty slots")}
         </button>
       </div>
 
-      <div className="overflow-auto" style={{ maxHeight: GRID_MAX_HEIGHT }}>
+      <div ref={scrollRef} className={paged ? "overflow-y-auto overflow-x-hidden" : "overflow-auto"} style={{ maxHeight: GRID_MAX_HEIGHT }}>
         <div className="relative" style={{ width: LABEL_WIDTH + totalWidth }}>
-          <TimeHeader slots={slots} widths={widths} />
+          <TimeHeader slots={viewSlots} widths={widths} />
           {isToday && (
             <CurrentTimeLine
-              scheduleStart={schedule.startTime}
-              scheduleEnd={schedule.endTime}
+              scheduleStart={viewStart}
+              scheduleEnd={viewEnd}
               rowsHeight={rowsHeight}
               minutesToX={minutesToX}
             />
           )}
-          {staff.map((s) => (
+          {visibleStaff.map((s) => (
             <StaffRow
               key={s.staffId}
               staff={s}

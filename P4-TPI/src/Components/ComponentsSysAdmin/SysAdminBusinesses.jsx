@@ -32,6 +32,7 @@ const SysAdminBusinesses = () => {
   const [types, setTypes] = useState([]);
   const [plans, setPlans] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(ALL);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [toast, setToast] = useState(null);
@@ -192,9 +193,12 @@ const SysAdminBusinesses = () => {
     );
   }
 
-  const filtered = selectedCategory === ALL
-    ? businesses
-    : businesses.filter((b) => b.typeBusiness === selectedCategory);
+  const term = search.trim().toLowerCase();
+  const filtered = businesses.filter(
+    (b) =>
+      (selectedCategory === ALL || b.typeBusiness === selectedCategory) &&
+      (b.name || "").toLowerCase().includes(term)
+  );
 
   return (
     <div className="pt-8 flex flex-col gap-6">
@@ -209,6 +213,13 @@ const SysAdminBusinesses = () => {
         </div>
       ) : (
         <>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("Search by business name...") || "Search by business name..."}
+            className="w-full sm:w-80 border border-[var(--border-subtle)] rounded-xl px-4 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand)]/20 focus:border-[var(--brand)] transition-all bg-[var(--surface)]"
+          />
+
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setSelectedCategory(ALL)}
@@ -237,7 +248,9 @@ const SysAdminBusinesses = () => {
 
           {filtered.length === 0 ? (
             <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] py-16 text-center text-sm text-[var(--text-muted)]">
-              {t("No businesses found for this category.") || "No businesses found for this category."}
+              {term
+                ? `${t("No businesses match") || "No businesses match"} "${search.trim()}".`
+                : (t("No businesses found for this category.") || "No businesses found for this category.")}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
