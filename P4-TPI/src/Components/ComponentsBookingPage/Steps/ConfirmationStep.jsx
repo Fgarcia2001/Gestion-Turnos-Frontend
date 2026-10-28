@@ -14,7 +14,8 @@ const ConfirmationStep = ({ confirmation, onBookAnother }) => {
       </div>
 
       <h2 className="text-2xl font-bold text-[#1a1a2e]">{t("appointmentConfirmedTitle") || "¡Tu turno está confirmado!"}</h2>
-      <p className="text-[#6b6b6b] mt-1">Te esperamos, no faltes.</p>
+      <p className="text-[#6b6b6b] mt-1">{t("seeYouSoonNotice") || "Te esperamos, no faltes."}</p>
+      <p className="text-[#6b6b6b] mt-1">{t("appointmentEmailNotice") || "Te enviamos los datos de tu turno por correo."}</p>
 
       {(confirmation?.id || (confirmation?.day && confirmation?.startTime)) && (
         <div className="w-full mt-6 rounded-2xl border border-[#e2ddd8] bg-white p-5 flex flex-col gap-3 text-left">

@@ -144,6 +144,8 @@ export const translations = {
     paymentLabel: "Payment method",
     payment_cash: "Cash",
     payment_card: "Card",
+    payment_transferencia: "Bank transfer",
+    payment_mercadopago: "MercadoPago",
     birthDayRequired: "Date of birth is required.",
     paymentRequired: "Payment method is required.",
 
@@ -159,6 +161,8 @@ export const translations = {
     durationLabel: "Duration",
     confirmButton: "Confirm Appointment",
     appointmentConfirmedTitle: "Your appointment is confirmed!",
+    seeYouSoonNotice: "We'll be waiting for you, don't miss it!",
+    appointmentEmailNotice: "We've sent the appointment details to your email.",
     bookAnother: "Book another appointment",
     appointmentIdLabel: "Confirmation number",
 
@@ -330,6 +334,11 @@ export const translations = {
     there: "there",
     headerSubtitle: "View and control your appointments here!",
     "Pending reassignment appointments": "Pending reassignment appointments",
+    "Pending reassignment appointments title": "Pending reassignment appointments",
+    "Pending reassignment subtitle": "Choose a new professional for each appointment.",
+    "Reassign appointment": "Reassign appointment",
+    "New professional": "New professional",
+    "Previous professional": "Previous professional",
     "New appointments": "New appointments",
     "Live updates": "Live updates",
     "No new appointments": "No new appointments",
@@ -813,6 +822,8 @@ export const translations = {
     durationLabel: "Duración",
     confirmButton: "Confirmar Turno",
     appointmentConfirmedTitle: "¡Tu turno está confirmado!",
+    seeYouSoonNotice: "Te esperamos, no faltes.",
+    appointmentEmailNotice: "Te enviamos los datos de tu turno por correo.",
     bookAnother: "Reservar otro turno",
     appointmentIdLabel: "Número de confirmación",
 
@@ -1306,12 +1317,11 @@ export const translations = {
     "Contact phone": "Teléfono de contacto",
     "Instagram URL": "URL de Instagram",
     "Facebook URL": "URL de Facebook",
-"Twitter / X URL": "URL de Twitter / X",
-     "LinkedIn URL": "URL de LinkedIn",
-     "Image uploaded from a file — type a URL to replace it": "Imagen cargada desde archivo — escribe una URL para reemplazarla",
-     "payment_cash": "Efectivo",
-     "payment_transferencia": "Transferencia",
-     "payment_mercadopago": "MercadoPago",
-     sysAdminProfileSubtitle: "Administra los datos de tu cuenta personal de SysAdmin."
+    "Twitter / X URL": "URL de Twitter / X",
+    "LinkedIn URL": "URL de LinkedIn",
+    "Image uploaded from a file — type a URL to replace it": "Imagen cargada desde archivo — escribe una URL para reemplazarla",
+    payment_transferencia: "Transferencia",
+    payment_mercadopago: "MercadoPago",
+    sysAdminProfileSubtitle: "Administra los datos de tu cuenta personal de SysAdmin."
   }
 };
