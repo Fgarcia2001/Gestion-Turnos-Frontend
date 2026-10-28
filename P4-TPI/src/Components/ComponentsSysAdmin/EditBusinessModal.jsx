@@ -102,7 +102,15 @@ const EditBusinessModal = ({ business, onClose, onSave }) => {
 
           <div>
             <label className={labelClass}>{t("Website slug (URL)") || "Website slug (URL)"}</label>
-            <input value={form.url} onChange={handleChange("url")} className={inputClass} placeholder="mi-negocio" />
+            <div className="flex items-center flex-1 min-w-0 border-b border-[var(--border-subtle)] focus-within:border-[var(--brand)] transition-colors">
+              <span className="text-sm text-[var(--text-muted)] pb-2 whitespace-nowrap">{window.location.origin}/</span>
+              <input
+                value={form.url}
+                onChange={handleChange("url")}
+                placeholder="mi-negocio"
+                className="w-full pb-2 text-sm text-[var(--text-primary)] focus:outline-none bg-transparent min-w-0"
+              />
+            </div>
           </div>
 
           <div>
