@@ -20,7 +20,11 @@ const STATUS_STYLES = {
   Expired: "bg-amber-50 text-amber-600",
 };
 
-const formatDate = (value) => {
+const CSS_ANIMATIONS = `
+  @keyframes historyRowIn { from { opacity: 0; transform: translateY(-8px) } to { opacity: 1; transform: translateY(0) } }
+`;
+
+const formatDate =(value) => {
   if (!value) return "—";
   const d = new Date(value);
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
@@ -124,6 +128,16 @@ const SysAdminSubscriptions = () => {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [changePlanTarget, setChangePlanTarget] = useState(null);
   const [search, setSearch] = useState("");
+  const [expanded, setExpanded] = useState(() => new Set());
+
+  const toggleExpanded = (businessId) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(businessId)) next.delete(businessId);
+      else next.add(businessId);
+      return next;
+    });
+  };
 
   const showToast = (message) => {
     setToast(message);
@@ -194,6 +208,7 @@ const SysAdminSubscriptions = () => {
 
   return (
     <div className="pt-8 flex flex-col gap-6">
+      <style>{CSS_ANIMATIONS}</style>
       <div>
         <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Subscriptions") || "Subscriptions"}</h2>
         <p className="text-sm text-[var(--text-muted)]">
@@ -244,7 +259,10 @@ const SysAdminSubscriptions = () => {
 
           return (
             <div className="flex flex-col gap-4">
-              {groups.map((group) => (
+              {groups.map((group) => {
+                const isExpanded = expanded.has(group.businessId);
+                const visibleItems = isExpanded ? group.items : group.items.slice(0, 1);
+                return (
                 <div key={group.businessId} className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] overflow-hidden">
                   <div className="px-6 pt-5 pb-1 flex items-center gap-2">
                     <h3 className="text-sm font-bold text-[var(--text-primary)]">{group.businessName}</h3>
@@ -267,8 +285,12 @@ const SysAdminSubscriptions = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {group.items.map((sub, i) => (
-                          <tr key={sub.id} className="border-b border-[var(--border-subtle)] last:border-0">
+                        {visibleItems.map((sub, i) => (
+                          <tr
+                            key={sub.id}
+                            className="border-b border-[var(--border-subtle)] last:border-0"
+                            style={i > 0 ? { animation: `historyRowIn 0.25s ease-out ${Math.min(i - 1, 8) * 0.04}s both` } : undefined}
+                          >
                             <td className="py-3 pr-6 text-sm font-semibold text-[var(--text-primary)]">
                               {sub.planName}
                               {i === 0 && (
@@ -319,9 +341,34 @@ const SysAdminSubscriptions = () => {
                         ))}
                       </tbody>
                     </table>
+                    {group.items.length > 1 && (
+                      <button
+                        onClick={() => toggleExpanded(group.businessId)}
+                        className="mt-3 flex items-center gap-1 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={`transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                        >
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                        {isExpanded
+                          ? (t("Hide history") || "Hide history")
+                          : `${t("Show history") || "Show history"} (${group.items.length - 1} ${t("more") || "more"})`}
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           );
         })()
