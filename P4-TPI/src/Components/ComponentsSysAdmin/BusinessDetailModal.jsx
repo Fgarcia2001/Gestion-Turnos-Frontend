@@ -77,7 +77,8 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
     currentPlan || subscriptionStatus || subscriptionStartDate || subscriptionEndDate
   );
   const branches = Array.isArray(detail?.branches) ? detail.branches : [];
-  const website = pick(detail, "url", "website", "businessUrl", "webUrl");
+  const urlSlug = pick(detail, "url", "website", "businessUrl", "webUrl");
+  const website = urlSlug ? `${window.location.origin}/${urlSlug}` : urlSlug;
   const email = pick(detail, "email", "contactEmail");
   const phone = pick(detail, "phone", "contactPhone", "phoneNumber");
   const urlLogo = detail?.urlLogo;

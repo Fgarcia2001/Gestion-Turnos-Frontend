@@ -104,6 +104,19 @@ export const translations = {
     // API messages
     invalidCredentials: "Invalid credentials. Please try again.",
     registrationFailed: "Registration failed. Please try again.",
+    forgotPasswordFailed: "Could not send the reset link. Please try again.",
+    resetLinkSentDesc: "If an account exists for that email, we've sent a password reset link.",
+    resetPasswordTitle: "Set a new password",
+    resetPasswordSubtitle: "Enter your new password below.",
+    newPasswordLabel: "New password",
+    confirmPasswordLabel: "Confirm password",
+    confirmPasswordRequired: "Please confirm your password.",
+    passwordMismatch: "Passwords don't match.",
+    resetPasswordButton: "Reset password",
+    resetPasswordSuccess: "Your password has been reset. You can now sign in.",
+    resetPasswordFailed: "Could not reset password. The link may be invalid or expired.",
+    invalidResetLink: "Invalid or missing reset link.",
+    goToLogin: "Go to login",
 
     // Booking flow - step titles
     selectBusinessType: "Select Business Type",
@@ -767,6 +780,19 @@ export const translations = {
     // API messages
     invalidCredentials: "Credenciales incorrectas. Inténtalo nuevamente.",
     registrationFailed: "No se pudo completar el registro. Inténtalo nuevamente.",
+    forgotPasswordFailed: "No se pudo enviar el enlace. Inténtalo nuevamente.",
+    resetLinkSentDesc: "Si existe una cuenta con ese correo, te enviamos un enlace para restablecer tu contraseña.",
+    resetPasswordTitle: "Elegí una nueva contraseña",
+    resetPasswordSubtitle: "Ingresá tu nueva contraseña.",
+    newPasswordLabel: "Nueva contraseña",
+    confirmPasswordLabel: "Confirmar contraseña",
+    confirmPasswordRequired: "Confirmá tu contraseña.",
+    passwordMismatch: "Las contraseñas no coinciden.",
+    resetPasswordButton: "Restablecer contraseña",
+    resetPasswordSuccess: "Tu contraseña fue restablecida. Ya podés iniciar sesión.",
+    resetPasswordFailed: "No se pudo restablecer la contraseña. El enlace puede ser inválido o haber expirado.",
+    invalidResetLink: "Enlace de restablecimiento inválido o faltante.",
+    goToLogin: "Ir al login",
 
     // Flujo de reserva - títulos de pasos
     selectBusinessType: "Selecciona el Tipo de Negocio",

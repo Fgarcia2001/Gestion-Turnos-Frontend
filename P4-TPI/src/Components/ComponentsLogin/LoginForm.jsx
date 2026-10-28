@@ -155,6 +155,18 @@ const signUp = async (payload, t) => {
   return res.json();
 };
 
+const forgotPassword = async (email, t) => {
+  const res = await fetch(`${BASE_URL}/forgotPassword`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(email),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(extractApiError(err, t("forgotPasswordFailed")));
+  }
+};
+
 // ── Main component ────────────────────────────────────────────────────────────
 const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRegister }) => {
   const { t } = useTranslation();
@@ -169,6 +181,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [businessTypes, setBusinessTypes] = useState([]);
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
 
   useEffect(() => {
     fetchBusinessTypes().then(setBusinessTypes);
@@ -210,6 +223,29 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
+
+    if (isForgotPassword) {
+      if (!loginFields.email.trim()) {
+        setErrors({ email: t("emailRequired") });
+        return;
+      }
+      if (!EMAIL_RE.test(loginFields.email)) {
+        setErrors({ email: t("emailInvalid") });
+        return;
+      }
+
+      setErrors({});
+      setIsLoading(true);
+      try {
+        await forgotPassword(loginFields.email, t);
+        setForgotPasswordSent(true);
+      } catch (err) {
+        setServerError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     const validationErrors = isRegister
       ? validateSignup({ ...signupFields, ...loginFields }, t)
@@ -266,24 +302,33 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
           </div>
         )}
 
+        {/* ── Forgot-password success banner (reemplaza el formulario) ── */}
+        {isForgotPassword && forgotPasswordSent && (
+          <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+            {t("resetLinkSentDesc") ?? "If an account exists for that email, we've sent a password reset link."}
+          </div>
+        )}
+
         {/* ── Email ── */}
-        <div className="space-y-1.5">
-          <label htmlFor="email" className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">
-            {t("emailLabel")}
-          </label>
-          <InputIcon icon={IconMail}>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder={t("emailPlaceholder")}
-              value={loginFields.email}
-              onChange={handleLoginChange}
-              className={inputWithIconCls + (errors.email ? inputErrorCls : "")}
-            />
-          </InputIcon>
-          <FieldError msg={errors.email} />
-        </div>
+        {!(isForgotPassword && forgotPasswordSent) && (
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">
+              {t("emailLabel")}
+            </label>
+            <InputIcon icon={IconMail}>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder={t("emailPlaceholder")}
+                value={loginFields.email}
+                onChange={handleLoginChange}
+                className={inputWithIconCls + (errors.email ? inputErrorCls : "")}
+              />
+            </InputIcon>
+            <FieldError msg={errors.email} />
+          </div>
+        )}
 
         {/* ── Password (hidden in forgot-password mode) ── */}
         {!isForgotPassword && (
@@ -295,7 +340,7 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
               {!isRegister && (
                 <button
                   type="button"
-                  onClick={() => setIsForgotPassword(true)}
+                  onClick={() => { setIsForgotPassword(true); setForgotPasswordSent(false); setErrors({}); setServerError(""); }}
                   className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 >
                   {t("forgotPass")}
@@ -423,25 +468,27 @@ const LoginForm = ({ handleRegister, isForgotPassword, setIsForgotPassword, isRe
         )}
 
         {/* ── Submit ── */}
-        <button
-          type="submit"
-          id="btn-submit-auth"
-          className="w-full h-12 bg-[var(--brand)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--brand-hover)] flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 mt-2"
-          disabled={isLoading}
-        >
-          {isLoading
-            ? <><IconLoader />{t("loading")}</>
-            : isForgotPassword
-              ? (t("sendResetLink") ?? "Send reset link")
-              : isRegister ? t("signUp") : t("signIn")}
-        </button>
+        {!(isForgotPassword && forgotPasswordSent) && (
+          <button
+            type="submit"
+            id="btn-submit-auth"
+            className="w-full h-12 bg-[var(--brand)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--brand-hover)] flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 mt-2"
+            disabled={isLoading}
+          >
+            {isLoading
+              ? <><IconLoader />{t("loading")}</>
+              : isForgotPassword
+                ? (t("sendResetLink") ?? "Send reset link")
+                : isRegister ? t("signUp") : t("signIn")}
+          </button>
+        )}
 
       </form>
 
       {isForgotPassword ? (
         <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
           <button
-            onClick={() => setIsForgotPassword(false)}
+            onClick={() => { setIsForgotPassword(false); setForgotPasswordSent(false); setErrors({}); setServerError(""); }}
             className="font-semibold text-[var(--text-primary)] hover:underline underline-offset-4 cursor-pointer transition-colors"
           >
             {t("backToLogin") ?? "← Back to login"}
