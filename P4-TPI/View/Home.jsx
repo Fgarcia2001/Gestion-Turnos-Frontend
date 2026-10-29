@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../CustomHooks/TraslateHook";
 import { useLandingContent } from "../CustomHooks/useLandingContent";
 import { resolveLandingColor, resolveLandingTextColor } from "../CustomHooks/landingColors";
+import { parseSectionsOrder } from "../CustomHooks/landingSectionsOrder";
 import HeroSection from "../src/Components/ComponentsHome/HeroSection";
 import OptionCard from "../src/Components/ComponentsHome/OptionCard";
 import BusinessTypesSection from "../src/Components/ComponentsHome/BusinessTypesSection";
@@ -58,6 +59,12 @@ const Home = () => {
   const primaryTextColor = resolveLandingTextColor(content, "primaryColor");
   const backgroundColor = resolveLandingColor(content, "backgroundColor");
   const accentColor = resolveLandingColor(content, "accentColor");
+  const sectionsOrder = parseSectionsOrder(content?.sectionsOrder);
+  const sectionBlocks = {
+    images: <BusinessTypesSection key="images" />,
+    plans: <PlansSection key="plans" />,
+    about: <AboutSection key="about" />,
+  };
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -200,11 +207,7 @@ const Home = () => {
           />
         </section>
 
-        <BusinessTypesSection />
-
-        <PlansSection />
-
-        <AboutSection />
+        {sectionsOrder.map((key) => sectionBlocks[key])}
       </div>
 
       <Footer />
