@@ -1,9 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
+import { fetchHelpContent } from "../../../services/helpContentService";
+import { submitBugReport } from "../../../services/bugReportService";
 
-// ── Datos de contacto — reemplazar por los reales ─────────────────────────────
+// ── Datos de contacto — fallback si el SysAdmin todavia no cargo HelpContent ──
 const CONTACT_WHATSAPP = "+5493410000000";
 const CONTACT_EMAIL = "soporte@ejemplo.com";
+
+// bugType del form ("bug"/"suggestion"/"other") -> enum que espera el backend.
+const BUG_TYPE_TO_API = { bug: "Bug", suggestion: "Suggestion", other: "Other" };
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 const IconHelpCircle = ({ className = "" }) => (
@@ -97,7 +102,7 @@ const ContactRow = ({ icon, label, value }) => (
 
 // ── Help ──────────────────────────────────────────────────────────────────────
 const Help = ({ onStartTour }) => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [openFaq, setOpenFaq] = useState(0);
   const [bugType, setBugType] = useState("bug");
   const [bugDescription, setBugDescription] = useState("");
@@ -105,11 +110,42 @@ const Help = ({ onStartTour }) => {
   const [formError, setFormError] = useState(null);
   const [toast, setToast] = useState(null);
   const [userAgent] = useState(() => navigator.userAgent);
+  const [sending, setSending] = useState(false);
+  const [helpContent, setHelpContent] = useState(null);
   const toastTimer = useRef(null);
 
   useEffect(() => () => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
   }, []);
+
+  // Contenido editable por SysAdmin (FAQs + contacto). Si falla o todavia no
+  // se cargo nada, se sigue mostrando el fallback hardcodeado de abajo.
+  useEffect(() => {
+    let cancelled = false;
+    fetchHelpContent().then((data) => {
+      if (!cancelled) setHelpContent(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const faqItems =
+    helpContent?.faqs && helpContent.faqs.length > 0
+      ? [...helpContent.faqs]
+          .sort((a, b) => a.order - b.order)
+          .map((f) => ({
+            id: f.id,
+            q: language === "en" ? f.questionEn : f.questionEs,
+            a: language === "en" ? f.answerEn : f.answerEs,
+          }))
+      : FAQ_ITEMS.map((item) => ({ id: item.q, q: t(item.q), a: t(item.a) }));
+
+  const contactWhatsapp = helpContent?.whatsappNumber || CONTACT_WHATSAPP;
+  const contactEmail = helpContent?.supportEmail || CONTACT_EMAIL;
+  const contactHours =
+    (language === "en" ? helpContent?.scheduleTextEn : helpContent?.scheduleTextEs) ||
+    (t("contactHoursValue") || "Mon–Fri · 9:00 to 18:00 (GMT-3)");
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -117,9 +153,9 @@ const Help = ({ onStartTour }) => {
     toastTimer.current = setTimeout(() => setToast(null), 4500);
   };
 
-  const waDigits = CONTACT_WHATSAPP.replace(/\D/g, "");
+  const waDigits = contactWhatsapp.replace(/\D/g, "");
   const whatsappUrl = `https://wa.me/${waDigits}?text=${encodeURIComponent(t("whatsappDefaultMessage") || "Hola, necesito ayuda con Gestión Turnos.")}`;
-  const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t("bugMailSubjectPrefix") || "Gestión Turnos")}`;
+  const mailtoUrl = `mailto:${contactEmail}?subject=${encodeURIComponent(t("bugMailSubjectPrefix") || "Gestión Turnos")}`;
 
   const buildBugReport = () => {
     const typeLabel = t(`bugType${bugType === "bug" ? "Bug" : bugType === "suggestion" ? "Suggestion" : "Other"}`);
@@ -148,12 +184,27 @@ const Help = ({ onStartTour }) => {
     return true;
   };
 
-  const handleSendReport = (event) => {
+  const handleSendReport = async (event) => {
     event.preventDefault();
     if (!validateReport()) return;
-    const { subject, body } = buildBugReport();
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    showToast(t("bugEmailOpened") || "Se abrió tu cliente de correo.");
+    setSending(true);
+    try {
+      await submitBugReport({
+        type: BUG_TYPE_TO_API[bugType] || "Other",
+        description: bugDescription.trim(),
+        stepsToReproduce: bugSteps.trim() || null,
+        browser: userAgent,
+        pageUrl: window.location.pathname,
+      });
+      showToast(t("bugReportSent") || "Reporte enviado. ¡Gracias por avisarnos!");
+      setBugDescription("");
+      setBugSteps("");
+      setBugType("bug");
+    } catch (err) {
+      showToast(err.message || (t("bugReportFailed") || "No se pudo enviar el reporte. Intenta de nuevo."), "error");
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleCopyReport = async () => {
@@ -209,11 +260,11 @@ const Help = ({ onStartTour }) => {
             subtitle={t("faqSubtitle") || "The most common questions about the platform."}
           />
           <div className="flex flex-col gap-2.5">
-            {FAQ_ITEMS.map((item, index) => {
+            {faqItems.map((item, index) => {
               const open = openFaq === index;
               return (
                 <div
-                  key={item.q}
+                  key={item.id}
                   className={`rounded-xl border overflow-hidden transition-colors ${open ? "border-[var(--border-accent)] bg-[var(--surface-faint-2)]" : "border-[var(--border-subtle)] bg-[var(--surface)]"}`}
                 >
                   <button
@@ -222,12 +273,12 @@ const Help = ({ onStartTour }) => {
                     aria-expanded={open}
                     className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left cursor-pointer"
                   >
-                    <span className="text-sm font-semibold text-[var(--text-primary)]">{t(item.q)}</span>
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">{item.q}</span>
                     <IconChevron className={`shrink-0 text-[var(--text-muted)] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
                   </button>
                   {open && (
                     <p className="px-4 pb-4 -mt-0.5 text-xs leading-relaxed text-[var(--text-secondary)]">
-                      {t(item.a)}
+                      {item.a}
                     </p>
                   )}
                 </div>
@@ -244,9 +295,9 @@ const Help = ({ onStartTour }) => {
             subtitle={t("contactSubtitle") || "We answer Monday to Friday during business hours."}
           />
           <div className="flex flex-col gap-3 mb-5">
-            <ContactRow icon={<IconChat className="w-4 h-4" />} label={t("contactWhatsAppLabel") || "WhatsApp"} value={CONTACT_WHATSAPP} />
-            <ContactRow icon={<IconMail className="w-4 h-4" />} label={t("contactEmailLabel") || "Email"} value={CONTACT_EMAIL} />
-            <ContactRow icon={<IconClock className="w-4 h-4" />} label={t("contactHoursLabel") || "Business hours"} value={t("contactHoursValue") || "Mon–Fri · 9:00 to 18:00 (GMT-3)"} />
+            <ContactRow icon={<IconChat className="w-4 h-4" />} label={t("contactWhatsAppLabel") || "WhatsApp"} value={contactWhatsapp} />
+            <ContactRow icon={<IconMail className="w-4 h-4" />} label={t("contactEmailLabel") || "Email"} value={contactEmail} />
+            <ContactRow icon={<IconClock className="w-4 h-4" />} label={t("contactHoursLabel") || "Business hours"} value={contactHours} />
           </div>
           <div className="flex flex-col gap-3">
             <a
@@ -325,10 +376,11 @@ const Help = ({ onStartTour }) => {
             <div className="flex gap-3 mt-1">
               <button
                 type="submit"
-                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors"
+                disabled={sending}
+                className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors disabled:opacity-60"
               >
                 <IconSend />
-                {t("bugSend") || "Send report"}
+                {sending ? (t("Saving...") || "Saving...") : (t("bugSend") || "Send report")}
               </button>
               <button
                 type="button"

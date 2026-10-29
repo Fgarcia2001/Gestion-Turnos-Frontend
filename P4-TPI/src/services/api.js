@@ -80,8 +80,10 @@ const requestJson = async (url, method, body) => {
 };
 
 export const getJson = (url) => requestJson(url, "GET");
-export const postJson = (url) => requestJson(url, "POST");
+export const postJson = (url, body) => requestJson(url, "POST", body);
 export const putJson = (url, body) => requestJson(url, "PUT", body);
+export const patchJson = (url, body) => requestJson(url, "PATCH", body);
+export const deleteJson = (url) => requestJson(url, "DELETE");
 
 // Perfil del usuario logueado (cualquier rol).
 export const fetchMyProfile = () => getJson(`${BASE_URL}/Staff/me`);

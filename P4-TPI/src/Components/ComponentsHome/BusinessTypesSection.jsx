@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+import { useLandingContent } from "../../../CustomHooks/useLandingContent";
+import { parseBusinessTypesOrder, sortByBusinessTypesOrder } from "../../../CustomHooks/businessTypesOrder";
 import barberiaImg from "../../assets/business-types/barberia.webp";
 import spaImg from "../../assets/business-types/spa.webp";
 import peluqueriaImg from "../../assets/business-types/peluqueria.webp";
@@ -6,14 +9,16 @@ import esteticaImg from "../../assets/business-types/estetica.webp";
 import masajesImg from "../../assets/business-types/masajes.webp";
 import tattooImg from "../../assets/business-types/tattoo.webp";
 
-// Rubros fijos (mismos tipos del registro).
+// Rubros fijos (mismos tipos del registro). `imgKey` es el campo editable
+// desde SysAdmin (LandingContent.imageUrlX); si viene null se usa `img`,
+// la imagen local empaquetada, como fallback.
 const RUBROS = [
-  { img: barberiaImg, key: "bizBarberia" },
-  { img: spaImg, key: "bizSpa" },
-  { img: peluqueriaImg, key: "bizPeluqueria" },
-  { img: esteticaImg, key: "bizEstetica" },
-  { img: masajesImg, key: "bizMasajes" },
-  { img: tattooImg, key: "bizTattoo" },
+  { img: barberiaImg, imgKey: "imageUrlBarberia", key: "bizBarberia" },
+  { img: spaImg, imgKey: "imageUrlSpa", key: "bizSpa" },
+  { img: peluqueriaImg, imgKey: "imageUrlPeluqueria", key: "bizPeluqueria" },
+  { img: esteticaImg, imgKey: "imageUrlEstetica", key: "bizEstetica" },
+  { img: masajesImg, imgKey: "imageUrlMasajes", key: "bizMasajes" },
+  { img: tattooImg, imgKey: "imageUrlTattoo", key: "bizTattoo" },
 ];
 
 // Íconos de las 3 features (decorativos).
@@ -43,9 +48,31 @@ const FEATURES = [
   { key: "featClients", icon: <IconClients /> },
 ];
 
+// Si la URL cargada desde SysAdmin esta rota/caida, cae a la imagen local
+// en vez de mostrar el icono de imagen rota.
+const RubroImage = ({ src, fallback, alt }) => {
+  const [failed, setFailed] = useState(false);
+  return (
+    <img
+      src={failed ? fallback : src}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      onError={() => setFailed(true)}
+      className="w-full h-full object-cover"
+    />
+  );
+};
+
 const BusinessTypesSection = () => {
   const { t } = useTranslation();
-  const list = RUBROS.map((r) => t(r.key)).join(", ");
+  const content = useLandingContent();
+  const orderedRubros = sortByBusinessTypesOrder(
+    RUBROS,
+    parseBusinessTypesOrder(content?.businessTypesOrder),
+    (r) => r.imgKey
+  );
+  const list = orderedRubros.map((r) => t(r.key)).join(", ");
   const subtitle = t("landingFreeSubtitle").replace("{list}", list);
 
   return (
@@ -68,15 +95,9 @@ const BusinessTypesSection = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-        {RUBROS.map((r) => (
+        {orderedRubros.map((r) => (
           <div key={r.key} className="aspect-[4/3] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-muted)]">
-            <img
-              src={r.img}
-              alt={t(r.key)}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover"
-            />
+            <RubroImage src={content?.[r.imgKey] || r.img} fallback={r.img} alt={t(r.key)} />
           </div>
         ))}
       </div>

@@ -3,9 +3,42 @@ import { fetchLandingContent, updateLandingContent, applyBrandName } from "../..
 import { resolveLandingColor, resolveLandingTextColor } from "../../../CustomHooks/landingColors";
 import { translateText } from "../../services/translateService";
 import { fetchPlans } from "../../services/api";
+import { reorderPlans } from "../../services/planService";
 import { IconMail, IconPhone } from "../ComponentsHome/FooterIcons";
 import { SOCIAL_LINKS } from "../ComponentsHome/socialLinksConfig";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  rectSortingStrategy,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  DEFAULT_BUSINESS_TYPE_ORDER,
+  parseBusinessTypesOrder,
+  serializeBusinessTypesOrder,
+  sortByBusinessTypesOrder,
+} from "../../../CustomHooks/businessTypesOrder";
+import {
+  DEFAULT_SECTIONS_ORDER,
+  parseSectionsOrder,
+  serializeSectionsOrder,
+} from "../../../CustomHooks/landingSectionsOrder";
+import barberiaImg from "../../assets/business-types/barberia.webp";
+import spaImg from "../../assets/business-types/spa.webp";
+import peluqueriaImg from "../../assets/business-types/peluqueria.webp";
+import esteticaImg from "../../assets/business-types/estetica.webp";
+import masajesImg from "../../assets/business-types/masajes.webp";
+import tattooImg from "../../assets/business-types/tattoo.webp";
 
 const SkeletonForm = () => (
   <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 flex flex-col gap-4 animate-pulse">
@@ -27,6 +60,16 @@ const IconTranslate = () => (
 const IconSun = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+  </svg>
+);
+
+// Handle de arrastre (drag-and-drop con @dnd-kit) para reordenar imagenes,
+// planes y secciones directamente en el preview.
+const IconGrip = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="9" cy="5" r="1.5" /><circle cx="15" cy="5" r="1.5" />
+    <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
+    <circle cx="9" cy="19" r="1.5" /><circle cx="15" cy="19" r="1.5" />
   </svg>
 );
 
@@ -73,6 +116,83 @@ const Field = ({ label, value, onChange, textarea, onTranslate, translating }) =
   );
 };
 
+// Thumbnail arrastrable de una imagen ilustrativa dentro del preview —
+// el tile entero es el handle (se arrastra tocando la imagen misma).
+const SortableImageTile = ({ id, src, accentColor }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ ...style, borderColor: accentColor }}
+      {...attributes}
+      {...listeners}
+      className="aspect-square rounded-lg overflow-hidden border cursor-grab active:cursor-grabbing touch-none"
+    >
+      <img src={src} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
+    </div>
+  );
+};
+
+// Mini card de un plan dentro del preview, arrastrable por el handle (los
+// puntitos) para no interferir con el resto del contenido de la card.
+const SortablePlanCard = ({ id, name, price, accentColor, primaryTextColor }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ ...style, borderColor: accentColor }}
+      className="relative w-[68px] h-14 rounded-lg bg-[var(--surface)] border flex flex-col items-center justify-center px-1"
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="absolute -top-1.5 -right-1.5 w-4 h-4 flex items-center justify-center rounded-full bg-[var(--surface-muted)] text-[var(--text-muted)] cursor-grab active:cursor-grabbing touch-none"
+      >
+        <IconGrip />
+      </button>
+      <span className="text-[9px] font-semibold truncate w-full text-center" style={{ color: primaryTextColor }}>{name}</span>
+      <span className="text-[9px] text-[var(--text-muted)]">${price}</span>
+    </div>
+  );
+};
+
+// Bloque de seccion de la landing (Imagenes / Planes / Quienes somos),
+// arrastrable por el handle de su encabezado para reordenar entre si. El
+// Hero y el Footer no pasan por aca, van siempre fijos.
+const SortableSectionBlock = ({ id, label, accentColor, children }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="border-t" >
+      <div
+        {...attributes}
+        {...listeners}
+        style={{ borderColor: accentColor }}
+        className="flex items-center gap-1.5 px-5 pt-2 text-[9px] font-semibold text-[var(--text-faint)] uppercase tracking-wide cursor-grab active:cursor-grabbing touch-none select-none"
+      >
+        <IconGrip />
+        {label}
+      </div>
+      <div style={{ borderColor: accentColor }}>{children}</div>
+    </div>
+  );
+};
+
 // Mini mockup del hero + seccion de planes de la landing (Home.jsx,
 // HeroSection.jsx y PlansSection.jsx), a escala reducida, reflejando en vivo
 // lo que el SysAdmin esta tipeando en el form.
@@ -85,10 +205,15 @@ const LivePreview = ({
   plansTitle,
   plansSubtitle,
   plans,
+  onPlansDragEnd,
   footerDesc,
   contactEmail,
   contactPhone,
   socials,
+  businessImages,
+  onImagesDragEnd,
+  sectionsOrder,
+  onSectionsDragEnd,
   lang,
   onToggleLang,
   primaryColor,
@@ -99,6 +224,70 @@ const LivePreview = ({
   onToggleTheme,
 }) => {
   const { t } = useTranslation();
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
+  const sectionLabels = {
+    images: t("Illustrative images") || "Illustrative images",
+    plans: t("Plans") || "Plans",
+    about: t("About us") || "About us",
+  };
+
+  const sectionContent = {
+    images: businessImages && businessImages.length > 0 && (
+      <div className="px-5 py-4">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onImagesDragEnd}>
+          <SortableContext items={businessImages.map((b) => b.key)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-3 gap-1.5">
+              {businessImages.map(({ key, src }) => (
+                <SortableImageTile key={key} id={key} src={src} accentColor={accentColor} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      </div>
+    ),
+    plans: (
+      <div className="px-5 pb-6 text-center">
+        <h2 className="text-sm font-bold break-words" style={{ color: primaryTextColor }}>{plansTitle || "..."}</h2>
+        <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
+          {plansSubtitle || "..."}
+        </p>
+        {plans && plans.length > 0 ? (
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onPlansDragEnd}>
+            <SortableContext items={plans.map((p) => p.id)} strategy={rectSortingStrategy}>
+              <div className="flex flex-wrap justify-center gap-1.5 mt-3">
+                {plans.map((plan) => (
+                  <SortablePlanCard
+                    key={plan.id}
+                    id={plan.id}
+                    name={plan.name}
+                    price={plan.price}
+                    accentColor={accentColor}
+                    primaryTextColor={primaryTextColor}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        ) : (
+          <div className="flex flex-wrap justify-center gap-1.5 mt-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-[68px] h-10 rounded-lg bg-[var(--surface)] border" style={{ borderColor: accentColor }} />
+            ))}
+          </div>
+        )}
+      </div>
+    ),
+    about: (
+      <div className="px-5 pb-6 text-center">
+        <h2 className="text-sm font-bold break-words" style={{ color: primaryTextColor }}>{aboutTitle || "..."}</h2>
+        <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
+          {aboutDesc || "..."}
+        </p>
+      </div>
+    ),
+  };
+
   return (
   <div className="lg:sticky lg:top-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
@@ -123,6 +312,10 @@ const LivePreview = ({
         </button>
       </div>
     </div>
+
+    <p className="text-[11px] text-[var(--text-muted)] -mt-1">
+      {t("reorderImagesHint") || "Drag the images, plans or section handles below to reorder them."}
+    </p>
 
     <div className={`border rounded-2xl overflow-hidden ${previewTheme === "dark" ? "dark" : ""}`} style={{ backgroundColor, borderColor: accentColor }}>
       <div className="h-8 flex items-center gap-1.5 px-3 border-b" style={{ backgroundColor: "var(--surface-muted)", borderColor: accentColor }}>
@@ -152,44 +345,15 @@ const LivePreview = ({
         </p>
       </div>
 
-      <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
-        <h2 className="text-sm font-bold break-words" style={{ color: primaryTextColor }}>{plansTitle || "..."}</h2>
-        <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
-          {plansSubtitle || "..."}
-        </p>
-        {plans && plans.length > 0 ? (
-          <div className="flex flex-wrap justify-center gap-1.5 mt-3">
-            {plans.map((plan) => {
-              const id = plan.id ?? plan.Id;
-              const name = plan.name ?? plan.Name;
-              const price = plan.price ?? plan.Price;
-              return (
-                <div
-                  key={id ?? name}
-                  className="w-[68px] h-14 rounded-lg bg-[var(--surface)] border flex flex-col items-center justify-center px-1"
-                  style={{ borderColor: accentColor }}
-                >
-                  <span className="text-[9px] font-semibold truncate w-full text-center" style={{ color: primaryTextColor }}>{name}</span>
-                  <span className="text-[9px] text-[var(--text-muted)]">${price}</span>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex flex-wrap justify-center gap-1.5 mt-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="w-[68px] h-10 rounded-lg bg-[var(--surface)] border" style={{ borderColor: accentColor }} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="px-5 py-6 border-t text-center" style={{ borderColor: accentColor }}>
-        <h2 className="text-sm font-bold break-words" style={{ color: primaryTextColor }}>{aboutTitle || "..."}</h2>
-        <p className="text-[var(--text-secondary-alt)] text-[11px] mt-1 max-w-[220px] mx-auto break-words">
-          {aboutDesc || "..."}
-        </p>
-      </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onSectionsDragEnd}>
+        <SortableContext items={sectionsOrder} strategy={verticalListSortingStrategy}>
+          {sectionsOrder.map((key) => (
+            <SortableSectionBlock key={key} id={key} label={sectionLabels[key]} accentColor={accentColor}>
+              {sectionContent[key]}
+            </SortableSectionBlock>
+          ))}
+        </SortableContext>
+      </DndContext>
 
       <div className="text-white px-5 py-6 flex flex-col items-center text-center" style={{ backgroundColor: primaryColor }}>
         <div className="flex items-center gap-1.5 mb-2">
@@ -279,7 +443,52 @@ const mapResponseToForm = (data) => ({
   facebookUrl: data.facebookUrl || "",
   twitterUrl: data.twitterUrl || "",
   linkedinUrl: data.linkedinUrl || "",
+  imageUrlBarberia: data.imageUrlBarberia || "",
+  imageUrlSpa: data.imageUrlSpa || "",
+  imageUrlPeluqueria: data.imageUrlPeluqueria || "",
+  imageUrlEstetica: data.imageUrlEstetica || "",
+  imageUrlMasajes: data.imageUrlMasajes || "",
+  imageUrlTattoo: data.imageUrlTattoo || "",
+  businessTypesOrder: data.businessTypesOrder || serializeBusinessTypesOrder(DEFAULT_BUSINESS_TYPE_ORDER),
+  sectionsOrder: data.sectionsOrder || serializeSectionsOrder(DEFAULT_SECTIONS_ORDER),
 });
+
+// Rubros fijos mostrados en la landing (BusinessTypesSection.jsx) — si el
+// campo queda vacio, el frontend sigue usando la imagen local empaquetada.
+// `fallbackImg` se usa tambien aca en el preview para mostrar algo cuando
+// el campo todavia no tiene una URL cargada.
+const BUSINESS_TYPE_IMAGE_FIELDS = [
+  { field: "imageUrlBarberia", labelKey: "bizBarberia", fallbackImg: barberiaImg },
+  { field: "imageUrlSpa", labelKey: "bizSpa", fallbackImg: spaImg },
+  { field: "imageUrlPeluqueria", labelKey: "bizPeluqueria", fallbackImg: peluqueriaImg },
+  { field: "imageUrlEstetica", labelKey: "bizEstetica", fallbackImg: esteticaImg },
+  { field: "imageUrlMasajes", labelKey: "bizMasajes", fallbackImg: masajesImg },
+  { field: "imageUrlTattoo", labelKey: "bizTattoo", fallbackImg: tattooImg },
+];
+
+const ImageUrlField = ({ label, value, onChange, fallback }) => {
+  const [failed, setFailed] = useState(false);
+  const src = value && !failed ? value : fallback;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-xs font-semibold text-[var(--text-tertiary)]">{label}</label>
+      <div className="flex items-center gap-2">
+        <div className="w-10 h-10 rounded-lg overflow-hidden border border-[var(--border-subtle)] bg-[var(--surface-muted)] shrink-0 flex items-center justify-center">
+          <img src={src} alt="" onError={() => setFailed(true)} className="w-full h-full object-cover" />
+        </div>
+        <input
+          value={value}
+          onChange={(e) => {
+            setFailed(false);
+            onChange(e.target.value);
+          }}
+          placeholder="https://..."
+          className="w-full rounded-xl border border-[var(--border-subtle)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--brand)]"
+        />
+      </div>
+    </div>
+  );
+};
 
 const SysAdminLanding = () => {
   const { t } = useTranslation();
@@ -316,6 +525,14 @@ const SysAdminLanding = () => {
     facebookUrl: "",
     twitterUrl: "",
     linkedinUrl: "",
+    imageUrlBarberia: "",
+    imageUrlSpa: "",
+    imageUrlPeluqueria: "",
+    imageUrlEstetica: "",
+    imageUrlMasajes: "",
+    imageUrlTattoo: "",
+    businessTypesOrder: serializeBusinessTypesOrder(DEFAULT_BUSINESS_TYPE_ORDER),
+    sectionsOrder: serializeSectionsOrder(DEFAULT_SECTIONS_ORDER),
   });
 
   const showToast = (message) => {
@@ -357,14 +574,15 @@ const SysAdminLanding = () => {
     };
   }, []);
 
-  // Solo para mostrar los planes reales en el preview (igual que
-  // PlansSection.jsx en la landing) - no se edita nada aca.
+  // Muestra los planes reales en el preview (igual que PlansSection.jsx en
+  // la landing), ya ordenados por displayOrder como los devuelve el backend.
+  // Arrastrarlos aca mismo persiste el nuevo orden via reorderPlans.
   useEffect(() => {
     let cancelled = false;
     fetchPlans().then((data) => {
       if (cancelled) return;
       const list = Array.isArray(data) ? data : [];
-      setPreviewPlans([...list].sort((a, b) => (a.price ?? a.Price ?? 0) - (b.price ?? b.Price ?? 0)));
+      setPreviewPlans(list.map((p) => ({ ...p, id: p.id ?? p.Id, name: p.name ?? p.Name, price: p.price ?? p.Price })));
     });
     return () => {
       cancelled = true;
@@ -372,6 +590,48 @@ const SysAdminLanding = () => {
   }, []);
 
   const handleChange = (field) => (value) => setForm((prev) => ({ ...prev, [field]: value }));
+
+  // dnd-kit entrega {active, over} en onDragEnd; `active.id`/`over.id` son
+  // los ids que cada SortableContext declaro (ver DEFAULT_*_ORDER).
+  const handleImagesDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    setForm((prev) => {
+      const order = parseBusinessTypesOrder(prev.businessTypesOrder);
+      const oldIndex = order.indexOf(active.id);
+      const newIndex = order.indexOf(over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return { ...prev, businessTypesOrder: serializeBusinessTypesOrder(arrayMove(order, oldIndex, newIndex)) };
+    });
+  };
+
+  const handleSectionsDragEnd = ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    setForm((prev) => {
+      const order = parseSectionsOrder(prev.sectionsOrder);
+      const oldIndex = order.indexOf(active.id);
+      const newIndex = order.indexOf(over.id);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return { ...prev, sectionsOrder: serializeSectionsOrder(arrayMove(order, oldIndex, newIndex)) };
+    });
+  };
+
+  // A diferencia de imagenes/secciones (que viven en LandingContent y se
+  // guardan recien con "Save changes"), el orden de planes se persiste al
+  // toque via PUT /plan/reorder — son entidades propias, no un campo mas
+  // del form.
+  const handlePlansDragEnd = async ({ active, over }) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = previewPlans.findIndex((p) => p.id === active.id);
+    const newIndex = previewPlans.findIndex((p) => p.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const reordered = arrayMove(previewPlans, oldIndex, newIndex);
+    setPreviewPlans(reordered);
+    try {
+      await reorderPlans(reordered.map((p) => p.id));
+    } catch (err) {
+      showToast(err.message || (t("Failed to save changes") || "Failed to save changes"));
+    }
+  };
 
   const handleTranslate = (esField, enField) => async () => {
     const text = form[esField];
@@ -422,6 +682,15 @@ const SysAdminLanding = () => {
     twitterUrl: form.twitterUrl,
     linkedinUrl: form.linkedinUrl,
   };
+  const orderedBusinessTypeFields = sortByBusinessTypesOrder(
+    BUSINESS_TYPE_IMAGE_FIELDS,
+    parseBusinessTypesOrder(form.businessTypesOrder),
+    (f) => f.field
+  );
+  const previewBusinessImages = orderedBusinessTypeFields.map(({ field, fallbackImg }) => ({
+    key: field,
+    src: form[field] || fallbackImg,
+  }));
 
   return (
     <div className="pt-8 flex flex-col gap-6">
@@ -569,6 +838,28 @@ const SysAdminLanding = () => {
             </div>
 
             <div className="h-px bg-[var(--border-subtle)]" />
+            <div>
+              <p className="text-xs font-semibold text-[var(--text-tertiary)]">{t("Illustrative images") || "Illustrative images"}</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                {t("illustrativeImagesHint") || "One per business type, shown on the public landing. Leave blank to use the default image."}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {orderedBusinessTypeFields.map(({ field, labelKey, fallbackImg }) => (
+                <ImageUrlField
+                  key={field}
+                  label={t(labelKey) || labelKey}
+                  value={form[field]}
+                  onChange={handleChange(field)}
+                  fallback={fallbackImg}
+                />
+              ))}
+            </div>
+            <p className="text-[11px] text-[var(--text-muted)] -mt-2">
+              {t("reorderImagesHint") || "Use the arrows on each image in the preview to reorder them."}
+            </p>
+
+            <div className="h-px bg-[var(--border-subtle)]" />
             <p className="text-xs font-semibold text-[var(--text-tertiary)]">
               {t("Contact & social links (optional — hidden on the landing if left blank)") || "Contact & social links (optional — hidden on the landing if left blank)"}
             </p>
@@ -606,6 +897,7 @@ const SysAdminLanding = () => {
             plansTitle={previewPlansTitle}
             plansSubtitle={previewPlansSubtitle}
             plans={previewPlans}
+            onPlansDragEnd={handlePlansDragEnd}
             footerDesc={previewFooterDesc}
             contactEmail={form.contactEmail}
             contactPhone={form.contactPhone}
@@ -616,6 +908,10 @@ const SysAdminLanding = () => {
             previewTheme={previewTheme}
             onToggleTheme={() => setPreviewTheme((prev) => (prev === "dark" ? "light" : "dark"))}
             socials={previewSocials}
+            businessImages={previewBusinessImages}
+            onImagesDragEnd={handleImagesDragEnd}
+            sectionsOrder={parseSectionsOrder(form.sectionsOrder)}
+            onSectionsDragEnd={handleSectionsDragEnd}
             lang={previewLang}
             onToggleLang={() => setPreviewLang((prev) => (prev === "es" ? "en" : "es"))}
           />

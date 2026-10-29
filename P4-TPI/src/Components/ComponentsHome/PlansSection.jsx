@@ -44,9 +44,10 @@ const PlansSection = () => {
         <p className="text-center text-sm text-[var(--text-muted)]">{t("noPlansAvailable")}</p>
       ) : (
         <div className="flex flex-wrap justify-center gap-6">
-          {[...plans]
-            .sort((a, b) => (a.price ?? a.Price ?? 0) - (b.price ?? b.Price ?? 0))
-            .map((tier) => {
+          {/* El orden ya viene del backend por displayOrder (lo que el
+              SysAdmin arma arrastrando los planes en el preview) — no
+              reordenar aca por precio, pisaria esa eleccion. */}
+          {plans.map((tier) => {
               const id = tier.id ?? tier.Id;
               const name = tier.name ?? tier.Name;
               const description = tier.description ?? tier.Description;
