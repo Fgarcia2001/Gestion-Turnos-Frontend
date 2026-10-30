@@ -3,10 +3,6 @@ import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchHelpContent } from "../../../services/helpContentService";
 import { submitBugReport } from "../../../services/bugReportService";
 
-// ── Datos de contacto — fallback si el SysAdmin todavia no cargo HelpContent ──
-const CONTACT_WHATSAPP = "+5493410000000";
-const CONTACT_EMAIL = "soporte@ejemplo.com";
-
 // bugType del form ("bug"/"suggestion"/"other") -> enum que espera el backend.
 const BUG_TYPE_TO_API = { bug: "Bug", suggestion: "Suggestion", other: "Other" };
 
@@ -88,17 +84,20 @@ const CardHeader = ({ icon, title, subtitle }) => (
   </div>
 );
 
-const ContactRow = ({ icon, label, value }) => (
-  <div className="flex items-center gap-3 bg-[var(--surface-faint-2)] border border-[var(--border-subtle)] rounded-xl px-3 py-2.5">
-    <div className="w-8 h-8 rounded-lg bg-[var(--surface-muted)] flex items-center justify-center text-[var(--text-primary)] shrink-0">
-      {icon}
+const ContactRow = ({ icon, label, value }) => {
+  if (!value) return null;
+  return (
+    <div className="flex items-center gap-3 bg-[var(--surface-faint-2)] border border-[var(--border-subtle)] rounded-xl px-3 py-2.5">
+      <div className="w-8 h-8 rounded-lg bg-[var(--surface-muted)] flex items-center justify-center text-[var(--text-primary)] shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] text-[var(--text-muted)]">{label}</p>
+        <p className="text-sm font-semibold text-[var(--text-primary)] break-all" dir="ltr">{value}</p>
+      </div>
     </div>
-    <div className="min-w-0">
-      <p className="text-[11px] text-[var(--text-muted)]">{label}</p>
-      <p className="text-sm font-semibold text-[var(--text-primary)] break-all" dir="ltr">{value}</p>
-    </div>
-  </div>
-);
+  );
+};
 
 // ── Help ──────────────────────────────────────────────────────────────────────
 const Help = ({ onStartTour }) => {
@@ -141,11 +140,12 @@ const Help = ({ onStartTour }) => {
           }))
       : FAQ_ITEMS.map((item) => ({ id: item.q, q: t(item.q), a: t(item.a) }));
 
-  const contactWhatsapp = helpContent?.whatsappNumber || CONTACT_WHATSAPP;
-  const contactEmail = helpContent?.supportEmail || CONTACT_EMAIL;
-  const contactHours =
-    (language === "en" ? helpContent?.scheduleTextEn : helpContent?.scheduleTextEs) ||
-    (t("contactHoursValue") || "Mon–Fri · 9:00 to 18:00 (GMT-3)");
+  // Sin fallback a datos inventados: si el SysAdmin todavia no cargo el
+  // contacto en HelpContent, esas filas/botones simplemente no se muestran.
+  const contactWhatsapp = helpContent?.whatsappNumber || "";
+  const contactEmail = helpContent?.supportEmail || "";
+  const contactHours = (language === "en" ? helpContent?.scheduleTextEn : helpContent?.scheduleTextEs) || "";
+  const hasContactInfo = Boolean(contactWhatsapp || contactEmail || contactHours);
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -294,29 +294,41 @@ const Help = ({ onStartTour }) => {
             title={t("contactTitle") || "Contact us"}
             subtitle={t("contactSubtitle") || "We answer Monday to Friday during business hours."}
           />
-          <div className="flex flex-col gap-3 mb-5">
-            <ContactRow icon={<IconChat className="w-4 h-4" />} label={t("contactWhatsAppLabel") || "WhatsApp"} value={contactWhatsapp} />
-            <ContactRow icon={<IconMail className="w-4 h-4" />} label={t("contactEmailLabel") || "Email"} value={contactEmail} />
-            <ContactRow icon={<IconClock className="w-4 h-4" />} label={t("contactHoursLabel") || "Business hours"} value={contactHours} />
-          </div>
-          <div className="flex flex-col gap-3">
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#25d366] text-white text-sm font-semibold hover:bg-[#1fbe5a] transition-colors"
-            >
-              <IconChat className="w-4 h-4" />
-              {t("contactWriteWhatsapp") || "Write on WhatsApp"}
-            </a>
-            <a
-              href={mailtoUrl}
-              className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors"
-            >
-              <IconMail className="w-4 h-4" />
-              {t("contactSendEmail") || "Send an email"}
-            </a>
-          </div>
+          {hasContactInfo ? (
+            <>
+              <div className="flex flex-col gap-3 mb-5">
+                <ContactRow icon={<IconChat className="w-4 h-4" />} label={t("contactWhatsAppLabel") || "WhatsApp"} value={contactWhatsapp} />
+                <ContactRow icon={<IconMail className="w-4 h-4" />} label={t("contactEmailLabel") || "Email"} value={contactEmail} />
+                <ContactRow icon={<IconClock className="w-4 h-4" />} label={t("contactHoursLabel") || "Business hours"} value={contactHours} />
+              </div>
+              <div className="flex flex-col gap-3">
+                {contactWhatsapp && (
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#25d366] text-white text-sm font-semibold hover:bg-[#1fbe5a] transition-colors"
+                  >
+                    <IconChat className="w-4 h-4" />
+                    {t("contactWriteWhatsapp") || "Write on WhatsApp"}
+                  </a>
+                )}
+                {contactEmail && (
+                  <a
+                    href={mailtoUrl}
+                    className="inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--brand)] text-white text-sm font-semibold hover:bg-[var(--brand-hover)] transition-colors"
+                  >
+                    <IconMail className="w-4 h-4" />
+                    {t("contactSendEmail") || "Send an email"}
+                  </a>
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-[var(--text-muted)] text-center py-6">
+              {t("contactInfoNotAvailable") || "Contact info isn't available yet."}
+            </p>
+          )}
         </section>
 
         {/* 3 · Reportar un bug */}
