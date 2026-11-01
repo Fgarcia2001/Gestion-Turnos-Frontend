@@ -11,7 +11,7 @@ const STATUS_LABEL_KEYS = {
   Cancelled: "statusCancelled",
 };
 
-const LABEL_WIDTH = 184;
+const LABEL_WIDTH = 220;
 const SLOT_WIDTH = 120;
 const COLLAPSED_WIDTH = 1;
 const ROW_HEIGHT = 76;
@@ -185,7 +185,12 @@ const StaffRow = ({ staff, widths, totalWidth, onSelect, minutesToX }) => (
       <div className="w-9 h-9 shrink-0 rounded-full bg-[var(--surface-muted)] text-[var(--text-primary)] flex items-center justify-center text-[12px] font-bold">
         {getInitials(staff.staffName)}
       </div>
-      <span className="text-sm font-semibold text-[var(--text-primary)] truncate">{staff.staffName}</span>
+      <span
+        title={staff.staffName}
+        className="text-sm font-semibold text-[var(--text-primary)] leading-tight break-words line-clamp-2 min-w-0"
+      >
+        {staff.staffName}
+      </span>
     </div>
 
     <div className="relative" style={{ width: totalWidth }}>
