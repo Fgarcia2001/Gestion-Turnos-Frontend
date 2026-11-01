@@ -9,7 +9,11 @@ const ServiceStep = ({ booking, onSelect }) => {
   return (
     <SelectionStep
       title={t("selectService") || "Select Service"}
-      fetchFn={() => fetchServicesByBusiness(booking.businessId)}
+      fetchFn={() =>
+        fetchServicesByBusiness(booking.businessId).then((list) =>
+          Array.isArray(list) ? list.filter((s) => s.isActive !== false) : list
+        )
+      }
       deps={[booking.businessId]}
       getId={(item) => item.id}
       isSelected={(item) => item.id === booking.serviceId}

@@ -37,6 +37,18 @@
 
   --success-bg: #f0fdf4;
   --success-text: #16a34a;
+
+  /* Seleccion (tarjetas, dias, horarios): en oscuro --brand no contrasta con
+     la superficie, por eso tienen tokens propios. */
+  --select-border: #1a1a2e;
+  --select-bg: #faf9f7;
+  --select-fill: #1a1a2e;
+  --on-select-fill: #ffffff;
+  --day-disabled: #d8d2cb;
+  --hover-bg: #F8F5F0;
+  --info-bg: #eef2ff;
+  --info-border: #c7d2fe;
+  --info-text: #3730a3;
 }
 
 .dark {
@@ -67,6 +79,29 @@
 
   --success-bg: #14532d;
   --success-text: #bbf7d0;
+
+  --select-border: #8b93e8;
+  --select-bg: rgba(139, 147, 232, 0.16);
+  --select-fill: #8b93e8;
+  --on-select-fill: #13131f;
+  --day-disabled: #4a4a64;
+  --hover-bg: #26263a;
+  --info-bg: rgba(139, 147, 232, 0.14);
+  --info-border: #4a4a64;
+  --info-text: #c7caf5;
+}
+
+/* Fuerza los tokens claros dentro de un bloque (el wizard publico de reserva
+   es solo claro aunque el usuario tenga el modo oscuro activo). */
+.dark .theme-light {
+  --text-primary: #1a1a2e;
+  --text-muted: #9a9a9a;
+  --text-dim: #4a4a4a;
+  --select-border: #1a1a2e;
+  --select-fill: #1a1a2e;
+  --on-select-fill: #ffffff;
+  --day-disabled: #d8d2cb;
+  --hover-bg: #F8F5F0;
 }
 
 body {

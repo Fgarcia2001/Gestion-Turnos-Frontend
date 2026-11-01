@@ -89,6 +89,9 @@ export const deleteJson = (url) => requestJson(url, "DELETE");
 export const fetchMyProfile = () => getJson(`${BASE_URL}/Staff/me`);
 // Solo actualiza los campos que vengan con valor; devuelve el perfil actualizado.
 export const updateMyProfile = (payload) => putJson(`${BASE_URL}/Staff/me`, payload);
+// Visibilidad del admin para que los clientes lo seleccionen al reservar (body: { isBookable: bool }).
+export const updateAdminBookable = (isBookable) =>
+  putJson(`${BASE_URL}/Staff/Business/Admin/bookable`, { isBookable });
 
 // ── Suscripción y pagos (MercadoPago Checkout Pro) ─────────────────────────────
 export const fetchMySubscription = () => getJson(`${BASE_URL}/BusinessSubscription/my`);
