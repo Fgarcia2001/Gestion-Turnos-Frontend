@@ -69,7 +69,7 @@ const DateTimeStep = ({ booking, onSelectDay, onSelectSlot }) => {
         <p className="text-[#6b6b6b] mt-1">{t("bookingSubtitle") || "Choose your preferred appointment date and time slot"}</p>
       </div>
 
-      <div className="w-full max-w-sm mx-auto border border-[#e2ddd8] rounded-2xl p-6 mb-8 shadow-sm bg-white">
+      <div className="theme-light w-full max-w-sm mx-auto border border-[#e2ddd8] rounded-2xl p-6 mb-8 shadow-sm bg-white">
         <BookingCalendar
           selected={booking.day}
           onSelect={onSelectDay}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BASE_URL, getAuthHeaders, fetchMyProfile, updateMyProfile } from "../../../../services/api";
+import { BASE_URL, getAuthHeaders, fetchMyProfile, updateMyProfile, updateAdminBookable } from "../../../../services/api";
 import { IconCamera, IconMail, IconPhone as IconPhoneIcon } from './SettingsIcons';
 import { useTranslation } from "../../../../../CustomHooks/TraslateHook";
 
@@ -27,6 +27,10 @@ const AdminTab = ({ self = false }) => {
   const [photoInputMode, setPhotoInputMode] = useState("url");
   const [photoPreview, setPhotoPreview] = useState("");
   const [error, setError] = useState("");
+  const [isBookable, setIsBookable] = useState(true);
+  const [showBookableModal, setShowBookableModal] = useState(false);
+  const [togglingBookable, setTogglingBookable] = useState(false);
+  const [bookableError, setBookableError] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -43,6 +47,7 @@ const AdminTab = ({ self = false }) => {
         setFormData(initial);
         setOriginalData(initial);
         setPhotoPreview(initial.staffLinkPhoto);
+        setIsBookable(data?.isBookable ?? true);
       } catch {
         // API not available yet
       } finally {
@@ -116,6 +121,27 @@ const AdminTab = ({ self = false }) => {
     }
   };
 
+  const closeBookableModal = () => {
+    if (togglingBookable) return;
+    setShowBookableModal(false);
+    setBookableError("");
+  };
+
+  const handleConfirmBookable = async () => {
+    setTogglingBookable(true);
+    setBookableError("");
+    try {
+      const next = !isBookable;
+      await updateAdminBookable(next);
+      setIsBookable(next);
+      setShowBookableModal(false);
+    } catch {
+      setBookableError(t("Could not update availability. Please try again.") || "No se pudo actualizar la disponibilidad. Intentá de nuevo.");
+    } finally {
+      setTogglingBookable(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -127,8 +153,19 @@ const AdminTab = ({ self = false }) => {
   return (
     <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto">
       {/* Profile */}
-      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">{self ? (t("My Profile") || "My Profile") : (t("Administrator Profile") || "Administrator Profile")}</h2>
+      <div className="relative bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6">
+        {!self && (
+          <button
+            type="button"
+            onClick={() => setShowBookableModal(true)}
+            title={t("Change availability") || "Cambiar disponibilidad"}
+            className={`absolute top-4 right-4 flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full border transition-colors ${isBookable ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"}`}
+          >
+            <span className={`size-1.5 rounded-full ${isBookable ? "bg-emerald-500" : "bg-amber-500"}`} />
+            {isBookable ? (t("Available") || "Disponible") : (t("Not available") || "No disponible")}
+          </button>
+        )}
+        <h2 className="text-lg font-semibold text-[var(--text-primary)] pr-32">{self ? (t("My Profile") || "My Profile") : (t("Administrator Profile") || "Administrator Profile")}</h2>
         <p className="text-sm text-[var(--text-muted)] mb-6 mt-1">{t("Manage your personal account data.") || "Manage your personal account data."}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
@@ -255,6 +292,39 @@ const AdminTab = ({ self = false }) => {
           </button>
         </div>
       </div>
+      )}
+
+      {/* Bookable confirmation modal */}
+      {showBookableModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={closeBookableModal}>
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-semibold text-[var(--text-primary)]">
+              {isBookable ? (t("Hide from bookings") || "Dejar de estar disponible") : (t("Show in bookings") || "Volver a estar disponible")}
+            </h3>
+            <p className="text-sm text-[var(--text-muted)] mt-2">
+              {isBookable
+                ? (t("Bookable off message") || "Esta acción cambiará tu disponibilidad: los clientes no podrán seleccionarte ni solicitar un turno con vos.")
+                : (t("Bookable on message") || "Volverás a estar disponible: los clientes podrán seleccionarte y solicitar turnos con vos.")}
+            </p>
+            {bookableError && <p className="text-sm text-red-500 mt-3">{bookableError}</p>}
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={closeBookableModal}
+                disabled={togglingBookable}
+                className="px-4 py-2 text-sm font-semibold rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] hover:bg-[var(--border-subtle)] transition-colors"
+              >
+                {t("Cancel") || "Cancel"}
+              </button>
+              <button
+                onClick={handleConfirmBookable}
+                disabled={togglingBookable}
+                className={`px-4 py-2 text-sm font-semibold rounded-xl transition-colors ${togglingBookable ? "bg-[#9a9a9a] text-[var(--text-faint)] cursor-not-allowed" : "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]"}`}
+              >
+                {togglingBookable ? (t("Saving") || "Saving...") : (t("Confirm") || "Confirmar")}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

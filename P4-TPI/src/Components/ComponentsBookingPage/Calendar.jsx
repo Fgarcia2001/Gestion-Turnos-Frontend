@@ -44,16 +44,16 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={() => onViewDateChange(new Date(year, month - 1, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F8F5F0] text-[#4a4a4a] transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--hover-bg)] text-[var(--text-dim)] transition-colors"
         >
           <IconChevronLeft />
         </button>
-        <span className="text-sm font-semibold text-[#1a1a2e]">
+        <span className="text-sm font-semibold text-[var(--text-primary)]">
           {(t(MONTH_KEYS[month]) || MONTH_KEYS[month])} {year}
         </span>
         <button
           onClick={() => onViewDateChange(new Date(year, month + 1, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F8F5F0] text-[#4a4a4a] transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[var(--hover-bg)] text-[var(--text-dim)] transition-colors"
         >
           <IconChevronRight />
         </button>
@@ -61,7 +61,7 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
 
       <div className="grid grid-cols-7 mb-1">
         {DAY_KEYS.map((k) => (
-          <div key={k} className="text-center text-[11px] font-semibold text-[#b3aca3] py-1">
+          <div key={k} className="text-center text-[11px] font-semibold text-[var(--text-muted)] py-1">
             {t(k) || k}
           </div>
         ))}
@@ -85,10 +85,10 @@ const BookingCalendar = ({ selected, onSelect, viewDate, onViewDateChange, minDa
               onClick={() => !disabled && onSelect(date)}
               className={`flex items-center justify-center h-9 w-full rounded-full text-sm transition-all
                 ${!c.cur ? "text-transparent cursor-default" : ""}
-                ${isOutOfRange ? "text-[#d8d2cb] cursor-not-allowed" : ""}
-                ${c.cur && !isOutOfRange && !isSelected ? "text-[#1a1a2e] cursor-pointer hover:bg-[#F8F5F0]" : ""}
-                ${isTodayCell ? "ring-1 ring-inset ring-[#1a1a2e]/40 font-semibold" : ""}
-                ${isSelected ? "bg-[#1a1a2e] text-white font-semibold shadow-sm shadow-[#1a1a2e]/30" : ""}
+                ${isOutOfRange ? "text-[var(--day-disabled)] cursor-not-allowed" : ""}
+                ${c.cur && !isOutOfRange && !isSelected ? "text-[var(--text-primary)] font-medium cursor-pointer hover:bg-[var(--hover-bg)]" : ""}
+                ${isTodayCell ? "ring-1 ring-inset ring-[var(--select-border)] font-semibold" : ""}
+                ${isSelected ? "bg-[var(--select-fill)] text-[var(--on-select-fill)] font-bold shadow-sm" : ""}
               `}
             >
               {c.day}

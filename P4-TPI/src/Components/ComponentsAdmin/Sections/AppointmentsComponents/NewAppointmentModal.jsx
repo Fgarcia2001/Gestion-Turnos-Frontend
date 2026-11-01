@@ -40,6 +40,28 @@ const IconUser = () => (
   </svg>
 );
 
+// Selection styling. In dark mode --brand barely differs from the surface, so
+// selected state uses the dedicated --select-* tokens (see index.css).
+const cardClass = (selected) =>
+  `relative text-left p-4 rounded-2xl border-2 transition-all ${
+    selected
+      ? "border-[var(--select-border)] bg-[var(--select-bg)] shadow-sm"
+      : "border-[var(--border-subtle)] hover:border-[var(--border-accent)] hover:bg-[var(--surface-faint)]"
+  }`;
+const chipClass = (selected, extra = "") =>
+  `border-2 text-sm font-semibold transition-all ${
+    selected
+      ? "border-[var(--select-fill)] bg-[var(--select-fill)] text-[var(--on-select-fill)] shadow-sm"
+      : "border-[var(--border-accent)] bg-[var(--surface-faint)] text-[var(--text-primary)] hover:border-[var(--select-border)]"
+  } ${extra}`;
+const CheckBadge = () => (
+  <span className="absolute top-3 right-3 flex items-center justify-center w-5 h-5 rounded-full bg-[var(--select-fill)] text-[var(--on-select-fill)]">
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  </span>
+);
+
 // ── Step list: branch only shown to Admin, staff skipped for Profesional ─────
 const resolveSteps = (role) => {
   const steps = ["client"];
@@ -154,7 +176,8 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
   const [services, setServices] = useState([]);
   const [serviceId, setServiceId] = useState(null);
   useEffect(() => {
-    fetchServiceData().then((data) => setServices(Array.isArray(data) ? data : []));
+    // Solo servicios activos: los inactivos no se pueden agendar.
+    fetchServiceData().then((data) => setServices(Array.isArray(data) ? data.filter((s) => s.isActive !== false) : []));
   }, []);
   const selectedService = services.find((s) => s.id === serviceId);
 
@@ -304,7 +327,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                 </button>
 
                 {pickedFromSearch && (
-                  <div className="bg-[#eef2ff] border border-[#c7d2fe] rounded-xl px-4 py-2.5 text-xs text-[#3730a3]">
+                  <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl px-4 py-2.5 text-xs text-[var(--info-text)]">
                     {t("existingClientSelected") || "Existing client selected — you can edit their info if needed."}
                   </div>
                 )}
@@ -350,12 +373,12 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   key={id}
                   type="button"
                   onClick={() => selectBranch(id)}
-                  className={`flex items-center gap-3 text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected ? "border-[var(--brand)] bg-[var(--surface-faint)]" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
-                  }`}
+                  aria-pressed={selected}
+                  className={`flex items-center gap-3 ${cardClass(selected)}`}
                 >
+                  {selected && <CheckBadge />}
                   <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] shrink-0"><IconMapPin /></span>
-                  <span className="font-semibold text-[var(--text-primary)]">{b.name ?? b.branchName}</span>
+                  <span className="font-semibold text-[var(--text-primary)] pr-6">{b.name ?? b.branchName}</span>
                 </button>
               );
             })}
@@ -372,10 +395,10 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   key={s.id}
                   type="button"
                   onClick={() => setServiceId(s.id)}
-                  className={`flex items-start gap-3 text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected ? "border-[var(--brand)] bg-[var(--surface-faint)]" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
-                  }`}
+                  aria-pressed={selected}
+                  className={`flex items-start gap-3 ${cardClass(selected)}`}
                 >
+                  {selected && <CheckBadge />}
                   <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[var(--surface-muted)] text-[var(--text-primary)] shrink-0"><IconClipboard /></span>
                   <div>
                     <p className="font-semibold text-[var(--text-primary)]">{s.name}</p>
@@ -397,14 +420,14 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                   key={s.id}
                   type="button"
                   onClick={() => setStaffId(s.id)}
-                  className={`flex items-center gap-3 text-left p-4 rounded-2xl border-2 transition-all ${
-                    selected ? "border-[var(--brand)] bg-[var(--surface-faint)]" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
-                  }`}
+                  aria-pressed={selected}
+                  className={`flex items-center gap-3 ${cardClass(selected)}`}
                 >
-                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--brand)] text-white text-xs font-bold shrink-0">
+                  {selected && <CheckBadge />}
+                  <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[var(--select-fill)] text-[var(--on-select-fill)] text-xs font-bold shrink-0">
                     {(s.name || "").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
                   </span>
-                  <span className="font-semibold text-[var(--text-primary)]">{s.name}</span>
+                  <span className="font-semibold text-[var(--text-primary)] pr-6">{s.name}</span>
                 </button>
               );
             })}
@@ -427,9 +450,8 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
                       key={slot.startTime}
                       type="button"
                       onClick={() => setStartTime(slot.startTime)}
-                      className={`py-2 rounded-lg border-2 text-sm font-semibold transition-all ${
-                        startTime === slot.startTime ? "border-[var(--brand)] bg-[var(--brand)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
-                      }`}
+                      aria-pressed={startTime === slot.startTime}
+                      className={chipClass(startTime === slot.startTime, "py-2 rounded-lg")}
                     >
                       {slot.startTime}
                     </button>
@@ -459,16 +481,19 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
             </div>
 
             <div>
-              <label className={labelClass}>{t("Payment Method") || "Payment Method"}</label>
-              <div className="grid grid-cols-2 gap-3">
-                {[{ value: 0, key: "cashOption", label: "Cash" }, { value: 1, key: "cardOption", label: "Card" }].map((opt) => (
+              <label className={labelClass}>{t("paymentLabel") || t("Payment Method") || "Payment Method"}</label>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { value: 0, key: "payment_cash", label: "Efectivo" },
+                  { value: 1, key: "payment_transferencia", label: "Transferencia" },
+                  { value: 2, key: "payment_mercadopago", label: "MercadoPago" },
+                ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
                     onClick={() => setPayment(opt.value)}
-                    className={`py-2 rounded-xl border-2 text-sm font-semibold transition-all ${
-                      Number(payment) === opt.value ? "border-[var(--brand)] bg-[var(--brand)] text-white" : "border-[var(--border-subtle)] hover:border-[var(--border-accent)]"
-                    }`}
+                    aria-pressed={Number(payment) === opt.value}
+                    className={chipClass(Number(payment) === opt.value, "py-2 rounded-xl")}
                   >
                     {t(opt.key) || opt.label}
                   </button>
@@ -515,7 +540,7 @@ const NewAppointmentModal = ({ branches = [], onClose, onCreated }) => {
             onClick={goNext}
             disabled={!canContinue || submitting}
             className={`px-6 py-2 rounded-xl text-sm font-semibold transition-colors ${
-              canContinue && !submitting ? "bg-[var(--brand)] text-white hover:bg-[var(--brand-hover)]" : "bg-[var(--border-subtle)] text-[var(--text-faint)] cursor-not-allowed"
+              canContinue && !submitting ? "bg-[var(--select-fill)] text-[var(--on-select-fill)] hover:opacity-90" : "bg-[var(--border-subtle)] text-[var(--text-faint)] cursor-not-allowed"
             }`}
           >
             {submitting
