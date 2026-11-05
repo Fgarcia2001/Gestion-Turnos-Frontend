@@ -145,6 +145,11 @@ export const fetchAppointmentsByDate = (date, branchId) => {
 export const fetchMyBranchAppointmentsByDate = (date) =>
   fetchJson(`${BASE_URL}/Appointment/my-branch/by-date?day=${toDateParam(date)}`);
 
+// Historial completo de turnos de un cliente puntual (mas reciente primero),
+// ya escopeado al negocio del Admin del lado del backend.
+export const fetchAppointmentsByClient = (clientId) =>
+  fetchJson(`${BASE_URL}/Appointment/by-client/${encodeURIComponent(clientId)}`);
+
 export const fetchStaffData = () => fetchJson(`${BASE_URL}/Staff/Business/Staffs`);
 export const fetchClientData = () => fetchJson(`${BASE_URL}/Client`);
 export const fetchBranchData = () => fetchJson(`${BASE_URL}/Branch`);

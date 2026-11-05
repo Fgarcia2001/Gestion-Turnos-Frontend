@@ -2,7 +2,7 @@
 // Presentational: all fetch state (detail/loading/error) is owned by the parent.
 import { useEffect, useState } from "react";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
-import { IconX, IconEdit, IconEye, IconEyeOff } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
+import { IconX, IconEdit, IconEye, IconEyeOff, IconTrash } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { getBusinessInitials, statusStyle } from "./businessStatus";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
 
@@ -51,7 +51,7 @@ const StatTile = ({ label, value }) => (
   </div>
 );
 
-const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onEdit, onToggleBranch, togglingBranchId }) => {
+const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChangePlan, onCancelSubscription, onEdit, onToggleBranch, togglingBranchId }) => {
   const { t } = useTranslation();
   const [logoFailed, setLogoFailed] = useState(false);
 
@@ -73,6 +73,7 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
   const subscriptionStatus = pick(detail, "subscriptionStatus");
   const subscriptionStartDate = pick(detail, "subscriptionStartDate", "startDate", "startsAt");
   const subscriptionEndDate = pick(detail, "subscriptionEndDate", "endDate", "endsAt", "expiresAt");
+  const pendingPlanName = pick(detail, "pendingPlanName");
   const hasSubscription = Boolean(
     currentPlan || subscriptionStatus || subscriptionStartDate || subscriptionEndDate
   );
@@ -174,21 +175,45 @@ const BusinessDetailModal = ({ detail, loading, error, onClose, onRetry, onChang
                           <Field label={t("Status") || "Status"} value={subscriptionStatus || (t("Not provided") || "Not provided")} />
                           <Field label={t("Start date") || "Start date"} value={formatDate(subscriptionStartDate) || (t("Not provided") || "Not provided")} />
                           <Field label={t("End date") || "End date"} value={formatDate(subscriptionEndDate) || (t("Not provided") || "Not provided")} />
+                          {pendingPlanName && (
+                            <div className="mt-2 flex items-start gap-2 text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-xl px-3.5 py-2.5">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 mt-0.5">
+                                <circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />
+                              </svg>
+                              <span>
+                                {(t("pendingPlanNotice") || "Scheduled switch to {plan} on {date}. You keep your current plan until then.")
+                                  .replace("{plan}", pendingPlanName)
+                                  .replace("{date}", formatDate(subscriptionEndDate) || "—")}
+                              </span>
+                            </div>
+                          )}
                         </>
                       ) : (
                         <p className="text-sm text-[var(--text-muted)]">{t("No subscription information.") || "No subscription information."}</p>
                       )}
                     </div>
-                    {onChangePlan && (
-                      <button
-                        type="button"
-                        onClick={onChangePlan}
-                        className="flex items-center gap-1.5 shrink-0 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
-                      >
-                        <IconEdit />
-                        {t("Change plan") || "Change plan"}
-                      </button>
-                    )}
+                    <div className="flex flex-col gap-2 shrink-0">
+                      {onChangePlan && (
+                        <button
+                          type="button"
+                          onClick={onChangePlan}
+                          className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-tertiary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 hover:bg-[var(--surface-muted)] transition-colors"
+                        >
+                          <IconEdit />
+                          {t("Change plan") || "Change plan"}
+                        </button>
+                      )}
+                      {onCancelSubscription && (
+                        <button
+                          type="button"
+                          onClick={onCancelSubscription}
+                          className="flex items-center gap-1.5 text-xs font-semibold text-[#b91c1c] hover:bg-red-50 border border-[var(--border-subtle)] rounded-lg px-3 py-1.5 transition-colors"
+                        >
+                          <IconTrash />
+                          {t("Cancel subscription") || "Cancel subscription"}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </Section>
 

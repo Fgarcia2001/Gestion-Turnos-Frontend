@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
 import {
   fetchAllSubscriptions,
-  updateSubscriptionStatus,
-  changeSubscriptionPlan,
   deleteSubscription,
 } from "../../services/subscriptionService";
-import { fetchAllPlans } from "../../services/planService";
 import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
-import { IconX, IconWarning, IconTrash, IconEdit } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
-import ChangePlanModal from "./ChangePlanModal";
+import { IconX, IconWarning, IconTrash } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
-
-const STATUS_OPTIONS = ["Active", "Inactive", "Cancelled", "Expired"];
 
 const STATUS_STYLES = {
   Active: "bg-green-50 text-green-600",
@@ -120,13 +114,10 @@ const DeleteSubscriptionModal = ({ subscription, onClose, onConfirm }) => {
 const SysAdminSubscriptions = () => {
   const { t } = useTranslation();
   const [subscriptions, setSubscriptions] = useState([]);
-  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [toast, setToast] = useState(null);
-  const [updatingId, setUpdatingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [changePlanTarget, setChangePlanTarget] = useState(null);
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState(() => new Set());
 
@@ -148,9 +139,8 @@ const SysAdminSubscriptions = () => {
     setLoading(true);
     setError(false);
     try {
-      const [list, planList] = await Promise.all([fetchAllSubscriptions(), fetchAllPlans()]);
+      const list = await fetchAllSubscriptions();
       setSubscriptions(Array.isArray(list) ? list : []);
-      setPlans(Array.isArray(planList) ? planList : []);
     } catch {
       setError(true);
     } finally {
@@ -164,11 +154,8 @@ const SysAdminSubscriptions = () => {
       setLoading(true);
       setError(false);
       try {
-        const [list, planList] = await Promise.all([fetchAllSubscriptions(), fetchAllPlans()]);
-        if (!cancelled) {
-          setSubscriptions(Array.isArray(list) ? list : []);
-          setPlans(Array.isArray(planList) ? planList : []);
-        }
+        const list = await fetchAllSubscriptions();
+        if (!cancelled) setSubscriptions(Array.isArray(list) ? list : []);
       } catch {
         if (!cancelled) setError(true);
       } finally {
@@ -179,26 +166,6 @@ const SysAdminSubscriptions = () => {
       cancelled = true;
     };
   }, []);
-
-  const handleStatusChange = async (subscription, status) => {
-    if (status === subscription.status) return;
-    setUpdatingId(subscription.id);
-    try {
-      const updated = await updateSubscriptionStatus(subscription.id, status);
-      setSubscriptions((prev) => prev.map((s) => (s.id === subscription.id ? updated : s)));
-      showToast(t("Subscription status updated") || "Subscription status updated");
-    } catch (err) {
-      showToast(err.message || (t("Failed to update status") || "Failed to update status"));
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  const handleChangePlan = async (planId) => {
-    await changeSubscriptionPlan(changePlanTarget.businessId, planId);
-    await load();
-    showToast(t("Plan changed") || "Plan changed");
-  };
 
   const handleDelete = async (subscription) => {
     await deleteSubscription(subscription.id);
@@ -212,7 +179,7 @@ const SysAdminSubscriptions = () => {
       <div>
         <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{t("Subscriptions") || "Subscriptions"}</h2>
         <p className="text-sm text-[var(--text-muted)]">
-          {t("sysAdminSubscriptionsSubtitle") || "Full subscription history, grouped by business. Change a status, switch plans or remove a subscription."}
+          {t("sysAdminSubscriptionsSubtitle") || "Read-only subscription history, grouped by business. To change a business's plan, go to Businesses."}
         </p>
       </div>
 
@@ -300,35 +267,17 @@ const SysAdminSubscriptions = () => {
                               )}
                             </td>
                             <td className="py-3 pr-6">
-                              <select
-                                value={sub.status}
-                                disabled={updatingId === sub.id}
-                                onChange={(e) => handleStatusChange(sub, e.target.value)}
-                                className={`text-xs font-semibold px-2.5 py-1.5 rounded-full border-0 cursor-pointer disabled:opacity-50 ${
+                              <span
+                                className={`text-xs font-semibold px-2.5 py-1.5 rounded-full ${
                                   STATUS_STYLES[sub.status] || "bg-[var(--surface-muted)] text-[var(--text-muted)]"
                                 }`}
                               >
-                                {STATUS_OPTIONS.map((opt) => (
-                                  <option
-                                    key={opt}
-                                    value={opt}
-                                    disabled={opt === "Expired" && sub.status !== "Expired"}
-                                  >
-                                    {t(opt) || opt}
-                                  </option>
-                                ))}
-                              </select>
+                                {t(sub.status) || sub.status}
+                              </span>
                             </td>
                             <td className="py-3 pr-6 text-sm text-[var(--text-tertiary)]">{formatDate(sub.startDate)}</td>
                             <td className="py-3 pr-6 text-sm text-[var(--text-tertiary)]">{formatDate(sub.endDate)}</td>
                             <td className="py-3 pr-2 text-right whitespace-nowrap">
-                              <button
-                                onClick={() => setChangePlanTarget(sub)}
-                                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] transition-colors"
-                                title={t("Change plan") || "Change plan"}
-                              >
-                                <IconEdit />
-                              </button>
                               <button
                                 onClick={() => setDeleteTarget(sub)}
                                 className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:bg-red-50 hover:text-red-500 transition-colors"
@@ -372,16 +321,6 @@ const SysAdminSubscriptions = () => {
             </div>
           );
         })()
-      )}
-
-      {changePlanTarget && (
-        <ChangePlanModal
-          businessName={changePlanTarget.businessName}
-          currentPlanId={changePlanTarget.planId}
-          plans={plans}
-          onClose={() => setChangePlanTarget(null)}
-          onConfirm={handleChangePlan}
-        />
       )}
 
       {deleteTarget && (

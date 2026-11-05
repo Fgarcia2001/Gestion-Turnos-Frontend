@@ -12,6 +12,7 @@ import { createStaff, updateStaff, deleteStaff } from "../../../services/staffSe
 import { createBranch, updateBranch, deleteBranch } from "../../../services/branchService";
 import { createService, updateService, deleteService } from "../../../services/servicesService";
 import { EditModal, CreateModal, SchedulesModal, DeleteModal } from "./ManagmentBusinessComponents/Modals";
+import { ClientHistoryModal } from "./ManagmentBusinessComponents/ClientHistoryModal";
 import { TableRow } from "./ManagmentBusinessComponents/TableComponents";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -101,7 +102,7 @@ const EmptyState = ({ tab, t }) => (
 // ── Main component ────────────────────────────────────────────────────────────
 const isReceptionist = (role) => role === "Recepcionista" || role === "Receptionist";
 
-const ManagmentBusiness = () => {
+const ManagmentBusiness = ({ onViewClientHistory }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const receptionist = isReceptionist(user?.role);
@@ -117,6 +118,7 @@ const ManagmentBusiness = () => {
   const [editTarget, setEditTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [schedulesTarget, setSchedulesTarget] = useState(null);
+  const [historyTarget, setHistoryTarget] = useState(null);
   const [toast, setToast] = useState(null);
   const [data, setData] = useState({
     staff: [],
@@ -405,6 +407,7 @@ const ManagmentBusiness = () => {
                         onDelete={() => setDeleteTarget(row)}
                         onSchedules={() => setSchedulesTarget(row)}
                         onToggleActive={handleToggleBranchActive}
+                        onViewHistory={() => setHistoryTarget(row)}
                       />
                     ))
                   )}
@@ -452,6 +455,18 @@ const ManagmentBusiness = () => {
           t={t}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
+        />
+      )}
+
+      {historyTarget && (
+        <ClientHistoryModal
+          client={historyTarget}
+          t={t}
+          onClose={() => setHistoryTarget(null)}
+          onViewAllAppointments={() => {
+            onViewClientHistory?.(historyTarget);
+            setHistoryTarget(null);
+          }}
         />
       )}
     </>

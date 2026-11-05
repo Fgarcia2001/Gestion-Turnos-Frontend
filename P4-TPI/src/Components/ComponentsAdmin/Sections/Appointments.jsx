@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "../../../../CustomHooks/TraslateHook";
 import { fetchBranchData } from "./ManagmentBusinessComponents/Data";
-import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate } from "../../../services/api";
+import { fetchAppointmentsByDate, fetchMyBranchAppointmentsByDate, fetchAppointmentsByClient } from "../../../services/api";
 import { updateAppointmentStatus, fetchMyAppointments } from "../../../services/appointmentService";
 import { useAuth } from "../../../../CustomHooks/AuthContext";
 import { ModalOverlay } from "./ManagmentBusinessComponents/Shared";
@@ -150,6 +150,7 @@ const STATUS_STYLES = {
   Pending: "bg-[#fef3c7] text-[#b45309]",
   Confirmed: "bg-[#dcfce7] text-[#15803d]",
   Cancelled: "bg-[#fee2e2] text-[#b91c1c]",
+  PendingReassignment: "bg-[#f3e8ff] text-[#7e22ce]",
 };
 
 // Claves de traducción para los valores de estado que guarda el backend
@@ -158,6 +159,7 @@ const STATUS_LABEL_KEYS = {
   Pending: "statusPending",
   Confirmed: "statusConfirmed",
   Cancelled: "statusCancelled",
+  PendingReassignment: "statusPendingReassignment",
 };
 
 const StatusBadge = ({ status }) => {
@@ -409,7 +411,7 @@ const parseInitialDate = (value) => {
   return y && m && d ? { y, m, d } : null;
 };
 
-const Appointments = ({ initialDate }) => {
+const Appointments = ({ initialDate, initialClientFilter }) => {
   const { t, language } = useTranslation();
   const today = new Date();
   const initial = parseInitialDate(initialDate);
@@ -425,6 +427,10 @@ const Appointments = ({ initialDate }) => {
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const [toast, setToast] = useState(null);
   const [showNewAppointment, setShowNewAppointment] = useState(false);
+  // Si viene seteado (desde el historial del cliente en Managment Business),
+  // la pantalla deja de mostrar la agenda de un dia y pasa a listar todos
+  // los turnos de ese cliente.
+  const [clientFilter, setClientFilter] = useState(initialClientFilter || null);
 
   const showToast = (message, isError = false) => {
     setToast({ message, isError });
@@ -453,18 +459,22 @@ const Appointments = ({ initialDate }) => {
   const loadAppointments = useCallback(async () => {
     setLoading(true);
     try {
-      const day = new Date(viewDate.getFullYear(), viewDate.getMonth(), selectedDay);
       let data;
-      if (role === "2" || role === "Profesional" || role === "Professional") {
-        const all = await fetchMyAppointments();
-        data = all.filter((a) => {
-          const [y, m, d] = (a.day || "").split("-").map(Number);
-          return y === viewDate.getFullYear() && m === viewDate.getMonth() + 1 && d === selectedDay;
-        });
-      } else if (role === "Recepcionista" || role === "Receptionist") {
-        data = await fetchMyBranchAppointmentsByDate(day);
+      if (clientFilter) {
+        data = await fetchAppointmentsByClient(clientFilter.id);
       } else {
-        data = await fetchAppointmentsByDate(day, selectedBranchId);
+        const day = new Date(viewDate.getFullYear(), viewDate.getMonth(), selectedDay);
+        if (role === "2" || role === "Profesional" || role === "Professional") {
+          const all = await fetchMyAppointments();
+          data = all.filter((a) => {
+            const [y, m, d] = (a.day || "").split("-").map(Number);
+            return y === viewDate.getFullYear() && m === viewDate.getMonth() + 1 && d === selectedDay;
+          });
+        } else if (role === "Recepcionista" || role === "Receptionist") {
+          data = await fetchMyBranchAppointmentsByDate(day);
+        } else {
+          data = await fetchAppointmentsByDate(day, selectedBranchId);
+        }
       }
       setAppointments(Array.isArray(data) ? data : []);
     } catch {
@@ -472,11 +482,12 @@ const Appointments = ({ initialDate }) => {
     } finally {
       setLoading(false);
     }
-  }, [selectedDay, selectedBranchId, role, viewDate]);
+  }, [selectedDay, selectedBranchId, role, viewDate, clientFilter]);
 
   useEffect(() => {
+    if (clientFilter) { loadAppointments(); return; }
     if (role && selectedDay) loadAppointments();
-  }, [loadAppointments, role, selectedDay]);
+  }, [loadAppointments, role, selectedDay, clientFilter]);
 
   const handleAppointmentCreated = () => {
     setShowNewAppointment(false);
@@ -537,37 +548,39 @@ const Appointments = ({ initialDate }) => {
 
       <div className="flex flex-col lg:flex-row gap-5 items-start">
 
-        <div data-tour="appointments-calendar" className="w-full lg:w-[300px] lg:shrink-0 bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-base font-bold text-[var(--text-primary)]">{t("Calendar") || "Calendar"}</h2>
-            <button
-              onClick={() => setShowNewAppointment(true)}
-              data-tour="appointments-new"
-              className="flex items-center gap-1.5 bg-[var(--brand)] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors"
-            >
-              <IconPlus />
-              {t("New Appointment") || "New Appointment"}
-            </button>
-          </div>
-          {role === "Admin" && branches.length > 0 && (
-            <div className="mb-4">
-              <label className="text-xs font-semibold text-[var(--text-secondary)] block mb-1.5">{t("Branch") || "Branch"}</label>
-              <select
-                value={selectedBranchId || ""}
-                onChange={e => setSelectedBranchId(e.target.value || null)}
-                className="w-full text-sm bg-[var(--surface-muted-3)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-[var(--text-primary)] outline-none focus:border-[var(--brand)] transition-colors"
+        {!clientFilter && (
+          <div data-tour="appointments-calendar" className="w-full lg:w-[300px] lg:shrink-0 bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-5">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-bold text-[var(--text-primary)]">{t("Calendar") || "Calendar"}</h2>
+              <button
+                onClick={() => setShowNewAppointment(true)}
+                data-tour="appointments-new"
+                className="flex items-center gap-1.5 bg-[var(--brand)] text-white text-xs font-semibold px-3 py-2 rounded-xl hover:bg-[var(--brand-hover)] transition-colors"
               >
-                <option value="">{t("allBranches") || "All branches"}</option>
-                {branches.map(b => (
-                  <option key={b.id || b.branchId} value={b.id || b.branchId}>
-                    {b.name || b.branchName}
-                  </option>
-                ))}
-              </select>
+                <IconPlus />
+                {t("New Appointment") || "New Appointment"}
+              </button>
             </div>
-          )}
-          <Calendar selected={selectedDay} onSelect={setSelectedDay} appointments={appointments} viewDate={viewDate} onViewDateChange={setViewDate} language={language} />
-        </div>
+            {role === "Admin" && branches.length > 0 && (
+              <div className="mb-4">
+                <label className="text-xs font-semibold text-[var(--text-secondary)] block mb-1.5">{t("Branch") || "Branch"}</label>
+                <select
+                  value={selectedBranchId || ""}
+                  onChange={e => setSelectedBranchId(e.target.value || null)}
+                  className="w-full text-sm bg-[var(--surface-muted-3)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-[var(--text-primary)] outline-none focus:border-[var(--brand)] transition-colors"
+                >
+                  <option value="">{t("allBranches") || "All branches"}</option>
+                  {branches.map(b => (
+                    <option key={b.id || b.branchId} value={b.id || b.branchId}>
+                      {b.name || b.branchName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <Calendar selected={selectedDay} onSelect={setSelectedDay} appointments={appointments} viewDate={viewDate} onViewDateChange={setViewDate} language={language} />
+          </div>
+        )}
 
         <div data-tour="appointments-list" className="flex-1 flex flex-col gap-3">
           {loading ? (
@@ -576,13 +589,36 @@ const Appointments = ({ initialDate }) => {
             </div>
           ) : (
             <>
-              <div className="mb-1">
-                <h2 className="text-lg font-bold text-[var(--text-primary)]">{formatDate(selectedDay)}</h2>
-                <p className="text-sm text-[var(--text-muted)]">{(t("apptsScheduledCount") || "{count} appointments scheduled").replace("{count}", appointments.length)}</p>
-              </div>
+              {clientFilter ? (
+                <div className="flex items-center justify-between gap-3 mb-1 bg-[var(--surface)] border border-[var(--border-subtle)] rounded-2xl px-5 py-4">
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-bold text-[var(--text-primary)] truncate">
+                      {(t("clientAppointmentHistoryTitle") || "Appointments for {name}").replace("{name}", clientFilter.name)}
+                    </h2>
+                    <p className="text-sm text-[var(--text-muted)]">{(t("apptsScheduledCount") || "{count} appointments scheduled").replace("{count}", appointments.length)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setClientFilter(null)}
+                    className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-lg px-3 py-2 hover:bg-[var(--surface-muted)] transition-colors"
+                  >
+                    <IconX />
+                    {t("clearFilter") || "Clear filter"}
+                  </button>
+                </div>
+              ) : (
+                <div className="mb-1">
+                  <h2 className="text-lg font-bold text-[var(--text-primary)]">{formatDate(selectedDay)}</h2>
+                  <p className="text-sm text-[var(--text-muted)]">{(t("apptsScheduledCount") || "{count} appointments scheduled").replace("{count}", appointments.length)}</p>
+                </div>
+              )}
               {appointments.length === 0 ? (
                 <div className="bg-[var(--surface)] rounded-2xl border border-[var(--border-subtle)] p-8 text-center">
-                  <p className="text-sm text-[var(--text-muted)]">{t("No appointments for this day") || "No appointments for this day"}</p>
+                  <p className="text-sm text-[var(--text-muted)]">
+                    {clientFilter
+                      ? (t("No appointments found.") || "No appointments found.")
+                      : (t("No appointments for this day") || "No appointments for this day")}
+                  </p>
                 </div>
               ) : (
                 appointments.map(appt => <AppointmentCard key={appt.id} appt={appt} onStatusChange={handleStatusChange} canChangeStatus />)
