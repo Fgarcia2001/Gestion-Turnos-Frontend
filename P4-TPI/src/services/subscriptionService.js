@@ -28,6 +28,21 @@ export const changeSubscriptionPlan = async (businessId, planId) => {
   return res.json();
 };
 
+// Corta el acceso pago YA (a diferencia de changeSubscriptionPlan a Free, que
+// programa un downgrade recien al vencer). Cierra la suscripcion actual como
+// Cancelled y crea una nueva Active en Free Plan en el mismo paso.
+export const cancelSubscription = async (businessId) => {
+  const res = await fetch(`${BASE_URL}/BusinessSubscription/business/${businessId}/cancel`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.detail || err?.message || "Failed to cancel the subscription. Please try again.");
+  }
+  return res.json();
+};
+
 export const deleteSubscription = async (id) => {
   const res = await fetch(`${BASE_URL}/BusinessSubscription/${id}`, {
     method: "DELETE",

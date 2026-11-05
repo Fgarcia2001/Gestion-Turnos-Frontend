@@ -63,6 +63,10 @@ const Admin = () => {
   // El nonce fuerza el remount aunque ya se esté en Appointments.
   const [appointmentsTarget, setAppointmentsTarget] = useState(null);
 
+  // Cliente cuyo historial se pidió ver desde Managment Business ("Ver todos
+  // sus turnos"). Igual que appointmentsTarget, el nonce fuerza el remount.
+  const [appointmentsClientFilter, setAppointmentsClientFilter] = useState(null);
+
   // Tutorial de bienvenida (Driver.js). Auto-arranca en la primera visita y se
   // puede repetir desde Help. No arranca si el usuario ya viene de MercadoPago
   // o con un plan pendiente (esos flujos abren directo en Settings).
@@ -81,16 +85,29 @@ const Admin = () => {
   const handleSelectSection = (id) => {
     if (allowedSections && !allowedSections.includes(id)) return;
     setAppointmentsTarget(null);
+    setAppointmentsClientFilter(null);
     setSection(id);
   };
 
   const handleNotificationNavigate = (day) => {
     setAppointmentsTarget({ day, nonce: Date.now() });
+    setAppointmentsClientFilter(null);
+    setSection("appointments");
+  };
+
+  // "Ver todos sus turnos" desde el historial del cliente en Managment Business.
+  const handleNavigateToClientHistory = (client) => {
+    setAppointmentsTarget(null);
+    setAppointmentsClientFilter({ id: client.id, name: client.name, nonce: Date.now() });
     setSection("appointments");
   };
 
   const renderAppointments = () => (
-    <Appointments initialDate={appointmentsTarget?.day} key={appointmentsTarget?.nonce} />
+    <Appointments
+      initialDate={appointmentsTarget?.day}
+      initialClientFilter={appointmentsClientFilter}
+      key={appointmentsTarget?.nonce ?? appointmentsClientFilter?.nonce}
+    />
   );
 
   const renderSection = () => {
@@ -101,7 +118,7 @@ const Admin = () => {
       case "home": return (
         <Home onUpgradePlan={() => { setSettingsTab("subscription"); setSection("settings"); }} />
       );
-      case "managmentBusiness": return <ManagmentBusiness />;
+      case "managmentBusiness": return <ManagmentBusiness onViewClientHistory={handleNavigateToClientHistory} />;
       case "appointments": return renderAppointments();
       case "schedule": return <Schedule />;
       case "settings": return <Settings key={settingsTab} initialTab={settingsTab} autoOpenPlanId={pendingPlanId} />;

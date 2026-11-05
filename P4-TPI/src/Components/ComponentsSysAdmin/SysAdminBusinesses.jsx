@@ -2,13 +2,78 @@ import { useState, useEffect } from "react";
 import { fetchSysAdminBusinesses, fetchSysAdminBusinessById } from "../../services/sysAdminService";
 import { fetchBusinessTypes, updateBusinessAsAdmin } from "../../services/businessService";
 import { fetchAllPlans } from "../../services/planService";
-import { changeSubscriptionPlan } from "../../services/subscriptionService";
+import { changeSubscriptionPlan, cancelSubscription } from "../../services/subscriptionService";
 import { setBranchActiveStatus } from "../../services/branchService";
 import BusinessCard from "./BusinessCard";
 import BusinessDetailModal from "./BusinessDetailModal";
 import ChangePlanModal from "./ChangePlanModal";
 import EditBusinessModal from "./EditBusinessModal";
+import { ModalOverlay } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Shared";
+import { IconX, IconWarning } from "../ComponentsAdmin/Sections/ManagmentBusinessComponents/Icons";
 import { useTranslation } from "../../../CustomHooks/TraslateHook";
+
+const CancelSubscriptionModal = ({ businessName, onClose, onConfirm }) => {
+  const { t } = useTranslation();
+  const [cancelling, setCancelling] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleConfirm = async () => {
+    setError("");
+    setCancelling(true);
+    try {
+      await onConfirm();
+      onClose();
+    } catch (err) {
+      setError(err.message || (t("Failed to cancel the subscription. Please try again.") || "Failed to cancel the subscription. Please try again."));
+      setCancelling(false);
+    }
+  };
+
+  return (
+    <ModalOverlay onClose={onClose}>
+      <div className="bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm p-6 relative text-center">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors p-1.5 rounded-lg hover:bg-[var(--surface-muted)]"
+        >
+          <IconX />
+        </button>
+
+        <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4 text-red-500">
+          <IconWarning />
+        </div>
+
+        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-1">{t("Cancel subscription?") || "Cancel subscription?"}</h2>
+        <p className="text-sm text-[var(--text-secondary)] mb-2">{t("cancelSubscriptionWarning") || "This immediately ends the paid subscription of"}</p>
+        <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">"{businessName}"</p>
+        <p className="text-xs text-[var(--text-muted)] mb-6">{t("cancelSubscriptionHint") || "The business moves to the Free Plan right away. This action cannot be undone."}</p>
+
+        {error && (
+          <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600 text-left">
+            {error}
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={cancelling}
+            className="flex-1 py-2.5 rounded-xl border border-[var(--border-subtle)] text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50"
+          >
+            {t("Cancel") || "Cancel"}
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={cancelling}
+            className="flex-1 py-2.5 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50"
+          >
+            {cancelling ? (t("Cancelling...") || "Cancelling...") : (t("Cancel subscription") || "Cancel subscription")}
+          </button>
+        </div>
+      </div>
+    </ModalOverlay>
+  );
+};
 
 const ALL = "All";
 
@@ -44,6 +109,7 @@ const SysAdminBusinesses = () => {
   const [detailError, setDetailError] = useState(false);
   const [detailReloadKey, setDetailReloadKey] = useState(0);
   const [changingPlan, setChangingPlan] = useState(false);
+  const [cancellingSubscription, setCancellingSubscription] = useState(false);
   const [editingBusiness, setEditingBusiness] = useState(false);
   const [togglingBranchId, setTogglingBranchId] = useState(null);
 
@@ -129,6 +195,7 @@ const SysAdminBusinesses = () => {
     setDetailError(false);
     setDetailLoading(false);
     setChangingPlan(false);
+    setCancellingSubscription(false);
     setEditingBusiness(false);
   };
 
@@ -138,6 +205,12 @@ const SysAdminBusinesses = () => {
     await changeSubscriptionPlan(selectedId, planId);
     retryDetail();
     showToast(t("Plan changed") || "Plan changed");
+  };
+
+  const handleCancelSubscription = async () => {
+    await cancelSubscription(selectedId);
+    retryDetail();
+    showToast(t("Subscription cancelled") || "Subscription cancelled");
   };
 
   const handleEditBusiness = async (payload) => {
@@ -274,6 +347,7 @@ const SysAdminBusinesses = () => {
           onClose={closeModal}
           onRetry={retryDetail}
           onChangePlan={!detailLoading && !detailError && detail ? () => setChangingPlan(true) : null}
+          onCancelSubscription={!detailLoading && !detailError && detail ? () => setCancellingSubscription(true) : null}
           onEdit={!detailLoading && !detailError && detail ? () => setEditingBusiness(true) : null}
           onToggleBranch={handleToggleBranch}
           togglingBranchId={togglingBranchId}
@@ -287,6 +361,14 @@ const SysAdminBusinesses = () => {
           plans={plans}
           onClose={() => setChangingPlan(false)}
           onConfirm={handleChangePlan}
+        />
+      )}
+
+      {cancellingSubscription && detail && (
+        <CancelSubscriptionModal
+          businessName={detail.name}
+          onClose={() => setCancellingSubscription(false)}
+          onConfirm={handleCancelSubscription}
         />
       )}
 

@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { IconDots, IconEdit, IconClock, IconTrash, IconEye, IconEyeOff } from './Icons';
+import { IconDots, IconEdit, IconClock, IconTrash, IconEye, IconEyeOff, IconHistory } from './Icons';
 import { Avatar, Badge } from './Shared';
 
 // ── Dropdown context menu ─────────────────────────────────────────────────────
-export const RowMenu = ({ tab, row, t, onEdit, onDelete, onSchedules, onToggleActive }) => {
+export const RowMenu = ({ tab, row, t, onEdit, onDelete, onSchedules, onToggleActive, onViewHistory }) => {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef(null);
@@ -61,6 +61,20 @@ export const RowMenu = ({ tab, row, t, onEdit, onDelete, onSchedules, onToggleAc
             {t("Edit") || "Edit"}
           </button>
 
+          {/* Historial de turnos — client only */}
+          {tab === "client" && (
+            <>
+              <div className="h-px bg-[var(--surface-muted)]" />
+              <button
+                onClick={() => { setOpen(false); onViewHistory(row); }}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors font-medium"
+              >
+                <IconHistory />
+                {t("View history") || "View history"}
+              </button>
+            </>
+          )}
+
           {/* Schedules + visibility toggle — branch only */}
           {tab === "branch" && (
             <>
@@ -99,7 +113,7 @@ export const RowMenu = ({ tab, row, t, onEdit, onDelete, onSchedules, onToggleAc
 };
 
 // ── Table row ─────────────────────────────────────────────────────────────────
-export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleActive }) => {
+export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleActive, onViewHistory }) => {
   const tdClass = "py-3 pr-6 text-sm text-[var(--text-secondary)]";
   
   if (tab === "staff") {
@@ -139,7 +153,7 @@ export const TableRow = ({ row, tab, t, onEdit, onDelete, onSchedules, onToggleA
         <td className={tdClass}>{row.phone}</td>
         <td className={tdClass}>{row.birthday ? new Date(row.birthday).toLocaleDateString() : ""}</td>
         <td className="py-3 text-right">
-          <RowMenu tab={tab} t={t} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} />
+          <RowMenu tab={tab} row={row} t={t} onEdit={onEdit} onDelete={onDelete} onSchedules={onSchedules} onViewHistory={onViewHistory} />
         </td>
       </tr>
     );
